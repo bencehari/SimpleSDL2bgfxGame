@@ -1,0 +1,7 @@
+.build
+
+bin/*
+!bin/contents.md
+
+docs/*
+!docs/contents.md
