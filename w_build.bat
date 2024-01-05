@@ -39,6 +39,7 @@ IF NOT EXIST ".build\SDL2.dll" COPY "bin\SDL2.dll" ".build\SDL2.dll"
 %compiler%^
  -std=%std_opt%^
  src/main.c^
+ src/init.c^
  -I%sdl_path%include^
  -I%bgfx_path%bgfx\include^
  -I%bgfx_path%bimg\include^
