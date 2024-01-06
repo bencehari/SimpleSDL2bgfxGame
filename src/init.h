@@ -5,7 +5,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-bool initialize(uint32_t flags, int width, int height);
-void deinitialize(void);
+extern bool initialize(uint32_t flags, int width, int height);
+extern void deinitialize(void);
 
 #endif // INIT_H

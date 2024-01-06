@@ -1,9 +1,6 @@
 #include "init.h"
 
 #include <stdio.h>
-#include <stdlib.h>
-#include <stdint.h>
-#include <stdbool.h>
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_syswm.h>
@@ -12,7 +9,7 @@
 
 #include "consc.h"
 
-SDL_Window* window;
+static SDL_Window* window;
 
 bool initialize(uint32_t flags, int width, int height) {
 	printf("SDL_Init... ");
@@ -65,6 +62,10 @@ bool initialize(uint32_t flags, int width, int height) {
 	init.platformData.ndt = wmi.info.vivante.display;
 	init.platformData.nwh = wmi.info.vivante.window;
 #endif // BX_PLATFORM_
+
+	// for switching to single threaded mode
+	// https://bkaradzic.github.io/bgfx/internals.html#api-and-render-thread
+	bgfx_render_frame(-1);
 	
 	printf("bgfx_init... ");
 	if (!bgfx_init(&init)) return false;

@@ -1,12 +1,18 @@
 :: echo off
+setlocal enabledelayedexpansion
+
+:: 0 disables debug mode
+:: any other value sets flags and runs the app with GDB (you need to start the app
+:: with `run` in gdb context)
+SET debug_mode=0
+:: if you don't need extra warnings, just add REM or :: at the start of the line
+SET extra=-Wextra
 
 :: choosing compiler
 :: for example (in this case, add `-lstdc++` doesn't needed):
 :: compiler=g++ and std_opt=c++17
 SET compiler=gcc
 SET std_opt=c99
-:: if you don't need extra warnings, just add REM or :: at the start of the line
-SET extra=-Wextra
 :: change the paths to your SDL2 and bgfx
 SET sdl_path=C:\dev\C\SDL2\SDL2-devel-2.28.5-mingw\x86_64-w64-mingw32\
 SET bgfx_path=C:\GitHub\bgfx\
@@ -16,17 +22,16 @@ SET bgfx_path=C:\GitHub\bgfx\
 :: or rename the lib files and remove this line
 SET mode=Debug
 
-:: 0 disables debug mode
-:: any other value sets flags and runs the app with GDB (you need to start the app
-:: with `run` in gdb context)
-SET debug_mode=0
-
 IF %debug_mode%==0 (
 	SET run_cmd=.build\output.exe
 ) ELSE (
 	SET dbg_flags=-g
 	SET run_cmd=gdb .build\output.exe
 )
+
+:: add *.c files from src folder
+SET source_files=
+FOR /f "usebackq delims=" %%a IN (`DIR /s /b ".\src\*.c"`) DO SET source_files=!source_files! %%a
 
 CLS
 
@@ -38,8 +43,7 @@ IF NOT EXIST ".build\SDL2.dll" COPY "bin\SDL2.dll" ".build\SDL2.dll"
 :: TODO: find a 64bit solution
 %compiler%^
  -std=%std_opt%^
- src/main.c^
- src/init.c^
+ %source_files%^
  -I%sdl_path%include^
  -I%bgfx_path%bgfx\include^
  -I%bgfx_path%bimg\include^

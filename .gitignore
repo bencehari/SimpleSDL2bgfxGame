@@ -1,5 +1,8 @@
 .build
 
+assets/shaders/*
+!assets/shaders/contents.md
+
 bin/*
 !bin/contents.md
 
