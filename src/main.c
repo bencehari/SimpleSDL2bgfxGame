@@ -16,6 +16,15 @@
 #define HEIGHT_F 480.0
 #define FPS 60
 
+void handle_input(void);
+
+void on_key_down(SDL_Keycode _keyCode);
+void on_key_up(SDL_Keycode _keyCode);
+
+void on_mouse_button_down(SDL_MouseButtonEvent* _buttonEvent);
+void on_mouse_button_up(SDL_MouseButtonEvent* _buttonEvent);
+void on_mouse_motion(SDL_MouseMotionEvent* _motionEvent);
+
 struct PosColorVertex {
 	float x;
 	float y;
@@ -48,6 +57,14 @@ static const uint16_t indices[] = {
 	2, 3, 6, // 10
 	6, 3, 7,
 };
+
+const float moveSpeed = 0.1f;
+struct Vec3 playerPos = { 0.0f, 0.0f, -5.0f };
+
+bool wDown;
+bool aDown;
+bool sDown;
+bool dDown;
 
 int main(int argc, char* argv[]) {
 	Uint32 initFlags =
@@ -86,7 +103,7 @@ int main(int argc, char* argv[]) {
 	int milliPeriod = (int)(1.0 / (double)FPS * 1000);
 	Uint32 lastTick;
 	Uint32 currentTick;
-	
+
 	bool running = true;
 	SDL_Event event;	
 	while (running) {
@@ -95,6 +112,11 @@ int main(int argc, char* argv[]) {
 		while (SDL_PollEvent(&event)) {
 			switch (event.type) {
 				case SDL_QUIT: running = false; break;
+				case SDL_KEYDOWN: on_key_down(event.key.keysym.sym); break;
+				case SDL_KEYUP: on_key_up(event.key.keysym.sym); break;
+				case SDL_MOUSEBUTTONDOWN: on_mouse_button_down((SDL_MouseButtonEvent*)&event); break;
+				case SDL_MOUSEBUTTONUP: on_mouse_button_up((SDL_MouseButtonEvent*)&event); break;
+				case SDL_MOUSEMOTION: on_mouse_motion((SDL_MouseMotionEvent*)&event); break;
 				case SDL_WINDOWEVENT: {
 					const SDL_WindowEvent wev = event.window;
 					switch (wev.event) {
@@ -106,12 +128,13 @@ int main(int argc, char* argv[]) {
 			}
 		}
 		
-		const struct Vec3 at = vec3Zero;
-		const struct Vec3 eye = { 0.0f, 0.0f, -5.0f };
+		handle_input();
 		
+		const struct Vec3 at = vec3_add_vec3(playerPos, vec3GlobalForward);
+	
 		{
 			float view[16];
-			mtx_look_at(view, &eye, &at);
+			mtx_look_at(view, &playerPos, &at);
 			
 			float proj[16];
 			mtx_proj(proj, 60.0f, WIDTH_F / HEIGHT_F, 0.1f, 100.0f, bgfx_get_caps()->homogeneousDepth);
@@ -141,4 +164,44 @@ int main(int argc, char* argv[]) {
 	deinitialize();
 	
 	return 0;
+}
+
+void handle_input(void) {
+	if (!SDL_GetRelativeMouseMode()) return;
+	
+	if (wDown) playerPos.z += moveSpeed;
+	if (sDown) playerPos.z -= moveSpeed;
+	if (aDown) playerPos.x -= moveSpeed;
+	if (dDown) playerPos.x += moveSpeed;
+}
+
+void on_key_down(SDL_Keycode _keyCode) {
+	switch (_keyCode) {
+		case SDLK_w: wDown = true; break;
+		case SDLK_a: aDown = true; break;
+		case SDLK_s: sDown = true; break;
+		case SDLK_d: dDown = true; break;
+	}
+}
+
+void on_key_up(SDL_Keycode _keyCode) {
+	switch (_keyCode) {
+		case SDLK_ESCAPE: SDL_SetRelativeMouseMode(SDL_FALSE); break;
+		case SDLK_w: wDown = false; break;
+		case SDLK_a: aDown = false; break;
+		case SDLK_s: sDown = false; break;
+		case SDLK_d: dDown = false; break;
+	}
+}
+
+void on_mouse_button_down(SDL_MouseButtonEvent* _buttonEvent) {
+	if (_buttonEvent->button == SDL_BUTTON_LEFT) SDL_SetRelativeMouseMode(SDL_TRUE);
+}
+
+void on_mouse_button_up(SDL_MouseButtonEvent* _buttonEvent) {
+	
+}
+
+void on_mouse_motion(SDL_MouseMotionEvent* _motionEvent) {
+	
 }
