@@ -61,6 +61,9 @@ static const uint16_t indices[] = {
 const float moveSpeed = 0.1f;
 struct Vec3 playerPos = { 0.0f, 0.0f, -5.0f };
 
+const float rotationSpeed = 0.1f;
+struct Vec2 lookInput = { 0.0f, 0.0f };
+
 bool wDown;
 bool aDown;
 bool sDown;
@@ -108,6 +111,7 @@ int main(int argc, char* argv[]) {
 	SDL_Event event;	
 	while (running) {
 		lastTick = SDL_GetTicks();
+		bgfx_dbg_text_clear(0, false);
 		
 		while (SDL_PollEvent(&event)) {
 			switch (event.type) {
@@ -130,11 +134,14 @@ int main(int argc, char* argv[]) {
 		
 		handle_input();
 		
-		const struct Vec3 at = vec3_add_vec3(playerPos, vec3GlobalForward);
+		const struct Vec3 at = v3_add_v3(playerPos, vec3GlobalForward);
+	
+		bgfx_dbg_text_printf(0, 1, 0x0f, "%f %f", lookInput.x, lookInput.y);
 	
 		{
 			float view[16];
 			mtx_look_at(view, &playerPos, &at);
+			// TODO: rotate view
 			
 			float proj[16];
 			mtx_proj(proj, 60.0f, WIDTH_F / HEIGHT_F, 0.1f, 100.0f, bgfx_get_caps()->homogeneousDepth);
@@ -169,17 +176,26 @@ int main(int argc, char* argv[]) {
 void handle_input(void) {
 	if (!SDL_GetRelativeMouseMode()) return;
 	
-	if (wDown) playerPos.z += moveSpeed;
-	if (sDown) playerPos.z -= moveSpeed;
-	if (aDown) playerPos.x -= moveSpeed;
-	if (dDown) playerPos.x += moveSpeed;
+	struct Vec3 move = vec3Zero;
+	if (wDown) move.z += 1.0f;
+	if (sDown) move.z -= 1.0f;
+	if (aDown) move.x -= 1.0f;
+	if (dDown) move.x += 1.0f;
+	
+	if (v3_equals(move, vec3Zero)) return;
+	
+	playerPos = v3_add_v3(playerPos, v3_mul_f(norm(move), moveSpeed));
 }
 
 void on_key_down(SDL_Keycode _keyCode) {
 	switch (_keyCode) {
+		case SDLK_UP:
 		case SDLK_w: wDown = true; break;
-		case SDLK_a: aDown = true; break;
+		case SDLK_DOWN:
 		case SDLK_s: sDown = true; break;
+		case SDLK_LEFT:
+		case SDLK_a: aDown = true; break;
+		case SDLK_RIGHT:
 		case SDLK_d: dDown = true; break;
 	}
 }
@@ -187,9 +203,13 @@ void on_key_down(SDL_Keycode _keyCode) {
 void on_key_up(SDL_Keycode _keyCode) {
 	switch (_keyCode) {
 		case SDLK_ESCAPE: SDL_SetRelativeMouseMode(SDL_FALSE); break;
+		case SDLK_UP:
 		case SDLK_w: wDown = false; break;
-		case SDLK_a: aDown = false; break;
+		case SDLK_DOWN:
 		case SDLK_s: sDown = false; break;
+		case SDLK_LEFT:
+		case SDLK_a: aDown = false; break;
+		case SDLK_RIGHT:
 		case SDLK_d: dDown = false; break;
 	}
 }
@@ -203,5 +223,9 @@ void on_mouse_button_up(SDL_MouseButtonEvent* _buttonEvent) {
 }
 
 void on_mouse_motion(SDL_MouseMotionEvent* _motionEvent) {
+	if (!SDL_GetRelativeMouseMode()) return;
 	
+	// TODO: probably wrong.
+	lookInput.x += _motionEvent->yrel * rotationSpeed;
+	lookInput.y += -_motionEvent->xrel * rotationSpeed;
 }

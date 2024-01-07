@@ -19,52 +19,99 @@ const struct Vec3 vec3GlobalRight = { 1.0f, 0.0f, 0.0f };
 const struct Vec3 vec3GlobalForward = { 0.0f, 0.0f, 1.0f };
 const struct Vec3 vec3GlobalBack = { 0.0f, 0.0f, -1.0f };
 
-inline struct Vec3 vec3_ctor(float _x, float _y, float _z) {
+inline struct Vec3 v3_ctor(float _x, float _y, float _z) {
 	struct Vec3 ret = { _x, _y, _z };
 	return ret;
 }
 
-void vec3_print(struct Vec3* _v) {
-	printf("{ %f; %f; %f }", _v->x, _v->y, _v->z);
+inline bool v3_equals(const struct Vec3 _a, const struct Vec3 _b) {
+	return
+		_a.x == _b.x &&
+		_a.y == _b.y &&
+		_a.z == _b.z;
 }
 
-inline struct Vec3 vec3_add_vec3(const struct Vec3 _a, const struct Vec3 _b) {
+void v3_print(struct Vec3* _v) {
+	printf("{ %f; %f; %f }\n", _v->x, _v->y, _v->z);
+}
+
+inline struct Vec3 v3_add_v3(const struct Vec3 _a, const struct Vec3 _b) {
 	struct Vec3 ret = { _a.x + _b.x, _a.y + _b.y, _a.z + _b.z };
 	return ret;
 }
 
-inline struct Vec3 vec3_add_float(const struct Vec3 _a, const float _b) {
+inline struct Vec3 v3_add_f(const struct Vec3 _a, const float _b) {
 	struct Vec3 ret = { _a.x + _b, _a.y + _b, _a.z + _b };
 	return ret;
 }
 
-inline struct Vec3 vec3_sub_vec3(const struct Vec3 _a, const struct Vec3 _b) {
+inline struct Vec3 v3_sub_v3(const struct Vec3 _a, const struct Vec3 _b) {
 	struct Vec3 ret = { _a.x - _b.x, _a.y - _b.y, _a.z - _b.z };
 	return ret;
 }
 
-inline struct Vec3 vec3_sub_float(const struct Vec3 _a, const float _b) {
+inline struct Vec3 v3_sub_f(const struct Vec3 _a, const float _b) {
 	struct Vec3 ret = { _a.x - _b, _a.y - _b, _a.z - _b };
 	return ret;
 }
 
-inline struct Vec3 vec3_mul_vec3(const struct Vec3 _a, const struct Vec3 _b) {
+inline struct Vec3 v3_mul_v3(const struct Vec3 _a, const struct Vec3 _b) {
 	struct Vec3 ret = { _a.x * _b.x, _a.y * _b.y, _a.z * _b.z };
 	return ret;
 }
 
-inline struct Vec3 vec3_mul_float(const struct Vec3 _a, const float _b) {
+inline struct Vec3 v3_mul_f(const struct Vec3 _a, const float _b) {
 	struct Vec3 ret = { _a.x * _b, _a.y * _b, _a.z * _b };
 	return ret;
 }
 
-inline struct Vec3 vec3_div_vec3(const struct Vec3 _a, const struct Vec3 _b) {
+inline struct Vec3 v3_div_v3(const struct Vec3 _a, const struct Vec3 _b) {
 	struct Vec3 ret = { _a.x / _b.x, _a.y / _b.y, _a.z / _b.z };
 	return ret;
 }
 
-inline struct Vec3 vec3_div_float(const struct Vec3 _a, const float _b) {
+inline struct Vec3 v3_div_f(const struct Vec3 _a, const float _b) {
 	struct Vec3 ret = { _a.x / _b, _a.y / _b, _a.z / _b };
+	return ret;
+}
+
+inline struct Vec2 v2_add_v2(const struct Vec2 _a, const struct Vec2 _b) {
+	struct Vec2 ret = { _a.x + _b.x, _a.y + _b.y };
+	return ret;
+}
+
+inline struct Vec2 v2_add_f(const struct Vec2 _a, const float _b) {
+	struct Vec2 ret = { _a.x + _b, _a.y + _b };
+	return ret;
+}
+
+inline struct Vec2 v2_sub_v2(const struct Vec2 _a, const struct Vec2 _b) {
+	struct Vec2 ret = { _a.x - _b.x, _a.y - _b.y };
+	return ret;
+}
+
+inline struct Vec2 v2_sub_f(const struct Vec2 _a, const float _b) {
+	struct Vec2 ret = { _a.x - _b, _a.y - _b };
+	return ret;
+}
+
+inline struct Vec2 v2_mul_v2(const struct Vec2 _a, const struct Vec2 _b) {
+	struct Vec2 ret = { _a.x * _b.x, _a.y * _b.y };
+	return ret;
+}
+
+inline struct Vec2 v2_mul_f(const struct Vec2 _a, const float _b) {
+	struct Vec2 ret = { _a.x * _b, _a.y * _b };
+	return ret;
+}
+
+inline struct Vec2 v2_div_v2(const struct Vec2 _a, const struct Vec2 _b) {
+	struct Vec2 ret = { _a.x / _b.x, _a.y / _b.y };
+	return ret;
+}
+
+inline struct Vec2 v2_div_f(const struct Vec2 _a, const float _b) {
+	struct Vec2 ret = { _a.x / _b, _a.y / _b };
 	return ret;
 }
 
@@ -81,6 +128,10 @@ inline struct Vec3 cross(const struct Vec3 _a, const struct Vec3 _b) {
 	return ret;
 }
 
+inline float dot_v2(const struct Vec2 _a, const struct Vec2 _b) {
+	return _a.x * _b.x + _a.y * _b.y;
+}
+
 // magnitude
 inline float mag(const struct Vec3 _a) {
 	return (float)sqrt(dot(_a, _a));
@@ -89,7 +140,17 @@ inline float mag(const struct Vec3 _a) {
 // normalized
 inline struct Vec3 norm(const struct Vec3 _a) {
 	const float invLen = 1.0f / mag(_a);
-	const struct Vec3 res = vec3_mul_float(_a, invLen);
+	const struct Vec3 res = v3_mul_f(_a, invLen);
+	return res;
+}
+
+inline float mag_v2(const struct Vec2 _a) {
+	return (float)sqrt(dot_v2(_a, _a));
+}
+
+inline struct Vec2 norm_v2(const struct Vec2 _a) {
+	const float invLen = 1.0f / mag_v2(_a);
+	const struct Vec2 res = v2_mul_f(_a, invLen);
 	return res;
 }
 
@@ -98,7 +159,7 @@ void mtx_look_at(float* _result, const struct Vec3* _eye, const struct Vec3* _at
 }
 
 void mtx_look_at_with_up(float* _result, const struct Vec3* _eye, const struct Vec3* _at, const struct Vec3* _up) {
-	const struct Vec3 view = norm(vec3_sub_vec3(*_at, *_eye));
+	const struct Vec3 view = norm(v3_sub_v3(*_at, *_eye));
 	
 	struct Vec3 right = {0};
 	struct Vec3 up = {0};
@@ -143,6 +204,48 @@ void mtx_rotate_xy(float* _result, float _ax, float _ay) {
 	_result[6] = -sx * cy;
 	_result[8] = -cx * sy;
 	_result[9] = sx;
+	_result[10] = cx * cy;
+	_result[15] = 1.0f;
+}
+
+void mtx_rotate_xyz(float* _result, float _ax, float _ay, float _az) {
+	const float sx = sin(_ax);
+	const float cx = cos(_ax);
+	const float sy = sin(_ay);
+	const float cy = cos(_ay);
+	const float sz = sin(_az);
+	const float cz = cos(_az);
+	
+	mem_set_ref(_result, 0, sizeof(float) * 16);
+	_result[0] = cy * cz;
+	_result[1] = -cy * sz;
+	_result[2] = sy;
+	_result[4] = cz * sx * sy + cx * sz;
+	_result[5] = cx * cz - sx * sy * sz;
+	_result[6] = -cy * sx;
+	_result[8] = -cx * cz * sy + sx * sz;
+	_result[9] = cz * sx + cx * sy * sz;
+	_result[10] = cx * cy;
+	_result[15] = 1.0f;
+}
+
+void mtx_rotate_zyx(float* _result, float _ax, float _ay, float _az) {
+	const float sx = sin(_ax);
+	const float cx = cos(_ax);
+	const float sy = sin(_ay);
+	const float cy = cos(_ay);
+	const float sz = sin(_az);
+	const float cz = cos(_az);
+
+	mem_set_ref(_result, 0, sizeof(float) * 16);
+	_result[0] = cy * cz;
+	_result[1] = cz * sx * sy - cx * sz;
+	_result[2] = cx * cz * sy + sx * sz;
+	_result[4] = cy * sz;
+	_result[5] = cx * cz + sx * sy * sz;
+	_result[6] = -cz * sx + cx * sy * sz;
+	_result[8] = -sy;
+	_result[9] = cy * sx;
 	_result[10] = cx * cy;
 	_result[15] = 1.0f;
 }
