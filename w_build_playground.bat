@@ -1,3 +1,4 @@
+:: @echo off
 CLS
 gcc^
  -std=c99^

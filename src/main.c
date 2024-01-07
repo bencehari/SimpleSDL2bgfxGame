@@ -80,7 +80,7 @@ int main(int argc, char* argv[]) {
 	bgfx_shader_handle_t fragmentShaderHnd = load_shader("fs_cubes.bin");
 	bgfx_program_handle_t program = bgfx_create_program(vertexShaderHnd, fragmentShaderHnd, true);
 	
-	unsigned int counter = 0;
+	size_t counter = 0;
 	
 	// FPS
 	int milliPeriod = (int)(1.0 / (double)FPS * 1000);
@@ -109,14 +109,19 @@ int main(int argc, char* argv[]) {
 		const struct Vec3 at = vec3Zero;
 		const struct Vec3 eye = { 0.0f, 0.0f, -5.0f };
 		
-		float view[16];
-		mtx_look_at(view, &eye, &at);
-		
-		float proj[16];
-		mtx_proj(proj, 60.0f, WIDTH_F / HEIGHT_F, 0.1f, 100.0f, bgfx_get_caps()->homogeneousDepth);
-		
-		bgfx_set_view_transform(0, view, proj);
-		
+		{
+			float view[16];
+			mtx_look_at(view, &eye, &at);
+			
+			float proj[16];
+			mtx_proj(proj, 60.0f, WIDTH_F / HEIGHT_F, 0.1f, 100.0f, bgfx_get_caps()->homogeneousDepth);
+			
+			bgfx_set_view_transform(0, view, proj);
+			bgfx_set_view_rect(0, 0, 0, WIDTH, HEIGHT);
+		}
+
+		bgfx_touch(0);
+
 		float mtx[16];
 		mtx_rotate_xy(mtx, counter * 0.01f, counter * 0.01f);
 		counter++;
@@ -126,7 +131,6 @@ int main(int argc, char* argv[]) {
 		bgfx_set_index_buffer(ibh, 0, sizeof(indices) / sizeof(uint16_t));
 		
 		bgfx_submit(0, program, 0, BGFX_DISCARD_ALL);
-		bgfx_touch(0);
 		bgfx_frame(false);
 		
 		currentTick = SDL_GetTicks();

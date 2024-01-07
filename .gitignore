@@ -8,3 +8,4 @@ bin/*
 
 docs/*
 !docs/contents.md
+!docs/useful_links.md

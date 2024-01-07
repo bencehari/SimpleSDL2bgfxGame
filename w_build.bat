@@ -1,4 +1,4 @@
-:: echo off
+@echo off
 setlocal enabledelayedexpansion
 
 :: 0 disables debug mode
@@ -25,7 +25,7 @@ SET mode=Debug
 IF %debug_mode%==0 (
 	SET run_cmd=.build\output.exe
 ) ELSE (
-	SET dbg_flags=-g
+	SET dbg_flags=-g -ggdb
 	SET run_cmd=gdb .build\output.exe
 )
 
@@ -37,6 +37,8 @@ CLS
 
 IF NOT EXIST .build MKDIR .build
 IF NOT EXIST ".build\SDL2.dll" COPY "bin\SDL2.dll" ".build\SDL2.dll"
+
+@echo on
 
 :: -lgdi32: https://learn.microsoft.com/en-us/windows/win32/gdi/windows-gdi
 :: doesn't seem right for me because of 32bit stuff, but bgfx requires it.

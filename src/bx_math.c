@@ -3,6 +3,7 @@
 #define _USE_MATH_DEFINES
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <math.h>
 #include <stdint.h>
 
@@ -18,11 +19,8 @@ const struct Vec3 vec3GlobalRight = { 1.0f, 0.0f, 0.0f };
 const struct Vec3 vec3GlobalForward = { 0.0f, 0.0f, 1.0f };
 const struct Vec3 vec3GlobalBack = { 0.0f, 0.0f, -1.0f };
 
-struct Vec3 vec3_ctor(float _x, float _y, float _z) {
-	struct Vec3 ret;
-	ret.x = _x;
-	ret.y = _y;
-	ret.z = _z;
+inline struct Vec3 vec3_ctor(float _x, float _y, float _z) {
+	struct Vec3 ret = { _x, _y, _z };
 	return ret;
 }
 
@@ -31,35 +29,43 @@ void vec3_print(struct Vec3* _v) {
 }
 
 inline struct Vec3 vec3_add_vec3(const struct Vec3 _a, const struct Vec3 _b) {
-	return vec3_ctor(_a.x + _b.x, _a.y + _b.y, _a.z + _b.z);
+	struct Vec3 ret = { _a.x + _b.x, _a.y + _b.y, _a.z + _b.z };
+	return ret;
 }
 
 inline struct Vec3 vec3_add_float(const struct Vec3 _a, const float _b) {
-	return vec3_ctor(_a.x + _b, _a.y + _b, _a.z + _b);
+	struct Vec3 ret = { _a.x + _b, _a.y + _b, _a.z + _b };
+	return ret;
 }
 
 inline struct Vec3 vec3_sub_vec3(const struct Vec3 _a, const struct Vec3 _b) {
-	return vec3_ctor(_a.x - _b.x, _a.y - _b.y, _a.z - _b.z);
+	struct Vec3 ret = { _a.x - _b.x, _a.y - _b.y, _a.z - _b.z };
+	return ret;
 }
 
 inline struct Vec3 vec3_sub_float(const struct Vec3 _a, const float _b) {
-	return vec3_ctor(_a.x - _b, _a.y - _b, _a.z - _b);
+	struct Vec3 ret = { _a.x - _b, _a.y - _b, _a.z - _b };
+	return ret;
 }
 
 inline struct Vec3 vec3_mul_vec3(const struct Vec3 _a, const struct Vec3 _b) {
-	return vec3_ctor(_a.x * _b.x, _a.y * _b.y, _a.z * _b.z);
+	struct Vec3 ret = { _a.x * _b.x, _a.y * _b.y, _a.z * _b.z };
+	return ret;
 }
 
 inline struct Vec3 vec3_mul_float(const struct Vec3 _a, const float _b) {
-	return vec3_ctor(_a.x * _b, _a.y * _b, _a.z * _b);
+	struct Vec3 ret = { _a.x * _b, _a.y * _b, _a.z * _b };
+	return ret;
 }
 
 inline struct Vec3 vec3_div_vec3(const struct Vec3 _a, const struct Vec3 _b) {
-	return vec3_ctor(_a.x / _b.x, _a.y / _b.y, _a.z / _b.z);
+	struct Vec3 ret = { _a.x / _b.x, _a.y / _b.y, _a.z / _b.z };
+	return ret;
 }
 
 inline struct Vec3 vec3_div_float(const struct Vec3 _a, const float _b) {
-	return vec3_ctor(_a.x / _b, _a.y / _b, _a.z / _b);
+	struct Vec3 ret = { _a.x / _b, _a.y / _b, _a.z / _b };
+	return ret;
 }
 
 inline float dot(const struct Vec3 _a, const struct Vec3 _b) {
@@ -67,11 +73,12 @@ inline float dot(const struct Vec3 _a, const struct Vec3 _b) {
 }
 
 inline struct Vec3 cross(const struct Vec3 _a, const struct Vec3 _b) {
-	return vec3_ctor(
+	struct Vec3 ret = {
 		_a.y * _b.z - _a.z * _b.y,
 		_a.z * _b.x - _a.x * _b.z,
 		_a.x * _b.y - _a.y * _b.x
-	);
+	};
+	return ret;
 }
 
 // magnitude

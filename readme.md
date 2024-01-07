@@ -21,14 +21,13 @@ Main bullet points of the experiment:
 - [Releases · libsdl-org/SDL (github.com)](https://github.com/libsdl-org/SDL/releases) (SDL2-devel-x.y.z-mingw.zip)
 - unzip "x86_64-w64-mingw32" folder
 - copy SDL2.dll into projects bin folder from "x86_64-w64-mingw32\bin"
+- set "sdl_path" in w_build.bat
 
 ## bgfx
 
 - [Releases · skeeto/w64devkit (github.com)](https://github.com/skeeto/w64devkit/releases)
 - unzip
 - set path to "path-to-w64devkit\bin" (to be able to use `make` in the console easily)
-
-
 
 ```bash
 git clone https://github.com/bkaradzic/bx.git
@@ -40,6 +39,8 @@ cd bgfx
 ..\bx\tools\bin\windows\genie.exe --gcc=mingw-gcc gmake
 make mingw-gcc-debug64
 ```
+
+- set "bgfx_path" in w_build.bat
 
 # Usage
 
