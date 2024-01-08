@@ -9,6 +9,7 @@
 #include "init.h"
 #include "loaders.h"
 #include "bx_math.h"
+#include "vec_macros.h"
 
 #define WIDTH 640
 #define HEIGHT 480
@@ -134,7 +135,7 @@ int main(int argc, char* argv[]) {
 		
 		handle_input();
 		
-		const struct Vec3 at = v3_add_v3(playerPos, vec3GlobalForward);
+		const struct Vec3 at = ADD_V3_V3(playerPos, vec3GlobalForward);
 	
 		bgfx_dbg_text_printf(0, 1, 0x0f, "%f %f", lookInput.x, lookInput.y);
 	
@@ -182,9 +183,9 @@ void handle_input(void) {
 	if (aDown) move.x -= 1.0f;
 	if (dDown) move.x += 1.0f;
 	
-	if (v3_equals(move, vec3Zero)) return;
+	if (EQ_V3(move, vec3Zero)) return;
 	
-	playerPos = v3_add_v3(playerPos, v3_mul_f(norm(move), moveSpeed));
+	playerPos = ADD_V3_V3(playerPos, MUL_V3_F(norm(move), moveSpeed));
 }
 
 void on_key_down(SDL_Keycode _keyCode) {

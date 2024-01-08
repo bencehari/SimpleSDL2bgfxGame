@@ -24,39 +24,12 @@ extern const struct Vec3 vec3GlobalForward;
 extern const struct Vec3 vec3GlobalBack;
 
 // Vector3
-extern struct Vec3 v3_ctor(float _x, float _y, float _z);
-extern bool v3_equals(const struct Vec3 _a, const struct Vec3 _b);
 extern void v3_print(struct Vec3* _v);
-
-// Vector3
-extern struct Vec3 v3_add_v3(const struct Vec3 _a, const struct Vec3 _b);
-extern struct Vec3 v3_add_f(const struct Vec3 _a, const float _b);
-extern struct Vec3 v3_sub_v3(const struct Vec3 _a, const struct Vec3 _b);
-extern struct Vec3 v3_sub_f(const struct Vec3 _a, const float _b);
-extern struct Vec3 v3_mul_v3(const struct Vec3 _a, const struct Vec3 _b);
-extern struct Vec3 v3_mul_f(const struct Vec3 _a, const float _b);
-extern struct Vec3 v3_div_v3(const struct Vec3 _a, const struct Vec3 _b);
-extern struct Vec3 v3_div_f(const struct Vec3 _a, const float _b);
-// Vector2
-extern struct Vec2 v2_add_v2(const struct Vec2 _a, const struct Vec2 _b);
-extern struct Vec2 v2_add_f(const struct Vec2 _a, const float _b);
-extern struct Vec2 v2_sub_v2(const struct Vec2 _a, const struct Vec2 _b);
-extern struct Vec2 v2_sub_f(const struct Vec2 _a, const float _b);
-extern struct Vec2 v2_mul_v2(const struct Vec2 _a, const struct Vec2 _b);
-extern struct Vec2 v2_mul_f(const struct Vec2 _a, const float _b);
-extern struct Vec2 v2_div_v2(const struct Vec2 _a, const struct Vec2 _b);
-extern struct Vec2 v2_div_f(const struct Vec2 _a, const float _b);
-
-// Vector3
-extern float dot(const struct Vec3 _a, const struct Vec3 _b);
-extern struct Vec3 cross(const struct Vec3 _a, const struct Vec3 _b);
-// Vector2
-extern float dot_v2(const struct Vec2 _a, const struct Vec2 _b);
-extern struct Vec3 cross_v2(const struct Vec2 _a, const struct Vec2 _b);
 
 // Vector3
 extern float mag(const struct Vec3 _a);
 extern struct Vec3 norm(const struct Vec3 _a);
+
 // Vector2
 extern float mag_v2(const struct Vec2 _a);
 extern struct Vec2 norm_v2(const struct Vec2 _a);

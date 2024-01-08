@@ -1,4 +1,5 @@
 #include "bx_math.h"
+#include "vec_macros.h"
 
 #define _USE_MATH_DEFINES
 
@@ -19,138 +20,27 @@ const struct Vec3 vec3GlobalRight = { 1.0f, 0.0f, 0.0f };
 const struct Vec3 vec3GlobalForward = { 0.0f, 0.0f, 1.0f };
 const struct Vec3 vec3GlobalBack = { 0.0f, 0.0f, -1.0f };
 
-inline struct Vec3 v3_ctor(float _x, float _y, float _z) {
-	struct Vec3 ret = { _x, _y, _z };
-	return ret;
-}
-
-inline bool v3_equals(const struct Vec3 _a, const struct Vec3 _b) {
-	return
-		_a.x == _b.x &&
-		_a.y == _b.y &&
-		_a.z == _b.z;
-}
-
 void v3_print(struct Vec3* _v) {
 	printf("{ %f; %f; %f }\n", _v->x, _v->y, _v->z);
 }
 
-inline struct Vec3 v3_add_v3(const struct Vec3 _a, const struct Vec3 _b) {
-	struct Vec3 ret = { _a.x + _b.x, _a.y + _b.y, _a.z + _b.z };
-	return ret;
-}
-
-inline struct Vec3 v3_add_f(const struct Vec3 _a, const float _b) {
-	struct Vec3 ret = { _a.x + _b, _a.y + _b, _a.z + _b };
-	return ret;
-}
-
-inline struct Vec3 v3_sub_v3(const struct Vec3 _a, const struct Vec3 _b) {
-	struct Vec3 ret = { _a.x - _b.x, _a.y - _b.y, _a.z - _b.z };
-	return ret;
-}
-
-inline struct Vec3 v3_sub_f(const struct Vec3 _a, const float _b) {
-	struct Vec3 ret = { _a.x - _b, _a.y - _b, _a.z - _b };
-	return ret;
-}
-
-inline struct Vec3 v3_mul_v3(const struct Vec3 _a, const struct Vec3 _b) {
-	struct Vec3 ret = { _a.x * _b.x, _a.y * _b.y, _a.z * _b.z };
-	return ret;
-}
-
-inline struct Vec3 v3_mul_f(const struct Vec3 _a, const float _b) {
-	struct Vec3 ret = { _a.x * _b, _a.y * _b, _a.z * _b };
-	return ret;
-}
-
-inline struct Vec3 v3_div_v3(const struct Vec3 _a, const struct Vec3 _b) {
-	struct Vec3 ret = { _a.x / _b.x, _a.y / _b.y, _a.z / _b.z };
-	return ret;
-}
-
-inline struct Vec3 v3_div_f(const struct Vec3 _a, const float _b) {
-	struct Vec3 ret = { _a.x / _b, _a.y / _b, _a.z / _b };
-	return ret;
-}
-
-inline struct Vec2 v2_add_v2(const struct Vec2 _a, const struct Vec2 _b) {
-	struct Vec2 ret = { _a.x + _b.x, _a.y + _b.y };
-	return ret;
-}
-
-inline struct Vec2 v2_add_f(const struct Vec2 _a, const float _b) {
-	struct Vec2 ret = { _a.x + _b, _a.y + _b };
-	return ret;
-}
-
-inline struct Vec2 v2_sub_v2(const struct Vec2 _a, const struct Vec2 _b) {
-	struct Vec2 ret = { _a.x - _b.x, _a.y - _b.y };
-	return ret;
-}
-
-inline struct Vec2 v2_sub_f(const struct Vec2 _a, const float _b) {
-	struct Vec2 ret = { _a.x - _b, _a.y - _b };
-	return ret;
-}
-
-inline struct Vec2 v2_mul_v2(const struct Vec2 _a, const struct Vec2 _b) {
-	struct Vec2 ret = { _a.x * _b.x, _a.y * _b.y };
-	return ret;
-}
-
-inline struct Vec2 v2_mul_f(const struct Vec2 _a, const float _b) {
-	struct Vec2 ret = { _a.x * _b, _a.y * _b };
-	return ret;
-}
-
-inline struct Vec2 v2_div_v2(const struct Vec2 _a, const struct Vec2 _b) {
-	struct Vec2 ret = { _a.x / _b.x, _a.y / _b.y };
-	return ret;
-}
-
-inline struct Vec2 v2_div_f(const struct Vec2 _a, const float _b) {
-	struct Vec2 ret = { _a.x / _b, _a.y / _b };
-	return ret;
-}
-
-inline float dot(const struct Vec3 _a, const struct Vec3 _b) {
-	return _a.x * _b.x + _a.y * _b.y + _a.z * _b.z;
-}
-
-inline struct Vec3 cross(const struct Vec3 _a, const struct Vec3 _b) {
-	struct Vec3 ret = {
-		_a.y * _b.z - _a.z * _b.y,
-		_a.z * _b.x - _a.x * _b.z,
-		_a.x * _b.y - _a.y * _b.x
-	};
-	return ret;
-}
-
-inline float dot_v2(const struct Vec2 _a, const struct Vec2 _b) {
-	return _a.x * _b.x + _a.y * _b.y;
-}
-
-// magnitude
 inline float mag(const struct Vec3 _a) {
-	return (float)sqrt(dot(_a, _a));
+	return (float)sqrt(DOT_V3(_a, _a));
 }
 
-// normalized
 inline struct Vec3 norm(const struct Vec3 _a) {
 	const float invLen = 1.0f / mag(_a);
-	const struct Vec3 res = v3_mul_f(_a, invLen);
+	const struct Vec3 res = MUL_V3_F(_a, invLen);
 	return res;
 }
 
 inline float mag_v2(const struct Vec2 _a) {
-	return (float)sqrt(dot_v2(_a, _a));
+	return (float)sqrt(DOT_V2(_a, _a));
 }
 
 inline struct Vec2 norm_v2(const struct Vec2 _a) {
 	const float invLen = 1.0f / mag_v2(_a);
-	const struct Vec2 res = v2_mul_f(_a, invLen);
+	const struct Vec2 res = MUL_V2_F(_a, invLen);
 	return res;
 }
 
@@ -159,15 +49,15 @@ void mtx_look_at(float* _result, const struct Vec3* _eye, const struct Vec3* _at
 }
 
 void mtx_look_at_with_up(float* _result, const struct Vec3* _eye, const struct Vec3* _at, const struct Vec3* _up) {
-	const struct Vec3 view = norm(v3_sub_v3(*_at, *_eye));
+	const struct Vec3 view = norm(SUB_V3_V3(*_at, *_eye));
 	
 	struct Vec3 right = {0};
 	struct Vec3 up = {0};
 	
-	const struct Vec3 uxv = cross(*_up, view);
+	const struct Vec3 uxv = CROSS_V3(*_up, view);
 	
-	right = dot(uxv, uxv) == 0.0f ? vec3GlobalLeft : norm(uxv);
-	up = cross(view, right);
+	right = DOT_V3(uxv, uxv) == 0.0f ? vec3GlobalLeft : norm(uxv);
+	up = CROSS_V3(view, right);
 	
 	_result[0] = right.x;
 	_result[1] = up.x;
@@ -184,9 +74,9 @@ void mtx_look_at_with_up(float* _result, const struct Vec3* _eye, const struct V
 	_result[10] = view.z;
 	_result[11] = 0.0f;
 	
-	_result[12] = -dot(right, *_eye);
-	_result[13] = -dot(up, *_eye);
-	_result[14] = -dot(view, *_eye);
+	_result[12] = -DOT_V3(right, *_eye);
+	_result[13] = -DOT_V3(up, *_eye);
+	_result[14] = -DOT_V3(view, *_eye);
 	_result[15] = 1.0f;
 }
 

@@ -12,7 +12,7 @@ Main bullet points of the experiment:
 
 - **OS:** Windows 11 Pro
 - **Editor:** Notepad++
-- **Console:** Windows PowerShell
+- **Console:** Windows PowerShell/Command Prompt
 
 # Set-up
 
@@ -28,6 +28,7 @@ Main bullet points of the experiment:
 - [Releases · skeeto/w64devkit (github.com)](https://github.com/skeeto/w64devkit/releases)
 - unzip
 - set path to "path-to-w64devkit\bin" (to be able to use `make` in the console easily)
+- [Building — bgfx documentation (bkaradzic.github.io)](https://bkaradzic.github.io/bgfx/build.html)
 
 ```bash
 git clone https://github.com/bkaradzic/bx.git
