@@ -70,7 +70,10 @@ bool aDown;
 bool sDown;
 bool dDown;
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
 int main(int argc, char* argv[]) {
+#pragma GCC diagnostic pop
 	Uint32 initFlags =
 		SDL_INIT_TIMER |
 		SDL_INIT_AUDIO |
@@ -219,7 +222,10 @@ void on_mouse_button_down(SDL_MouseButtonEvent* _buttonEvent) {
 	if (_buttonEvent->button == SDL_BUTTON_LEFT) SDL_SetRelativeMouseMode(SDL_TRUE);
 }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
 void on_mouse_button_up(SDL_MouseButtonEvent* _buttonEvent) {
+#pragma GCC diagnostic pop
 	
 }
 
