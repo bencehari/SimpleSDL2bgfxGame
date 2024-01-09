@@ -1,62 +1,31 @@
 #include "bx_math.h"
-#include "vec_macros.h"
+#include "ke_math.h"
 
-#define _USE_MATH_DEFINES
-
-#include <stdio.h>
 #include <stdlib.h>
-#include <math.h>
 #include <stdint.h>
 
-static void mtx_proj_xywh(float* _result, float _x, float _y, float _width, float _height, float _near, float _far, bool homogeneousNdc);
+static void mtx_proj_xywh_internal(float* _result, float _x, float _y, float _width, float _height, float _near, float _far, bool homogeneousNdc);
+
 // TODO: should place somewhere else
-static void mem_set_ref(void* _dst, uint8_t _ch, size_t _numBytes);
-
-const struct Vec3 vec3Zero = { 0.0f, 0.0f, 0.0f };
-const struct Vec3 vec3GlobalUp = { 0.0f, 1.0f, 0.0f };
-const struct Vec3 vec3GlobalDown = { 0.0f, -1.0f, 0.0f };
-const struct Vec3 vec3GlobalLeft = { -1.0f, 0.0f, 0.0f };
-const struct Vec3 vec3GlobalRight = { 1.0f, 0.0f, 0.0f };
-const struct Vec3 vec3GlobalForward = { 0.0f, 0.0f, 1.0f };
-const struct Vec3 vec3GlobalBack = { 0.0f, 0.0f, -1.0f };
-
-void v3_print(struct Vec3* _v) {
-	printf("{ %f; %f; %f }\n", _v->x, _v->y, _v->z);
-}
-
-inline float mag(const struct Vec3 _a) {
-	return (float)sqrt(DOT_V3(_a, _a));
-}
-
-inline struct Vec3 norm(const struct Vec3 _a) {
-	const float invLen = 1.0f / mag(_a);
-	const struct Vec3 res = MUL_V3_F(_a, invLen);
-	return res;
-}
-
-inline float mag_v2(const struct Vec2 _a) {
-	return (float)sqrt(DOT_V2(_a, _a));
-}
-
-inline struct Vec2 norm_v2(const struct Vec2 _a) {
-	const float invLen = 1.0f / mag_v2(_a);
-	const struct Vec2 res = MUL_V2_F(_a, invLen);
-	return res;
+static void mem_set_ref(void* _dst, uint8_t _ch, size_t _numBytes) {
+	uint8_t* dst = (uint8_t*)_dst;
+	const uint8_t* end = dst + _numBytes;
+	while (dst != end) *dst++ = (char)_ch;
 }
 
 void mtx_look_at(float* _result, const struct Vec3* _eye, const struct Vec3* _at) {
-	mtx_look_at_with_up(_result, _eye, _at, &vec3GlobalUp);
+	mtx_look_at_with_up(_result, _eye, _at, &UP_V3);
 }
 
 void mtx_look_at_with_up(float* _result, const struct Vec3* _eye, const struct Vec3* _at, const struct Vec3* _up) {
-	const struct Vec3 view = norm(SUB_V3_V3(*_at, *_eye));
+	const struct Vec3 view = NORM_V3(SUB_V3_V3(*_at, *_eye));
 	
 	struct Vec3 right = {0};
 	struct Vec3 up = {0};
 	
 	const struct Vec3 uxv = CROSS_V3(*_up, view);
 	
-	right = DOT_V3(uxv, uxv) == 0.0f ? vec3GlobalLeft : norm(uxv);
+	right = DOT_V3(uxv, uxv) == 0.0f ? LEFT_V3 : NORM_V3(uxv);
 	up = CROSS_V3(view, right);
 	
 	_result[0] = right.x;
@@ -141,12 +110,12 @@ void mtx_rotate_zyx(float* _result, float _ax, float _ay, float _az) {
 }
 
 void mtx_proj(float* _result, float _fovy, float _aspect, float _near, float _far, bool _homogeneousNdc) {
-	const float height = 1.0f / tan(to_rad(_fovy) * 0.5f);
+	const float height = 1.0f / tan(RAD(_fovy) * 0.5f);
 	const float width = height * 1.0f / _aspect;
-	mtx_proj_xywh(_result, 0.0f, 0.0f, width, height, _near, _far, _homogeneousNdc);
+	mtx_proj_xywh_internal(_result, 0.0f, 0.0f, width, height, _near, _far, _homogeneousNdc);
 }
 
-static void mtx_proj_xywh(float* _result, float _x, float _y, float _width, float _height, float _near, float _far, bool homogeneousNdc) {
+static void mtx_proj_xywh_internal(float* _result, float _x, float _y, float _width, float _height, float _near, float _far, bool homogeneousNdc) {
 	const float diff = _far - _near;
 	const float aa = homogeneousNdc ? (_far + _near) / diff : _far / diff;
 	const float bb = homogeneousNdc ? (2.0f * _far * _near) / diff : _near * aa;
@@ -159,15 +128,4 @@ static void mtx_proj_xywh(float* _result, float _x, float _y, float _width, floa
 	_result[10] = aa;
 	_result[11] = 1.0f;
 	_result[14] = -bb;
-}
-
-inline float to_rad(float _degrees) {
-	return _degrees * (M_PI / 180.0f);
-}
-
-// TODO: should place somewhere else
-static void mem_set_ref(void* _dst, uint8_t _ch, size_t _numBytes) {
-	uint8_t* dst = (uint8_t*)_dst;
-	const uint8_t* end = dst + _numBytes;
-	while (dst != end) *dst++ = (char)_ch;
 }

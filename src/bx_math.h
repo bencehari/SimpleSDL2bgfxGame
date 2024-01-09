@@ -14,26 +14,6 @@ struct Vec2 {
 	float x, y;
 };
 
-// Vector3
-extern const struct Vec3 vec3Zero;
-extern const struct Vec3 vec3GlobalUp;
-extern const struct Vec3 vec3GlobalDown;
-extern const struct Vec3 vec3GlobalLeft;
-extern const struct Vec3 vec3GlobalRight;
-extern const struct Vec3 vec3GlobalForward;
-extern const struct Vec3 vec3GlobalBack;
-
-// Vector3
-extern void v3_print(struct Vec3* _v);
-
-// Vector3
-extern float mag(const struct Vec3 _a);
-extern struct Vec3 norm(const struct Vec3 _a);
-
-// Vector2
-extern float mag_v2(const struct Vec2 _a);
-extern struct Vec2 norm_v2(const struct Vec2 _a);
-
 // Matrix4x4
 extern void mtx_look_at(float* _result, const struct Vec3* _eye, const struct Vec3* _at);
 extern void mtx_look_at_with_up(float* _result, const struct Vec3* _eye, const struct Vec3* _at, const struct Vec3* _up);
@@ -41,8 +21,5 @@ extern void mtx_rotate_xy(float* _result, float _ax, float _ay);
 extern void mtx_rotate_xyz(float* _result, float _ax, float _ay, float _az);
 extern void mtx_rotate_zyx(float* _result, float _ax, float _ay, float _az);
 extern void mtx_proj(float* _result, float _fovy, float _aspect, float _near, float _far, bool _homogeneousNdc);
-
-// common
-extern float to_rad(float _degrees);
 
 #endif // BX_MATH

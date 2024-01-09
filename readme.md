@@ -18,14 +18,14 @@ Main bullet points of the experiment:
 
 ## SDL2
 
-- [Releases · libsdl-org/SDL (github.com)](https://github.com/libsdl-org/SDL/releases) (SDL2-devel-x.y.z-mingw.zip)
+- download SDL2: [Releases · libsdl-org/SDL (github.com)](https://github.com/libsdl-org/SDL/releases) (SDL2-devel-x.y.z-mingw.zip)
 - unzip "x86_64-w64-mingw32" folder
 - copy SDL2.dll into projects bin folder from "x86_64-w64-mingw32\bin"
 - set "sdl_path" in w_build.bat
 
 ## bgfx
 
-- [Releases · skeeto/w64devkit (github.com)](https://github.com/skeeto/w64devkit/releases)
+- download MinGW-W64: [Releases · skeeto/w64devkit (github.com)](https://github.com/skeeto/w64devkit/releases)
 - unzip
 - set path to "path-to-w64devkit\bin" (to be able to use `make` in the console easily)
 - [Building — bgfx documentation (bkaradzic.github.io)](https://bkaradzic.github.io/bgfx/build.html)
@@ -35,9 +35,15 @@ git clone https://github.com/bkaradzic/bx.git
 git clone https://github.com/bkaradzic/bimg.git
 git clone https://github.com/bkaradzic/bgfx.git
 
-cd bgfx
+cd bx
+make mingw-gcc-debug64
 
-..\bx\tools\bin\windows\genie.exe --gcc=mingw-gcc gmake
+cd ..
+cd bimg
+make mingw-gcc-debug64
+
+cd ..
+cd bgfx
 make mingw-gcc-debug64
 ```
 
