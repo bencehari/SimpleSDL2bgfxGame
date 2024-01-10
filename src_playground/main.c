@@ -1,8 +1,33 @@
 #include <stdio.h>
 
-#include "../src/bx_math.h"
+#include "../src/math/matrix4.h"
+#include "../src/core/object.h"
+#include "../src/math/vector3.h"
+
+void test_object_position_set_get(void);
+void test_matrix4(void);
 
 int main(void) {
+	// test_matrix4(); printf("\n");
+	test_object_position_set_get(); printf("\n");
+}
+
+void test_object_position_set_get(void) {
+	struct Object obj = OBJECT_CTOR;
+	struct Vec3 v = { 1.0f, 2.0f, 3.0f };
+	
+	set_position(&obj, &v);
+	
+	struct Vec3 pos = get_position(&obj);
+	printf("{ %2.2f, %2.2f, %2.2f }\n", pos.x, pos.y, pos.z);
+	
+	set_position_xyz(&obj, 2.0f, 3.0f, 4.0f);
+	
+	pos = get_position(&obj);
+	printf("{ %2.2f, %2.2f, %2.2f }\n", pos.x, pos.y, pos.z);
+}
+
+void test_matrix4(void) {
 	float a[16] = {
 		1, 1, 1, 1,
 		2, 2, 2, 2,
