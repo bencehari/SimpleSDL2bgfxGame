@@ -8,8 +8,9 @@
 
 #include "init.h"
 #include "loaders.h"
-#include "bx_math.h"
-#include "ke_math.h"
+#include "math/vector3.h"
+#include "math/vector2.h"
+#include "math/matrix4.h"
 
 #define WIDTH 640
 #define HEIGHT 480
@@ -62,7 +63,7 @@ static const uint16_t indices[] = {
 const float moveSpeed = 0.1f;
 struct Vec3 playerPos = { 0.0f, 0.0f, -5.0f };
 
-const float rotationSpeed = 0.1f;
+const float rotationSpeed = 0.001f;
 struct Vec2 lookInput = { 0.0f, 0.0f };
 
 bool wDown;
@@ -145,7 +146,16 @@ int main(int argc, char* argv[]) {
 		{
 			float view[16];
 			mtx_look_at(view, &playerPos, &at);
+			
 			// TODO: rotate view
+			float rotXMtx[16] = IDENTITY_MTX;
+			float rotYMtx[16] = IDENTITY_MTX;
+			
+			mtx_rotate_x(rotXMtx, lookInput.x);
+			mtx_rotate_y(rotYMtx, lookInput.y);
+			
+			mul_mtx_mtx(view, view, rotYMtx);
+			mul_mtx_mtx(view, view, rotXMtx);
 			
 			float proj[16];
 			mtx_proj(proj, 60.0f, WIDTH_F / HEIGHT_F, 0.1f, 100.0f, bgfx_get_caps()->homogeneousDepth);
@@ -234,5 +244,5 @@ void on_mouse_motion(SDL_MouseMotionEvent* _motionEvent) {
 	
 	// TODO: probably wrong.
 	lookInput.x += _motionEvent->yrel * rotationSpeed;
-	lookInput.y += -_motionEvent->xrel * rotationSpeed;
+	lookInput.y += _motionEvent->xrel * rotationSpeed;
 }
