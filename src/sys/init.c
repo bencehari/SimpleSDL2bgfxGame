@@ -7,13 +7,13 @@
 
 #include <bgfx/c99/bgfx.h>
 
-#include "consc.h"
+#include "../utils/consc.h"
 
 static SDL_Window* window;
 
-bool initialize(uint32_t flags, int width, int height) {
+bool sys_initialize(uint32_t _flags, int _width, int _height) {
 	printf("SDL_Init... ");
-	if (SDL_Init(flags) != 0) {
+	if (SDL_Init(_flags) != 0) {
 		printf("\n" ANSI_COLOR_RED "Error initializing SDL: %s" ANSI_COLOR_RESET "\n", SDL_GetError());
 		return false;
 	}
@@ -23,7 +23,7 @@ bool initialize(uint32_t flags, int width, int height) {
 	window = SDL_CreateWindow(
 		"SDL2/bgfx Test",
 		SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-		width, height, 0);
+		_width, _height, 0);
 		
 	if (!window) {
 		printf("\n" ANSI_COLOR_RED "Error creating window: %s" ANSI_COLOR_RESET "\n", SDL_GetError());
@@ -42,8 +42,8 @@ bool initialize(uint32_t flags, int width, int height) {
 	bgfx_init_t init;
 	bgfx_init_ctor(&init);
 	
-	init.resolution.width = width;
-	init.resolution.height = height;
+	init.resolution.width = _width;
+	init.resolution.height = _height;
 	init.resolution.reset = BGFX_RESET_VSYNC;
 	
 	init.platformData.context = NULL;
@@ -78,7 +78,7 @@ bool initialize(uint32_t flags, int width, int height) {
 	return true;
 }
 
-void deinitialize(void) {
+void sys_deinitialize(void) {
 	bgfx_shutdown();
 	while (bgfx_render_frame(1) != BGFX_RENDER_FRAME_NO_CONTEXT) {};
 	

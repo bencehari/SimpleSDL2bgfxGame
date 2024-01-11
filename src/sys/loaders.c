@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "consc.h"
+#include "../utils/consc.h"
 
 // TODO: handle errors like invalid path, fopen returns NULL, etc.
 bgfx_shader_handle_t load_shader(const char* _filename) {

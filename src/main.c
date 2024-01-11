@@ -6,8 +6,8 @@
 
 #include <bgfx/c99/bgfx.h>
 
-#include "init.h"
-#include "loaders.h"
+#include "sys/init.h"
+#include "sys/loaders.h"
 #include "math/vector3.h"
 #include "math/vector2.h"
 #include "math/matrix4.h"
@@ -60,16 +60,16 @@ static const uint16_t indices[] = {
 	6, 3, 7,
 };
 
-const float moveSpeed = 0.1f;
-struct Vec3 playerPos = { 0.0f, 0.0f, -5.0f };
+static const float moveSpeed = 0.1f;
+static struct Vec3 playerPos = { 0.0f, 0.0f, -5.0f };
 
-const float rotationSpeed = 0.001f;
-struct Vec2 lookInput = { 0.0f, 0.0f };
+static const float rotationSpeed = 0.001f;
+static struct Vec2 lookInput = { 0.0f, 0.0f };
 
-bool wDown;
-bool aDown;
-bool sDown;
-bool dDown;
+static bool wDown;
+static bool aDown;
+static bool sDown;
+static bool dDown;
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
@@ -87,7 +87,7 @@ int main(int argc, char* argv[]) {
 		// SDL_INIT_NOPARACHUTE
 		;
 	
-	if (!initialize(initFlags, WIDTH, HEIGHT)) {
+	if (!sys_initialize(initFlags, WIDTH, HEIGHT)) {
 		printf("Initialization failed. Terminating...");
 		return 0;
 	}
@@ -182,7 +182,7 @@ int main(int argc, char* argv[]) {
 		if (sleep > 0) SDL_Delay(sleep);
 	}
 
-	deinitialize();
+	sys_deinitialize();
 	
 	return 0;
 }

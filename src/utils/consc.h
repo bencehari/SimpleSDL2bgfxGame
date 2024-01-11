@@ -1,5 +1,5 @@
-#ifndef CONSC_H
-#define CONSC_H
+#ifndef KE_CONSC_H
+#define KE_CONSC_H
 
 #define ANSI_COLOR_RED     "\x1b[31m"
 #define ANSI_COLOR_GREEN   "\x1b[32m"
@@ -9,4 +9,4 @@
 #define ANSI_COLOR_CYAN    "\x1b[36m"
 #define ANSI_COLOR_RESET   "\x1b[0m"
 
-#endif // CONSC_H
+#endif // KE_CONSC_H

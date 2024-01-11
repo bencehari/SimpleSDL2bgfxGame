@@ -9,8 +9,8 @@ struct Object {
 	float transform[16];
 };
 
-void set_position(struct Object* _o, const struct Vec3* _v);
-void set_position_xyz(struct Object* _o, float _x, float _y, float _z);
-struct Vec3 get_position(const struct Object* _o);
+void obj_set_position(struct Object* _o, const struct Vec3* _v);
+void obj_set_position_xyz(struct Object* _o, float _x, float _y, float _z);
+struct Vec3 obj_get_position(const struct Object* _o);
 
 #endif // KE_OBJECT_H
