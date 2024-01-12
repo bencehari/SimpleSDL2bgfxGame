@@ -7,10 +7,10 @@
 #include <bgfx/c99/bgfx.h>
 
 #include "sys/init.h"
-#include "sys/loaders.h"
 #include "math/vector3.h"
 #include "math/vector2.h"
 #include "math/matrix4.h"
+#include "core/programs.h"
 
 #define WIDTH 640
 #define HEIGHT 480
@@ -101,9 +101,8 @@ int main(int argc, char* argv[]) {
 	bgfx_vertex_buffer_handle_t vbh = bgfx_create_vertex_buffer(bgfx_make_ref(vertices, sizeof(vertices)), &vertexLayout, BGFX_BUFFER_NONE);
 	bgfx_index_buffer_handle_t ibh = bgfx_create_index_buffer(bgfx_make_ref(indices, sizeof(indices)), BGFX_BUFFER_NONE);
 	
-	bgfx_shader_handle_t vertexShaderHnd = load_shader("vs_cubes.bin");
-	bgfx_shader_handle_t fragmentShaderHnd = load_shader("fs_cubes.bin");
-	bgfx_program_handle_t program = bgfx_create_program(vertexShaderHnd, fragmentShaderHnd, true);
+	programs_initialize(1);
+	int cubeProgIndex = program_create("vs_cubes.bin", "fs_cubes.bin", true);
 	
 	size_t counter = 0;
 	
@@ -174,7 +173,7 @@ int main(int argc, char* argv[]) {
 		bgfx_set_vertex_buffer(0, vbh, 0, sizeof(vertices) / sizeof(struct PosColorVertex));
 		bgfx_set_index_buffer(ibh, 0, sizeof(indices) / sizeof(uint16_t));
 		
-		bgfx_submit(0, program, 0, BGFX_DISCARD_ALL);
+		bgfx_submit(0, *program_get_by_idx(cubeProgIndex), 0, BGFX_DISCARD_ALL);
 		bgfx_frame(false);
 		
 		currentTick = SDL_GetTicks();
@@ -182,6 +181,7 @@ int main(int argc, char* argv[]) {
 		if (sleep > 0) SDL_Delay(sleep);
 	}
 
+	programs_deinitialize();
 	sys_deinitialize();
 	
 	return 0;

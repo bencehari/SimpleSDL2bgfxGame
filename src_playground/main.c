@@ -16,14 +16,14 @@ void test_object_position_set_get(void) {
 	struct Object obj = OBJECT_CTOR;
 	struct Vec3 v = { 1.0f, 2.0f, 3.0f };
 	
-	set_position(&obj, &v);
+	obj_set_position(&obj, &v);
 	
-	struct Vec3 pos = get_position(&obj);
+	struct Vec3 pos = obj_get_position(&obj);
 	printf("{ %2.2f, %2.2f, %2.2f }\n", pos.x, pos.y, pos.z);
 	
-	set_position_xyz(&obj, 2.0f, 3.0f, 4.0f);
+	obj_set_position_xyz(&obj, 2.0f, 3.0f, 4.0f);
 	
-	pos = get_position(&obj);
+	pos = obj_get_position(&obj);
 	printf("{ %2.2f, %2.2f, %2.2f }\n", pos.x, pos.y, pos.z);
 }
 
