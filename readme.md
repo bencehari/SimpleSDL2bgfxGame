@@ -16,12 +16,14 @@ Main bullet points of the experiment:
 
 # Set-up
 
+Create a paths.txt in the root of the project.
+
 ## SDL2
 
 - download SDL2: [Releases · libsdl-org/SDL (github.com)](https://github.com/libsdl-org/SDL/releases) (SDL2-devel-x.y.z-mingw.zip)
 - unzip "x86_64-w64-mingw32" folder
 - copy SDL2.dll into projects bin folder from "x86_64-w64-mingw32\bin"
-- set "sdl_path" in w_build.bat
+- add the path "to\the\SDL2\x86_64-w64-mingw32\" to paths.txt (must be first line and don't forget the \ at the end)
 
 ## bgfx
 
@@ -47,7 +49,7 @@ cd bgfx
 make mingw-gcc-debug64
 ```
 
-- set "bgfx_path" in w_build.bat
+- add the path "to\the\bgfx\" (where the bgfx, bimg and bx folders are) to paths.txt (must be second line and don't forget the \ at the end)
 
 # Usage
 

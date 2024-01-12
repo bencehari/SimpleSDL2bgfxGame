@@ -1,5 +1,5 @@
 @echo off
-setlocal enabledelayedexpansion
+SETLOCAL enabledelayedexpansion
 
 :: 0 disables debug mode
 :: any other value sets flags and runs the app with GDB (you need to start the app
@@ -13,9 +13,16 @@ SET extra=-Wextra
 :: compiler=g++ and std_opt=c++17
 SET compiler=gcc
 SET std_opt=c99
+
+SET i=0
+FOR /F "tokens=* delims=" %%x in (paths.txt) DO (
+	SET /a i+=1
+	SET "paths[!i!]=%%x"
+)
+
 :: change the paths to your SDL2 and bgfx
-SET sdl_path=C:\dev\C\SDL2\SDL2-devel-2.28.5-mingw\x86_64-w64-mingw32\
-SET bgfx_path=C:\GitHub\bgfx\
+SET sdl_path=!paths[1]!
+SET bgfx_path=!paths[2]!
 
 :: bgfx thing (for now). If you used `make mingw-gcc-debug64`, use Debug
 :: if `make mingw-gcc-release64` was used, use Release
