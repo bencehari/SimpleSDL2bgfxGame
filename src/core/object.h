@@ -3,7 +3,9 @@
 
 #include "../math/vector3.h"
 
-#define OBJECT_CTOR ((struct Object) { {1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f} })
+#define OBJECT_CTOR ((struct Object) { \
+	{1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f} \
+	})
 
 struct Object {
 	float transform[16];

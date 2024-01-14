@@ -11,6 +11,10 @@
 #include "math/vector2.h"
 #include "math/matrix4.h"
 #include "core/programs.h"
+#include "core/vertex.h"
+#include "core/models.h"
+
+#include "utils/consc.h"
 
 #define WIDTH 640
 #define HEIGHT 480
@@ -26,39 +30,6 @@ void on_key_up(SDL_Keycode _keyCode);
 void on_mouse_button_down(SDL_MouseButtonEvent* _buttonEvent);
 void on_mouse_button_up(SDL_MouseButtonEvent* _buttonEvent);
 void on_mouse_motion(SDL_MouseMotionEvent* _motionEvent);
-
-struct PosColorVertex {
-	float x;
-	float y;
-	float z;
-	uint32_t abgr;
-};
-
-static struct PosColorVertex vertices[] = {
-	{ -1.0f,  1.0f,  1.0f, 0xff000000 },
-    {  1.0f,  1.0f,  1.0f, 0xff0000ff },
-    { -1.0f, -1.0f,  1.0f, 0xff00ff00 },
-    {  1.0f, -1.0f,  1.0f, 0xff00ffff },
-    { -1.0f,  1.0f, -1.0f, 0xffff0000 },
-    {  1.0f,  1.0f, -1.0f, 0xffff00ff },
-    { -1.0f, -1.0f, -1.0f, 0xffffff00 },
-    {  1.0f, -1.0f, -1.0f, 0xffffffff },
-};
-
-static const uint16_t indices[] = {
-	0, 1, 2, // 0
-	1, 3, 2,
-	4, 6, 5, // 2
-	5, 6, 7,
-	0, 2, 4, // 4
-	4, 2, 6,
-	1, 5, 3, // 6
-	5, 7, 3,
-	0, 4, 1, // 8
-	4, 5, 1,
-	2, 3, 6, // 10
-	6, 3, 7,
-};
 
 static const float moveSpeed = 0.1f;
 static struct Vec3 playerPos = { 0.0f, 0.0f, -5.0f };
@@ -92,17 +63,42 @@ int main(int argc, char* argv[]) {
 		return 0;
 	}
 	
-	bgfx_vertex_layout_t vertexLayout;
-	bgfx_vertex_layout_begin(&vertexLayout, BGFX_RENDERER_TYPE_COUNT);
-	bgfx_vertex_layout_add(&vertexLayout, BGFX_ATTRIB_POSITION, 3, BGFX_ATTRIB_TYPE_FLOAT, false, false);
-	bgfx_vertex_layout_add(&vertexLayout, BGFX_ATTRIB_COLOR0, 4, BGFX_ATTRIB_TYPE_UINT8, true, false);
-	bgfx_vertex_layout_end(&vertexLayout);
+	vertex_init();
+	model_hnd_initialize(1);
 	
-	bgfx_vertex_buffer_handle_t vbh = bgfx_create_vertex_buffer(bgfx_make_ref(vertices, sizeof(vertices)), &vertexLayout, BGFX_BUFFER_NONE);
-	bgfx_index_buffer_handle_t ibh = bgfx_create_index_buffer(bgfx_make_ref(indices, sizeof(indices)), BGFX_BUFFER_NONE);
+	const int cubeModelIdx = model_create(
+		(struct Vertex[]) {
+			VERTEX_CTOR(-1.0f,  1.0f,  1.0f, 0xff000000),
+			VERTEX_CTOR( 1.0f,  1.0f,  1.0f, 0xff0000ff),
+			VERTEX_CTOR(-1.0f, -1.0f,  1.0f, 0xff00ff00),
+			VERTEX_CTOR( 1.0f, -1.0f,  1.0f, 0xff00ffff),
+			VERTEX_CTOR(-1.0f,  1.0f, -1.0f, 0xffff0000),
+			VERTEX_CTOR( 1.0f,  1.0f, -1.0f, 0xffff00ff),
+			VERTEX_CTOR(-1.0f, -1.0f, -1.0f, 0xffffff00),
+			VERTEX_CTOR( 1.0f, -1.0f, -1.0f, 0xffffffff),
+		},
+		8,
+		(uint16_t[]) {
+			0, 1, 2, // 0
+			1, 3, 2,
+			4, 6, 5, // 2
+			5, 6, 7,
+			0, 2, 4, // 4
+			4, 2, 6,
+			1, 5, 3, // 6
+			5, 7, 3,
+			0, 4, 1, // 8
+			4, 5, 1,
+			2, 3, 6, // 10
+			6, 3, 7,
+		},
+		36,
+		&vertexLayout);
+	
+	// model_print(model_get_by_idx(cubeModelIdx), true, true);
 	
 	programs_initialize(1);
-	int cubeProgIndex = program_create("vs_cubes.bin", "fs_cubes.bin", true);
+	const int cubeProgIndex = program_create("vs_cubes.bin", "fs_cubes.bin", true);
 	
 	size_t counter = 0;
 	
@@ -111,6 +107,7 @@ int main(int argc, char* argv[]) {
 	Uint32 lastTick;
 	Uint32 currentTick;
 
+	puts(AC_GREEN "[GAME LOOP START]" AC_RESET);
 	bool running = true;
 	SDL_Event event;	
 	while (running) {
@@ -170,8 +167,10 @@ int main(int argc, char* argv[]) {
 		counter++;
 		bgfx_set_transform(mtx, 1);
 		
-		bgfx_set_vertex_buffer(0, vbh, 0, sizeof(vertices) / sizeof(struct PosColorVertex));
-		bgfx_set_index_buffer(ibh, 0, sizeof(indices) / sizeof(uint16_t));
+		struct Model* model = model_get_by_idx(cubeModelIdx);
+		
+		bgfx_set_vertex_buffer(0, model->vertexBufferHnd, 0, model->verticesLen);
+		bgfx_set_index_buffer(model->indexBufferHnd, 0, model->indicesLen);
 		
 		bgfx_submit(0, *program_get_by_idx(cubeProgIndex), 0, BGFX_DISCARD_ALL);
 		bgfx_frame(false);
@@ -181,6 +180,7 @@ int main(int argc, char* argv[]) {
 		if (sleep > 0) SDL_Delay(sleep);
 	}
 
+	model_hnd_deinitialize();
 	programs_deinitialize();
 	sys_deinitialize();
 	

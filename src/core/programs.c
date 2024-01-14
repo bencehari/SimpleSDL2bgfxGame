@@ -24,7 +24,7 @@ void programs_deinitialize() {
 
 int program_create(const char* _vertexShader, const char* _fragmentShader, bool _destroyShaders) {
 	if (currentProgramIndex >= programCount) {
-		puts(ANSI_COLOR_YELLOW "Max shader program count reached." ANSI_COLOR_RESET);
+		puts(AC_YELLOW "Max shader program count reached." AC_RESET);
 		return -1;
 	}
 	
@@ -53,7 +53,7 @@ int program_create(const char* _vertexShader, const char* _fragmentShader, bool 
 
 bgfx_program_handle_t* program_get_by_idx(int _idx) {
 	if (_idx >= programCount) {
-		printf(ANSI_COLOR_YELLOW "Shader program index (%d) is too high (max: %d)." ANSI_COLOR_RESET, _idx, programCount);
+		printf(AC_YELLOW "Shader program index (%d) is too high (max: %d)." AC_RESET, _idx, programCount);
 		return NULL;
 	}
 	

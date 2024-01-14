@@ -14,10 +14,10 @@ static SDL_Window* window;
 bool sys_initialize(uint32_t _flags, int _width, int _height) {
 	printf("SDL_Init... ");
 	if (SDL_Init(_flags) != 0) {
-		printf("\n" ANSI_COLOR_RED "Error initializing SDL: %s" ANSI_COLOR_RESET "\n", SDL_GetError());
+		printf("\n" AC_RED "Error initializing SDL: %s" AC_RESET "\n", SDL_GetError());
 		return false;
 	}
-	printf(ANSI_COLOR_GREEN "DONE" ANSI_COLOR_RESET "\n");
+	printf(AC_GREEN "DONE" AC_RESET "\n");
 	
 	printf("SDL_CreateWindow... ");
 	window = SDL_CreateWindow(
@@ -26,18 +26,18 @@ bool sys_initialize(uint32_t _flags, int _width, int _height) {
 		_width, _height, 0);
 		
 	if (!window) {
-		printf("\n" ANSI_COLOR_RED "Error creating window: %s" ANSI_COLOR_RESET "\n", SDL_GetError());
+		printf("\n" AC_RED "Error creating window: %s" AC_RESET "\n", SDL_GetError());
 		SDL_Quit();
 		return 0;
 	}
-	printf(ANSI_COLOR_GREEN "DONE" ANSI_COLOR_RESET "\n");
+	printf(AC_GREEN "DONE" AC_RESET "\n");
 	
 	SDL_SysWMinfo wmi;
 	SDL_VERSION(&wmi.version);
 	
 	printf("SDL_GetWindowWMInfo... ");
 	if (!SDL_GetWindowWMInfo(window, &wmi)) return false;
-	printf(ANSI_COLOR_GREEN "DONE" ANSI_COLOR_RESET "\n");
+	printf(AC_GREEN "DONE" AC_RESET "\n");
 	
 	bgfx_init_t init;
 	bgfx_init_ctor(&init);
@@ -69,7 +69,7 @@ bool sys_initialize(uint32_t _flags, int _width, int _height) {
 	
 	printf("bgfx_init... ");
 	if (!bgfx_init(&init)) return false;
-	printf(ANSI_COLOR_GREEN "DONE" ANSI_COLOR_RESET "\n");
+	printf(AC_GREEN "DONE" AC_RESET "\n");
 	
 	bgfx_set_debug(BGFX_DEBUG_TEXT);
 	

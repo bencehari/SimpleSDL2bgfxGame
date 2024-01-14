@@ -16,7 +16,7 @@ Main bullet points of the experiment:
 
 # Set-up
 
-Create a paths.txt in the root of the project.
+Create a paths.txt in the root of the project (it is .gitignore'd to avoid overriding different paths on different computers with VC).
 
 ## SDL2
 
