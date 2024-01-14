@@ -13,6 +13,7 @@
 #include "core/programs.h"
 #include "core/vertex.h"
 #include "core/models.h"
+#include "core/object.h"
 
 #include "utils/consc.h"
 
@@ -66,7 +67,7 @@ int main(int argc, char* argv[]) {
 	vertex_init();
 	model_hnd_initialize(1);
 	
-	const int cubeModelIdx = model_create(
+	struct Model* pCubeModel = model_create(
 		(struct Vertex[]) {
 			VERTEX_CTOR(-1.0f,  1.0f,  1.0f, 0xff000000),
 			VERTEX_CTOR( 1.0f,  1.0f,  1.0f, 0xff0000ff),
@@ -95,10 +96,11 @@ int main(int argc, char* argv[]) {
 		36,
 		&vertexLayout);
 	
-	// model_print(model_get_by_idx(cubeModelIdx), true, true);
+	// model_print(pCubeModel, true, true);
 	
-	programs_initialize(1);
-	const int cubeProgIndex = program_create("vs_cubes.bin", "fs_cubes.bin", true);
+	bgfx_program_handle_t cubeProgHnd = program_create("vs_cubes.bin", "fs_cubes.bin", true);
+	
+	struct Object cube = OBJECT_CTOR(pCubeModel, cubeProgHnd);
 	
 	size_t counter = 0;
 	
@@ -107,7 +109,7 @@ int main(int argc, char* argv[]) {
 	Uint32 lastTick;
 	Uint32 currentTick;
 
-	puts(AC_GREEN "[GAME LOOP START]" AC_RESET);
+	puts(AC_MAGENTA "[GAME LOOP START]" AC_RESET);
 	bool running = true;
 	SDL_Event event;	
 	while (running) {
@@ -162,26 +164,24 @@ int main(int argc, char* argv[]) {
 
 		bgfx_touch(0);
 
-		float mtx[16];
-		mtx_rotate_xy(mtx, counter * 0.01f, counter * 0.01f);
+		// render objects START
+
+		mtx_rotate_xy(cube.transform, counter * 0.01f, counter * 0.01f);
 		counter++;
-		bgfx_set_transform(mtx, 1);
+		obj_render(&cube);
 		
-		struct Model* model = model_get_by_idx(cubeModelIdx);
+		// render objects END
 		
-		bgfx_set_vertex_buffer(0, model->vertexBufferHnd, 0, model->verticesLen);
-		bgfx_set_index_buffer(model->indexBufferHnd, 0, model->indicesLen);
-		
-		bgfx_submit(0, *program_get_by_idx(cubeProgIndex), 0, BGFX_DISCARD_ALL);
 		bgfx_frame(false);
 		
 		currentTick = SDL_GetTicks();
 		int sleep = milliPeriod - (currentTick - lastTick);
 		if (sleep > 0) SDL_Delay(sleep);
 	}
+	
+	puts(AC_MAGENTA "[SHUTTING DOWN]" AC_RESET);
 
 	model_hnd_deinitialize();
-	programs_deinitialize();
 	sys_deinitialize();
 	
 	return 0;

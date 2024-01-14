@@ -6,7 +6,7 @@
 
 #include "../utils/consc.h"
 
-static bool initialized = false;
+static bool initialized;
 
 static int modelCount;
 static int currentModelIndex = 0;
@@ -35,7 +35,7 @@ void model_hnd_deinitialize(void) {
 	initialized = false;
 }
 
-void model_print(struct Model* _model, bool _printVertices, bool _printIndices) {
+void model_print(const struct Model* _model, bool _printVertices, bool _printIndices) {
 	printf(AC_CYAN "[MODEL INFO]\n  [BASE]" AC_RESET "\n    id: %d, vertLen: %d, indLen: %d, vertex: %s, indices: %s, vBufHnd: %u, iBuffHnd: %u\n",
 		_model->id,
 		_model->verticesLen,
@@ -62,13 +62,13 @@ void model_print(struct Model* _model, bool _printVertices, bool _printIndices) 
 			printf("%8d %8d %8d\n", _model->indices[i - 2], _model->indices[i - 1], _model->indices[i]);
 		}
 	}
-	printf(AC_CYAN "\n[MODEL INFO END]" AC_RESET);
+	printf(AC_CYAN "\n[MODEL INFO END]\n" AC_RESET);
 }
 
-int model_create(const struct Vertex _vertices[], int _verticesLen, const uint16_t _indices[], int _indicesLen, const bgfx_vertex_layout_t* _vertexLayout) {
+struct Model* model_create(const struct Vertex _vertices[], int _verticesLen, const uint16_t _indices[], int _indicesLen, const bgfx_vertex_layout_t* _vertexLayout) {
 	if (currentModelIndex >= modelCount) {
 		puts(AC_YELLOW "Max model count reached." AC_RESET);
-		return -1;
+		return NULL;
 	}
 
 	size_t verticesSize = sizeof(struct Vertex) * _verticesLen;
@@ -90,14 +90,5 @@ int model_create(const struct Vertex _vertices[], int _verticesLen, const uint16
 		.indexBufferHnd = bgfx_create_index_buffer(bgfx_make_ref(pindices, indicesSize), BGFX_BUFFER_NONE)
 	};
 	
-	return currentModelIndex++;
-}
-
-struct Model* model_get_by_idx(int _idx) {
-	if (_idx >= currentModelIndex) {
-		printf(AC_YELLOW "Model index (%d) is too high (created model count: %d)." AC_RESET, _idx, currentModelIndex);
-		return NULL;
-	}
-	
-	return &models[_idx];
+	return &models[currentModelIndex++];
 }
