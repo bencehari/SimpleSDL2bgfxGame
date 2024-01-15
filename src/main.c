@@ -189,6 +189,7 @@ int main(int argc, char* argv[]) {
 	models_cleanup();
 	puts(AC_MAGENTA "Cleaning up programs..." AC_RESET);
 	programs_cleanup();
+	
 	sys_cleanup();
 	puts(AC_MAGENTA "DONE" AC_RESET);
 	

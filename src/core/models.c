@@ -26,6 +26,9 @@ void models_init(int _maxModelCount) {
 
 void models_cleanup(void) {
 	while (--currentModelIndex >= 0) {
+		bgfx_destroy_vertex_buffer(models[currentModelIndex].vertexBufferHnd);
+		bgfx_destroy_index_buffer(models[currentModelIndex].indexBufferHnd);
+		
 		free(models[currentModelIndex].vertices);
 		free(models[currentModelIndex].indices);
 		free(&models[currentModelIndex]);
