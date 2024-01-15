@@ -24,7 +24,7 @@ bgfx_shader_handle_t load_shader(const char* _filename) {
 		case BGFX_RENDERER_TYPE_COUNT: break;
 	}
 	
-	// printf(ANSI_COLOR_YELLOW "ShaderName: '%s'.\nPath: '%s'\n" ANSI_COLOR_RESET, _filename, shaderPath);
+	// printf(AC_YELLOW "ShaderName: '%s'.\nPath: '%s'\n" AC_RESET, _filename, shaderPath);
 	
 	size_t shaderPathLen = strlen(shaderPath);
 	size_t fileNameLen = strlen(_filename);
@@ -34,16 +34,16 @@ bgfx_shader_handle_t load_shader(const char* _filename) {
 	memcpy(&filePath[shaderPathLen], _filename, fileNameLen);
 	filePath[shaderPathLen + fileNameLen] = '\0';
 	
-	// printf(ANSI_COLOR_YELLOW "%s\n" ANSI_COLOR_RESET, filePath);
+	// printf(AC_YELLOW "%s\n" AC_RESET, filePath);
 	
 	FILE* file = fopen(filePath, "rb");
-	// if (file == NULL) printf(ANSI_COLOR_YELLOW "file is NULL\n" ANSI_COLOR_RESET);
+	// if (file == NULL) printf(AC_YELLOW "file is NULL\n" AC_RESET);
 	
 	fseek(file, 0, SEEK_END);
 	long fileSize = ftell(file);
 	fseek(file, 0, SEEK_SET);
 	
-	// printf(ANSI_COLOR_YELLOW "fileSize: %ld\n" ANSI_COLOR_RESET, fileSize);
+	// printf(AC_YELLOW "fileSize: %ld\n" AC_RESET, fileSize);
 	
 	const bgfx_memory_t* mem = bgfx_alloc(fileSize + 1);
 	fread(mem->data, 1, fileSize, file);

@@ -6,6 +6,6 @@
 #include <stdbool.h>
 
 extern bool sys_initialize(uint32_t _flags, int _width, int _height);
-extern void sys_deinitialize(void);
+extern void sys_cleanup(void);
 
 #endif // KE_INIT_H

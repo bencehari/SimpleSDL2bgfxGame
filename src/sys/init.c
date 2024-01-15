@@ -17,7 +17,7 @@ bool sys_initialize(uint32_t _flags, int _width, int _height) {
 		printf("\n" AC_RED "Error initializing SDL: %s" AC_RESET "\n", SDL_GetError());
 		return false;
 	}
-	printf(AC_GREEN "DONE" AC_RESET "\n");
+	puts(AC_GREEN "DONE" AC_RESET);
 	
 	printf("SDL_CreateWindow... ");
 	window = SDL_CreateWindow(
@@ -30,14 +30,14 @@ bool sys_initialize(uint32_t _flags, int _width, int _height) {
 		SDL_Quit();
 		return 0;
 	}
-	printf(AC_GREEN "DONE" AC_RESET "\n");
+	puts(AC_GREEN "DONE" AC_RESET);
 	
 	SDL_SysWMinfo wmi;
 	SDL_VERSION(&wmi.version);
 	
 	printf("SDL_GetWindowWMInfo... ");
 	if (!SDL_GetWindowWMInfo(window, &wmi)) return false;
-	printf(AC_GREEN "DONE" AC_RESET "\n");
+	puts(AC_GREEN "DONE" AC_RESET);
 	
 	bgfx_init_t init;
 	bgfx_init_ctor(&init);
@@ -65,11 +65,11 @@ bool sys_initialize(uint32_t _flags, int _width, int _height) {
 
 	// for switching to single threaded mode
 	// https://bkaradzic.github.io/bgfx/internals.html#api-and-render-thread
-	bgfx_render_frame(-1);
+	// bgfx_render_frame(-1);
 	
 	printf("bgfx_init... ");
 	if (!bgfx_init(&init)) return false;
-	printf(AC_GREEN "DONE" AC_RESET "\n");
+	puts(AC_GREEN "DONE" AC_RESET);
 	
 	bgfx_set_debug(BGFX_DEBUG_TEXT);
 	
@@ -78,10 +78,12 @@ bool sys_initialize(uint32_t _flags, int _width, int _height) {
 	return true;
 }
 
-void sys_deinitialize(void) {
+void sys_cleanup(void) {
+	puts(AC_MAGENTA "Cleaning up bgfx..." AC_RESET);
 	bgfx_shutdown();
 	while (bgfx_render_frame(1) != BGFX_RENDER_FRAME_NO_CONTEXT) {};
 	
+	puts(AC_MAGENTA "Cleaning up SDL..." AC_RESET);
 	SDL_DestroyWindow(window);
 	SDL_Quit();
 }

@@ -65,7 +65,8 @@ int main(int argc, char* argv[]) {
 	}
 	
 	vertex_init();
-	model_hnd_initialize(1);
+	programs_init(1);
+	models_init(1);
 	
 	struct Model* pCubeModel = model_create(
 		(struct Vertex[]) {
@@ -162,15 +163,18 @@ int main(int argc, char* argv[]) {
 			bgfx_set_view_rect(0, 0, 0, WIDTH, HEIGHT);
 		}
 
-		bgfx_touch(0);
+		bgfx_encoder_t* encoder = bgfx_encoder_begin(true);
+		bgfx_encoder_touch(encoder, 0);
 
 		// render objects START
 
 		mtx_rotate_xy(cube.transform, counter * 0.01f, counter * 0.01f);
 		counter++;
-		obj_render(&cube);
+		obj_encoder_render(encoder, &cube);
 		
 		// render objects END
+		
+		bgfx_encoder_end(encoder);
 		
 		bgfx_frame(false);
 		
@@ -181,8 +185,12 @@ int main(int argc, char* argv[]) {
 	
 	puts(AC_MAGENTA "[SHUTTING DOWN]" AC_RESET);
 
-	model_hnd_deinitialize();
-	sys_deinitialize();
+	puts(AC_MAGENTA "Cleaning up models..." AC_RESET);
+	models_cleanup();
+	puts(AC_MAGENTA "Cleaning up programs..." AC_RESET);
+	programs_cleanup();
+	sys_cleanup();
+	puts(AC_MAGENTA "DONE" AC_RESET);
 	
 	return 0;
 }

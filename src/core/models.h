@@ -17,8 +17,8 @@ struct Model {
 	bgfx_index_buffer_handle_t indexBufferHnd;
 };
 
-extern void model_hnd_initialize(int _maxModelCount);
-extern void model_hnd_deinitialize(void);
+extern void models_init(int _maxModelCount);
+extern void models_cleanup(void);
 
 extern void model_print(const struct Model* _model, bool _printVertices, bool _printIndices);
 

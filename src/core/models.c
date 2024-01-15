@@ -9,12 +9,12 @@
 static bool initialized;
 
 static int modelCount;
-static int currentModelIndex = 0;
+static int currentModelIndex;
 static struct Model* models;
 
-void model_hnd_initialize(int _maxModelCount) {
+void models_init(int _maxModelCount) {
 	if (initialized) {
-		model_hnd_deinitialize();
+		models_cleanup();
 		currentModelIndex = 0;
 	}
 	
@@ -24,11 +24,11 @@ void model_hnd_initialize(int _maxModelCount) {
 	initialized = true;
 }
 
-void model_hnd_deinitialize(void) {
-	for (int i = 0; i < currentModelIndex; i++) {
-		free(models[i].vertices);
-		free(models[i].indices);
-		free(&models[i]);
+void models_cleanup(void) {
+	while (--currentModelIndex >= 0) {
+		free(models[currentModelIndex].vertices);
+		free(models[currentModelIndex].indices);
+		free(&models[currentModelIndex]);
 	}
 	
 	models = NULL;
