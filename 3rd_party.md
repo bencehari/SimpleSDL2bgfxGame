@@ -1,0 +1,3 @@
+- [Simple DirectMedia Layer - Homepage (libsdl.org)](https://www.libsdl.org/)
+- [bkaradzic/bgfx: Cross-platform, graphics API agnostic, "Bring Your Own Engine/Framework" style rendering library. (github.com)](https://github.com/bkaradzic/bgfx)
+- [HandmadeMath/HandmadeMath: A simple math library for games and computer graphics. Compatible with both C and C++. Public domain and easy to modify. (github.com)](https://github.com/HandmadeMath/HandmadeMath)

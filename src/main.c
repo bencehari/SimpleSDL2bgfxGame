@@ -7,9 +7,7 @@
 #include <bgfx/c99/bgfx.h>
 
 #include "sys/init.h"
-#include "math/vector3.h"
-#include "math/vector2.h"
-#include "math/matrix4.h"
+#include "math/HMM_math.h"
 #include "core/programs.h"
 #include "core/vertex.h"
 #include "core/models.h"
@@ -90,11 +88,13 @@ int main(int argc, char* argv[]) {
 	
 	// view related
 	const float moveSpeed = 0.1f;
-	const float rotationSpeed = 0.001f;
-	struct Vec3 playerPos = V3_CTOR(0.0f, 0.0f, -5.0f);
-	struct Vec2 lookInput = V2_CTOR(0.0f, 0.0f);
+	const float rotationSpeed = 20.0f;
+	HMM_Vec3 playerPos = HMM_V3(0.0f, 0.0f, -5.0f);
+	HMM_Vec2 lookInput = HMM_V2(0.0f, 0.0f);
 	
 	// input
+	const float widthRec = 1 / WIDTH_F;
+	const float heightRec = 1 / HEIGHT_F;
 	bool wDown;
 	bool aDown;
 	bool sDown;
@@ -148,8 +148,8 @@ int main(int argc, char* argv[]) {
 					if (SDL_GetRelativeMouseMode()) {
 						SDL_MouseMotionEvent* e = (SDL_MouseMotionEvent*)&event;
 						
-						lookInput.x += e->yrel * rotationSpeed;
-						lookInput.y += e->xrel * rotationSpeed;
+						lookInput.X += e->yrel * widthRec * rotationSpeed;
+						lookInput.Y += e->xrel * heightRec * rotationSpeed;
 					}
 				} break;
 				case SDL_WINDOWEVENT: {
@@ -165,27 +165,83 @@ int main(int argc, char* argv[]) {
 		
 		// process input when the mouse is locked in the window
 		if (SDL_GetRelativeMouseMode()) {
-			struct Vec3 move = ZERO_V3;
+			HMM_Vec3 move = ZERO_V3;
 			
-			if (wDown) move.z += 1.0f;
-			if (sDown) move.z -= 1.0f;
-			if (aDown) move.x -= 1.0f;
-			if (dDown) move.x += 1.0f;
+			if (wDown) move.Z += 1.0f;
+			if (sDown) move.Z -= 1.0f;
+			if (aDown) move.X -= 1.0f;
+			if (dDown) move.X += 1.0f;
 			
-			if (!EQ_V3(move, ZERO_V3)) playerPos = ADD_V3_V3(playerPos, MUL_V3_F(NORM_V3(move), moveSpeed));
+			if (!HMM_Eq(move, ZERO_V3)) playerPos = HMM_Add(playerPos, HMM_Mul(HMM_NormV3(move), moveSpeed));
 		}
 	
-		bgfx_dbg_text_printf(0, 1, 0x0f, "%f %f", lookInput.x, lookInput.y);
+		bgfx_dbg_text_printf(0, 1, 0x0f, "%f %f", lookInput.X, lookInput.Y);
 
 		// calculate view and projection matrix
 		{
 			float view[16];
-			mtx_look_at(view, &playerPos, &ZERO_V3);
+			const HMM_Vec3 v/*iew*/ = HMM_NormV3(HMM_Sub(ZERO_V3, playerPos));
+	
+			HMM_Vec3 right = ZERO_V3;
+			HMM_Vec3 up = ZERO_V3;
+			
+			const HMM_Vec3 uxv = HMM_Cross(UP_V3, v/*iew*/);
+			
+			right = HMM_DotV3(uxv, uxv) == 0.0f ? LEFT_V3 : HMM_NormV3(uxv);
+			up = HMM_Cross(v/*iew*/, right);
+			
+			view[0] = right.X;
+			view[1] = up.X;
+			view[2] = v/*iew*/.X;
+			view[3] = 0.0f;
+			
+			view[4] = right.Y;
+			view[5] = up.Y;
+			view[6] = v/*iew*/.Y;
+			view[7] = 0.0f;
+			
+			view[8] = right.Z;
+			view[9] = up.Z;
+			view[10] = v/*iew*/.Z;
+			view[11] = 0.0f;
+			
+			view[12] = -HMM_DotV3(right, playerPos);
+			view[13] = -HMM_DotV3(up, playerPos);
+			view[14] = -HMM_DotV3(v/*iew*/, playerPos);
+			view[15] = 1.0f;
 
 			// TODO: rotate view
 			
 			float proj[16];
-			mtx_proj(proj, 60.0f, WIDTH_F / HEIGHT_F, 0.1f, 100.0f, bgfx_get_caps()->homogeneousDepth);
+			// ----- TEMP -----
+			// calculate projection matrix
+			const float _fovy = 60.0f;
+			const float _aspect = WIDTH_F / HEIGHT_F;
+			const float _near = 0.1f;
+			const float _far = 100.0f;
+			const bool _homogeneousNdc = bgfx_get_caps()->homogeneousDepth;
+			const float _height = 1.0f / tan(_fovy * HMM_RadToDeg * 0.5f);
+			const float _width = _height * 1.0f / _aspect;
+			
+			const float _x = 0.0f;
+			const float _y = 0.0f;
+			
+			const float diff = _far - _near;
+			const float aa = _homogeneousNdc ? (_far + _near) / diff : _far / diff;
+			const float bb = _homogeneousNdc ? (2.0f * _far * _near) / diff : _near * aa;
+			
+			uint8_t* dst = (uint8_t*)proj;
+			const uint8_t* end = dst + (sizeof(float) * 16);
+			while (dst != end) *dst++ = (char)0;
+			
+			proj[0] = _width;
+			proj[5] = _height;
+			proj[8] = -_x;
+			proj[9] = -_y;
+			proj[10] = aa;
+			proj[11] = 1.0f;
+			proj[14] = -bb;
+			// ----- TEMP -----
 			
 			bgfx_set_view_transform(0, view, proj);
 			bgfx_set_view_rect(0, 0, 0, WIDTH, HEIGHT);
@@ -196,7 +252,30 @@ int main(int argc, char* argv[]) {
 
 		// render objects START
 
-		mtx_rotate_xy(cube.transform, counter * 0.01f, counter * 0.01f);
+		// ----- TEMP -----
+		const float _ax = counter * 0.01f;
+		const float _ay = counter * 0.01f;
+		
+		const float sx = sin(_ax);
+		const float cx = cos(_ax);
+		const float sy = sin(_ay);
+		const float cy = cos(_ay);
+		
+		uint8_t* dst = (uint8_t*)cube.transform;
+		const uint8_t* end = dst + (sizeof(float) * 16);
+		while (dst != end) *dst++ = (char)0;
+
+		cube.transform[0] = cy;
+		cube.transform[2] = sy;
+		cube.transform[4] = sx * sy;
+		cube.transform[5] = cx;
+		cube.transform[6] = -sx * cy;
+		cube.transform[8] = -cx * sy;
+		cube.transform[9] = sx;
+		cube.transform[10] = cx * cy;
+		cube.transform[15] = 1.0f;
+		// ----- TEMP -----
+		
 		counter++;
 		obj_encoder_render(encoder, &cube);
 		
