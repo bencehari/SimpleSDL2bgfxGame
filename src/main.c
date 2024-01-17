@@ -7,7 +7,7 @@
 #include <bgfx/c99/bgfx.h>
 
 #include "sys/init.h"
-#include "math/HMM_math.h"
+#include "math/HMM_include.h"
 #include "core/programs.h"
 #include "core/vertex.h"
 #include "core/models.h"
@@ -15,10 +15,10 @@
 
 #include "utils/consc.h"
 
-#define WIDTH 640
-#define HEIGHT 480
-#define WIDTH_F 640.0
-#define HEIGHT_F 480.0
+#define WIDTH 1024
+#define HEIGHT 768
+#define WIDTH_F 1024.0
+#define HEIGHT_F 768.0
 #define FPS 60
 
 #pragma GCC diagnostic push
@@ -88,17 +88,18 @@ int main(int argc, char* argv[]) {
 	
 	// view related
 	const float moveSpeed = 0.1f;
-	const float rotationSpeed = 20.0f;
-	HMM_Vec3 playerPos = HMM_V3(0.0f, 0.0f, -5.0f);
-	HMM_Vec2 lookInput = HMM_V2(0.0f, 0.0f);
+	const float rotationSpeed = 5.0f;
+	Vec3 playerPos = VEC3_CTOR(0.0f, 0.0f, -5.0f);
+	Vec2 lookRotation = VEC2_CTOR(0.0f, 0.0f);
 	
 	// input
 	const float widthRec = 1 / WIDTH_F;
 	const float heightRec = 1 / HEIGHT_F;
-	bool wDown;
-	bool aDown;
-	bool sDown;
-	bool dDown;
+	bool
+		wDown = false,
+		aDown = false,
+		sDown = false,
+		dDown = false;
 
 	// temp
 	size_t counter = 0;
@@ -148,8 +149,8 @@ int main(int argc, char* argv[]) {
 					if (SDL_GetRelativeMouseMode()) {
 						SDL_MouseMotionEvent* e = (SDL_MouseMotionEvent*)&event;
 						
-						lookInput.X += e->yrel * widthRec * rotationSpeed;
-						lookInput.Y += e->xrel * heightRec * rotationSpeed;
+						lookRotation.X -= e->yrel * widthRec * rotationSpeed;
+						lookRotation.Y += e->xrel * heightRec * rotationSpeed;
 					}
 				} break;
 				case SDL_WINDOWEVENT: {
@@ -165,55 +166,42 @@ int main(int argc, char* argv[]) {
 		
 		// process input when the mouse is locked in the window
 		if (SDL_GetRelativeMouseMode()) {
-			HMM_Vec3 move = ZERO_V3;
+			Vec3 move = ZERO_V3;
 			
 			if (wDown) move.Z += 1.0f;
 			if (sDown) move.Z -= 1.0f;
 			if (aDown) move.X -= 1.0f;
 			if (dDown) move.X += 1.0f;
 			
-			if (!HMM_Eq(move, ZERO_V3)) playerPos = HMM_Add(playerPos, HMM_Mul(HMM_NormV3(move), moveSpeed));
+			if (!EQ(move, ZERO_V3)) playerPos = ADD(playerPos, MUL(NORM_V3(move), moveSpeed));
 		}
+
+		// lookRotation.X = pitch
+		// lookRotation.Y = yaw
+		Vec3 forward = VEC3_CTOR(
+			cos(lookRotation.X) * sin(lookRotation.Y),
+			-sin(lookRotation.X),
+			cos(lookRotation.X) * cos(lookRotation.Y)
+		);
 	
-		bgfx_dbg_text_printf(0, 1, 0x0f, "%f %f", lookInput.X, lookInput.Y);
+		bgfx_dbg_text_printf(0, 1, 0x0f, "POSITION: %.3f %.3f %.3f", playerPos.X, playerPos.Y, playerPos.Z);
+		bgfx_dbg_text_printf(0, 2, 0x0f, "   MOUSE: %.3f %.3f", lookRotation.X, lookRotation.Y);
+		bgfx_dbg_text_printf(0, 3, 0x0f, " FORWARD: %.3f %.3f %.3f", forward.X, forward.Y, forward.Z);
 
 		// calculate view and projection matrix
 		{
-			float view[16];
-			const HMM_Vec3 v/*iew*/ = HMM_NormV3(HMM_Sub(ZERO_V3, playerPos));
-	
-			HMM_Vec3 right = ZERO_V3;
-			HMM_Vec3 up = ZERO_V3;
+			Mat4 view = MUL(
+				MUL(
+					ROT(lookRotation.X, AXIS_X),
+					ROT(lookRotation.Y, AXIS_Y)
+				),
+				TRANSLATE(playerPos)
+			);
 			
-			const HMM_Vec3 uxv = HMM_Cross(UP_V3, v/*iew*/);
+			MAT4_PrintToScreen(&view, 5);
 			
-			right = HMM_DotV3(uxv, uxv) == 0.0f ? LEFT_V3 : HMM_NormV3(uxv);
-			up = HMM_Cross(v/*iew*/, right);
-			
-			view[0] = right.X;
-			view[1] = up.X;
-			view[2] = v/*iew*/.X;
-			view[3] = 0.0f;
-			
-			view[4] = right.Y;
-			view[5] = up.Y;
-			view[6] = v/*iew*/.Y;
-			view[7] = 0.0f;
-			
-			view[8] = right.Z;
-			view[9] = up.Z;
-			view[10] = v/*iew*/.Z;
-			view[11] = 0.0f;
-			
-			view[12] = -HMM_DotV3(right, playerPos);
-			view[13] = -HMM_DotV3(up, playerPos);
-			view[14] = -HMM_DotV3(v/*iew*/, playerPos);
-			view[15] = 1.0f;
-
-			// TODO: rotate view
-			
-			HMM_Mat4 proj = HMM_Perspective_LH_ZO(90.0f, WIDTH_F / HEIGHT_F, 0.1f, 100.0f);
-			bgfx_set_view_transform(0, view, &proj);
+			Mat4 proj = PERSPECTIVE(90.0f, WIDTH_F / HEIGHT_F, 0.1f, 100.0f);
+			bgfx_set_view_transform(0, &view, &proj);
 			bgfx_set_view_rect(0, 0, 0, WIDTH, HEIGHT);
 		}
 
@@ -223,8 +211,8 @@ int main(int argc, char* argv[]) {
 		// render objects START
 
 		const float angle = counter * 0.01f;
-		HMM_Mat4 cubeTr = HMM_M4D(1.0f);
-		cubeTr = HMM_Mul(HMM_Rotate_LH(angle, AXIS_X), HMM_Rotate_LH(angle, AXIS_Y));
+		Mat4 cubeTr = MAT4_CTOR;
+		cubeTr = MUL(ROT(angle, AXIS_X), ROT(angle, AXIS_Y));
 		cube.transform = cubeTr;
 
 		counter++;

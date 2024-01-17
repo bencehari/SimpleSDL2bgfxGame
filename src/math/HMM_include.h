@@ -10,6 +10,7 @@
 #include "HandmadeMath.h"
 #pragma GCC diagnostic pop
 
-#include "HMM_ext.h"
+#include "math_glue.h"
+#include "math_debug.h"
 
 #endif // KE_HMM_MATH_H

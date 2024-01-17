@@ -3,7 +3,7 @@
 
 #include <bgfx/c99/bgfx.h>
 
-#include "../math/HMM_math.h"
+#include "../math/HMM_include.h"
 #include "models.h"
 
 #define OBJECT_CTOR(_m, _p) ((struct Object) {HMM_M4D(1.0f), (_m), (_p)})
