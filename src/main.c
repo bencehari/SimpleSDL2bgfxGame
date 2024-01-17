@@ -88,7 +88,7 @@ int main(int argc, char* argv[]) {
 	
 	// view related
 	const float moveSpeed = 0.1f;
-	const float rotationSpeed = 5.0f;
+	const float rotationSpeed = 1.0f;
 	Vec3 playerPos = VEC3_CTOR(0.0f, 0.0f, -5.0f);
 	Vec2 lookRotation = VEC2_CTOR(0.0f, 0.0f);
 	
@@ -149,8 +149,8 @@ int main(int argc, char* argv[]) {
 					if (SDL_GetRelativeMouseMode()) {
 						SDL_MouseMotionEvent* e = (SDL_MouseMotionEvent*)&event;
 						
-						lookRotation.X -= e->yrel * widthRec * rotationSpeed;
-						lookRotation.Y += e->xrel * heightRec * rotationSpeed;
+						lookRotation.X -= e->yrel * widthRec * 360.0f * rotationSpeed;
+						lookRotation.Y += e->xrel * heightRec * 360.0f * rotationSpeed;
 					}
 				} break;
 				case SDL_WINDOWEVENT: {
@@ -183,22 +183,24 @@ int main(int argc, char* argv[]) {
 			-sin(lookRotation.X),
 			cos(lookRotation.X) * cos(lookRotation.Y)
 		);
+		
+		int dbgTextIdx = 1;
 	
-		bgfx_dbg_text_printf(0, 1, 0x0f, "POSITION: %.3f %.3f %.3f", playerPos.X, playerPos.Y, playerPos.Z);
-		bgfx_dbg_text_printf(0, 2, 0x0f, "   MOUSE: %.3f %.3f", lookRotation.X, lookRotation.Y);
-		bgfx_dbg_text_printf(0, 3, 0x0f, " FORWARD: %.3f %.3f %.3f", forward.X, forward.Y, forward.Z);
+		bgfx_dbg_text_printf(0, dbgTextIdx++, 0x0f, "POSITION: %.3f %.3f %.3f", playerPos.X, playerPos.Y, playerPos.Z);
+		bgfx_dbg_text_printf(0, dbgTextIdx++, 0x0f, "   MOUSE: %.3f %.3f", lookRotation.X, lookRotation.Y);
+		bgfx_dbg_text_printf(0, dbgTextIdx++, 0x0f, " FORWARD: %.3f %.3f %.3f", forward.X, forward.Y, forward.Z);
 
 		// calculate view and projection matrix
 		{
 			Mat4 view = MUL(
 				MUL(
-					ROT(lookRotation.X, AXIS_X),
-					ROT(lookRotation.Y, AXIS_Y)
+					ROT(lookRotation.X * DEG_TO_RAD, AXIS_X),
+					ROT(lookRotation.Y * DEG_TO_RAD, AXIS_Y)
 				),
 				TRANSLATE(playerPos)
 			);
 			
-			MAT4_PrintToScreen(&view, 5);
+			MAT4_PrintToScreen(&view, ++dbgTextIdx); dbgTextIdx++;
 			
 			Mat4 proj = PERSPECTIVE(90.0f, WIDTH_F / HEIGHT_F, 0.1f, 100.0f);
 			bgfx_set_view_transform(0, &view, &proj);
@@ -211,9 +213,7 @@ int main(int argc, char* argv[]) {
 		// render objects START
 
 		const float angle = counter * 0.01f;
-		Mat4 cubeTr = MAT4_CTOR;
-		cubeTr = MUL(ROT(angle, AXIS_X), ROT(angle, AXIS_Y));
-		cube.transform = cubeTr;
+		cube.transform = MUL(ROT(angle, AXIS_X), ROT(angle, AXIS_Y));;
 
 		counter++;
 		obj_encoder_render(encoder, &cube);

@@ -7,6 +7,10 @@ typedef HMM_Vec2 Vec2;
 typedef HMM_Vec3 Vec3;
 #define VEC3_CTOR(_x, _y, _z) (HMM_V3((_x), (_y), (_z)))
 
+typedef HMM_Vec4 Vec4;
+#define VEC4_CTOR(_x, _y, _z, _w) (HMM_V4((_x), (_y), (_z), (_w)))
+#define VEC4_V3_CTOR(_a, _w) (HMM_V4V((_a), (_w)))
+
 typedef HMM_Mat4 Mat4;
 #define MAT4_CTOR (HMM_M4D(1.0f))
 #define MAT4_CTOR_ZERO (HMM_M4())
@@ -34,6 +38,12 @@ typedef HMM_Mat4 Mat4;
 #define ROT(_a, _b) (HMM_Rotate_LH(_a, _b))
 #define TRANSLATE(_a) (HMM_Translate((_a)))
 
-#define PERSPECTIVE(_fov, _ratio, _near, _far) (HMM_Perspective_LH_ZO((_fov), (_ratio), (_near), (_far)))
+#define PERSPECTIVE(_fov, _ratio, _near, _far) \
+	(bgfx_get_caps()->homogeneousDepth ? \
+	HMM_Perspective_LH_NO((_fov), (_ratio), (_near), (_far)) : \
+	HMM_Perspective_LH_ZO((_fov), (_ratio), (_near), (_far)))
+
+#define RAD_TO_DEG (HMM_RadToDeg)
+#define DEG_TO_RAD (HMM_DegToRad)
 
 #endif // KE_HMM_EXT_H

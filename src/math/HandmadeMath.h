@@ -1793,6 +1793,7 @@ static inline HMM_Mat4 HMM_InvOrthographic(HMM_Mat4 OrthoMatrix)
     return Result;
 }
 
+// @h4ri: modified
 COVERAGE(HMM_Perspective_RH_NO, 1)
 static inline HMM_Mat4 HMM_Perspective_RH_NO(float FOV, float AspectRatio, float Near, float Far)
 {
@@ -1802,17 +1803,19 @@ static inline HMM_Mat4 HMM_Perspective_RH_NO(float FOV, float AspectRatio, float
 
     // See https://www.khronos.org/registry/OpenGL-Refpages/gl2.1/xhtml/gluPerspective.xml
 
-    float Cotangent = 1.0f / HMM_TanF(FOV / 2.0f);
+    float Cotangent = 1.0f / HMM_TanF(FOV * 0.5f);
     Result.Elements[0][0] = Cotangent / AspectRatio;
     Result.Elements[1][1] = Cotangent;
     Result.Elements[2][3] = -1.0f;
 
-    Result.Elements[2][2] = (Near + Far) / (Near - Far);
-    Result.Elements[3][2] = (2.0f * Near * Far) / (Near - Far);
+	float diff = Near - Far;
+    Result.Elements[2][2] = (Near + Far) / diff;
+    Result.Elements[3][2] = (2.0f * Near * Far) / diff;
     
     return Result;
 }
 
+// @h4ri: modified
 COVERAGE(HMM_Perspective_RH_ZO, 1)
 static inline HMM_Mat4 HMM_Perspective_RH_ZO(float FOV, float AspectRatio, float Near, float Far)
 {
@@ -1822,13 +1825,14 @@ static inline HMM_Mat4 HMM_Perspective_RH_ZO(float FOV, float AspectRatio, float
 
     // See https://www.khronos.org/registry/OpenGL-Refpages/gl2.1/xhtml/gluPerspective.xml
 
-    float Cotangent = 1.0f / HMM_TanF(FOV / 2.0f);
+    float Cotangent = 1.0f / HMM_TanF(FOV * 0.5f);
     Result.Elements[0][0] = Cotangent / AspectRatio;
     Result.Elements[1][1] = Cotangent;
     Result.Elements[2][3] = -1.0f;
 
-    Result.Elements[2][2] = (Far) / (Near - Far);
-    Result.Elements[3][2] = (Near * Far) / (Near - Far);
+	float diff = Near - Far;
+    Result.Elements[2][2] = (Far) / diff;
+    Result.Elements[3][2] = (Near * Far) / diff;
 
     return Result;
 }
