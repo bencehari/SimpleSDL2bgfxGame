@@ -212,38 +212,8 @@ int main(int argc, char* argv[]) {
 
 			// TODO: rotate view
 			
-			float proj[16];
-			// ----- TEMP -----
-			// calculate projection matrix
-			const float _fovy = 60.0f;
-			const float _aspect = WIDTH_F / HEIGHT_F;
-			const float _near = 0.1f;
-			const float _far = 100.0f;
-			const bool _homogeneousNdc = bgfx_get_caps()->homogeneousDepth;
-			const float _height = 1.0f / tan(_fovy * HMM_RadToDeg * 0.5f);
-			const float _width = _height * 1.0f / _aspect;
-			
-			const float _x = 0.0f;
-			const float _y = 0.0f;
-			
-			const float diff = _far - _near;
-			const float aa = _homogeneousNdc ? (_far + _near) / diff : _far / diff;
-			const float bb = _homogeneousNdc ? (2.0f * _far * _near) / diff : _near * aa;
-			
-			uint8_t* dst = (uint8_t*)proj;
-			const uint8_t* end = dst + (sizeof(float) * 16);
-			while (dst != end) *dst++ = (char)0;
-			
-			proj[0] = _width;
-			proj[5] = _height;
-			proj[8] = -_x;
-			proj[9] = -_y;
-			proj[10] = aa;
-			proj[11] = 1.0f;
-			proj[14] = -bb;
-			// ----- TEMP -----
-			
-			bgfx_set_view_transform(0, view, proj);
+			HMM_Mat4 proj = HMM_Perspective_LH_ZO(90.0f, WIDTH_F / HEIGHT_F, 0.1f, 100.0f);
+			bgfx_set_view_transform(0, view, &proj);
 			bgfx_set_view_rect(0, 0, 0, WIDTH, HEIGHT);
 		}
 
@@ -252,30 +222,11 @@ int main(int argc, char* argv[]) {
 
 		// render objects START
 
-		// ----- TEMP -----
-		const float _ax = counter * 0.01f;
-		const float _ay = counter * 0.01f;
-		
-		const float sx = sin(_ax);
-		const float cx = cos(_ax);
-		const float sy = sin(_ay);
-		const float cy = cos(_ay);
-		
-		uint8_t* dst = (uint8_t*)cube.transform;
-		const uint8_t* end = dst + (sizeof(float) * 16);
-		while (dst != end) *dst++ = (char)0;
+		const float angle = counter * 0.01f;
+		HMM_Mat4 cubeTr = HMM_M4D(1.0f);
+		cubeTr = HMM_Mul(HMM_Rotate_LH(angle, AXIS_X), HMM_Rotate_LH(angle, AXIS_Y));
+		cube.transform = cubeTr;
 
-		cube.transform[0] = cy;
-		cube.transform[2] = sy;
-		cube.transform[4] = sx * sy;
-		cube.transform[5] = cx;
-		cube.transform[6] = -sx * cy;
-		cube.transform[8] = -cx * sy;
-		cube.transform[9] = sx;
-		cube.transform[10] = cx * cy;
-		cube.transform[15] = 1.0f;
-		// ----- TEMP -----
-		
 		counter++;
 		obj_encoder_render(encoder, &cube);
 		
