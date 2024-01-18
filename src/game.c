@@ -38,10 +38,10 @@ void game(float width, float height, float fps) {
 	const float widthRec = 1 / width;
 	const float heightRec = 1 / height;
 	bool
-		wDown = false,
-		aDown = false,
-		sDown = false,
-		dDown = false;
+		forwardDown = false,
+		backDown = false,
+		leftDown = false,
+		rightDown = false;
 
 	// temp
 	size_t counter = 0;
@@ -60,26 +60,26 @@ void game(float width, float height, float fps) {
 				case SDL_KEYDOWN: {
 					switch (event.key.keysym.sym) {
 						case SDLK_UP:
-						case SDLK_w: wDown = true; break;
+						case SDLK_w: forwardDown = true; break;
 						case SDLK_DOWN:
-						case SDLK_s: sDown = true; break;
+						case SDLK_s: backDown = true; break;
 						case SDLK_LEFT:
-						case SDLK_a: aDown = true; break;
+						case SDLK_a: leftDown = true; break;
 						case SDLK_RIGHT:
-						case SDLK_d: dDown = true; break;
+						case SDLK_d: rightDown = true; break;
 					}
 				} break;
 				case SDL_KEYUP: {
 					switch (event.key.keysym.sym) {
 						case SDLK_ESCAPE: SDL_SetRelativeMouseMode(SDL_FALSE); break;
 						case SDLK_UP:
-						case SDLK_w: wDown = false; break;
+						case SDLK_w: forwardDown = false; break;
 						case SDLK_DOWN:
-						case SDLK_s: sDown = false; break;
+						case SDLK_s: backDown = false; break;
 						case SDLK_LEFT:
-						case SDLK_a: aDown = false; break;
+						case SDLK_a: leftDown = false; break;
 						case SDLK_RIGHT:
-						case SDLK_d: dDown = false; break;
+						case SDLK_d: rightDown = false; break;
 					}
 				} break;
 				case SDL_MOUSEBUTTONDOWN: {
@@ -105,26 +105,26 @@ void game(float width, float height, float fps) {
 				} break;
 			}
 		}
+
+		// TODO: gimbal lock problem, if playerPos changed by this, let's learn quaternions
+		// X = pitch, Y = yaw
+		const Vec3 forward = VEC3_CTOR(
+			cos(lookRotation.X) * sin(lookRotation.Y),
+			-sin(lookRotation.X),
+			cos(lookRotation.X) * cos(lookRotation.Y)
+		);
 		
 		// process input when the mouse is locked in the window
 		if (SDL_GetRelativeMouseMode()) {
 			Vec3 move = ZERO_V3;
 			
-			if (wDown) move.Z += 1.0f;
-			if (sDown) move.Z -= 1.0f;
-			if (aDown) move.X -= 1.0f;
-			if (dDown) move.X += 1.0f;
+			if (forwardDown) move.Z += 1.0f;
+			if (backDown) move.Z -= 1.0f;
+			if (leftDown) move.X -= 1.0f;
+			if (rightDown) move.X += 1.0f;
 			
 			if (!EQ(move, ZERO_V3)) playerPos = ADD(playerPos, MUL(NORM_V3(move), moveSpeed));
 		}
-
-		// lookRotation.X = pitch
-		// lookRotation.Y = yaw
-		Vec3 forward = VEC3_CTOR(
-			cos(lookRotation.X) * sin(lookRotation.Y),
-			-sin(lookRotation.X),
-			cos(lookRotation.X) * cos(lookRotation.Y)
-		);
 		
 		int dbgTextIdx = 1;
 		bgfx_dbg_text_printf(0, dbgTextIdx++, 0x0f, "POSITION: %.3f %.3f %.3f", playerPos.X, playerPos.Y, playerPos.Z);
