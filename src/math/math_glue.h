@@ -37,6 +37,7 @@ typedef HMM_Mat4 Mat4;
 
 #define ROT(_a, _b) (HMM_Rotate_LH(_a, _b))
 #define TRANSLATE(_a) (HMM_Translate((_a)))
+#define LOOK_AT(_a, _b) (HMM_LookAt_LH((_a), (_b), UP_V3))
 
 #define PERSPECTIVE(_fov, _ratio, _near, _far) \
 	(bgfx_get_caps()->homogeneousDepth ? \

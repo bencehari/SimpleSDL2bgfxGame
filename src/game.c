@@ -91,8 +91,8 @@ void game(float width, float height, float fps) {
 					if (SDL_GetRelativeMouseMode()) {
 						SDL_MouseMotionEvent* e = (SDL_MouseMotionEvent*)&event;
 						
-						lookRotation.X -= e->yrel * widthRec * 360.0f * rotationSpeed;
-						lookRotation.Y += e->xrel * heightRec * 360.0f * rotationSpeed;
+						lookRotation.X += e->yrel * widthRec * 360.0f * rotationSpeed * DEG_TO_RAD;
+						lookRotation.Y += e->xrel * heightRec * 360.0f * rotationSpeed * DEG_TO_RAD;
 					}
 				} break;
 				case SDL_WINDOWEVENT: {
@@ -127,22 +127,15 @@ void game(float width, float height, float fps) {
 		);
 		
 		int dbgTextIdx = 1;
-	
 		bgfx_dbg_text_printf(0, dbgTextIdx++, 0x0f, "POSITION: %.3f %.3f %.3f", playerPos.X, playerPos.Y, playerPos.Z);
 		bgfx_dbg_text_printf(0, dbgTextIdx++, 0x0f, "   MOUSE: %.3f %.3f", lookRotation.X, lookRotation.Y);
 		bgfx_dbg_text_printf(0, dbgTextIdx++, 0x0f, " FORWARD: %.3f %.3f %.3f", forward.X, forward.Y, forward.Z);
 
 		// calculate view and projection matrix
 		{
-			Mat4 view = MUL(
-				MUL(
-					ROT(lookRotation.X * DEG_TO_RAD, AXIS_X),
-					ROT(lookRotation.Y * DEG_TO_RAD, AXIS_Y)
-				),
-				TRANSLATE(playerPos)
-			);
+			Mat4 view = LOOK_AT(playerPos, ADD(playerPos, forward));
 			
-			MAT4_PrintToScreen(&view, ++dbgTextIdx); dbgTextIdx++;
+			MAT4_print_to_screen(&view, ++dbgTextIdx); dbgTextIdx++;
 			
 			Mat4 proj = PERSPECTIVE(90.0f, width / height, 0.1f, 100.0f);
 			bgfx_set_view_transform(0, &view, &proj);
