@@ -134,26 +134,25 @@ void game(float width, float height, float fps) {
 		// calculate view and projection matrix
 		{
 			Mat4 view = LOOK_AT(playerPos, ADD(playerPos, forward));
-			
-			MAT4_print_to_screen(&view, ++dbgTextIdx); dbgTextIdx++;
+			MAT4_print_to_screen(&view, ++dbgTextIdx, NULL); dbgTextIdx += 5;
 			
 			Mat4 proj = PERSPECTIVE(90.0f, width / height, 0.1f, 100.0f);
 			bgfx_set_view_transform(0, &view, &proj);
 			bgfx_set_view_rect(0, 0, 0, (int)width, (int)height);
+
+			bgfx_encoder_t* encoder = bgfx_encoder_begin(true);
+			bgfx_encoder_touch(encoder, 0);
 		}
 
-		bgfx_encoder_t* encoder = bgfx_encoder_begin(true);
-		bgfx_encoder_touch(encoder, 0);
+		// RENDER objects START
 
-		// render objects START
+		const float angle = counter++ * 0.01f;
 
-		const float angle = counter * 0.01f;
-		cube.transform = MUL(ROT(angle, AXIS_X), ROT(angle, AXIS_Y));;
-
-		counter++;
+		cube.transform = MUL(ROT(angle, AXIS_X), ROT(angle, AXIS_Y));
+		MAT4_print_to_screen(&cube.transform, ++dbgTextIdx, "cube"); dbgTextIdx += 5;
 		obj_encoder_render(encoder, &cube);
 		
-		// render objects END
+		// RENDER objects END
 		
 		bgfx_encoder_end(encoder);
 		

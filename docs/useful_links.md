@@ -16,3 +16,9 @@
 
 - [About size_t and ptrdiff_t (pvs-studio.com)](https://pvs-studio.com/en/blog/posts/cpp/a0050/)
 - [John Carmack on Inlined Code (number-none.com)](http://number-none.com/blow/blog/programming/2014/09/26/carmack-on-inlined-code.html)
+
+
+
+# Rendering
+
+- [math - Calculating a LookAt matrix - Stack Overflow](https://stackoverflow.com/questions/349050/calculating-a-lookat-matrix)

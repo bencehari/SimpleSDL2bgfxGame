@@ -8,7 +8,7 @@
 
 #include "math_glue.h"
 
-extern void MAT4_print_to_screen(const Mat4* _m, int _startRow);
+extern void MAT4_print_to_screen(const Mat4* _m, int _startRow, const char* _name);
 extern void MAT4_print_to_console(const Mat4* _m);
 
 #endif // KE_MATH_DEBUG_H
