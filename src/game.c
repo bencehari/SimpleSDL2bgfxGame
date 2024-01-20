@@ -139,10 +139,10 @@ void game(float width, float height, float fps) {
 			Mat4 proj = PERSPECTIVE(90.0f, width / height, 0.1f, 100.0f);
 			bgfx_set_view_transform(0, &view, &proj);
 			bgfx_set_view_rect(0, 0, 0, (int)width, (int)height);
-
-			bgfx_encoder_t* encoder = bgfx_encoder_begin(true);
-			bgfx_encoder_touch(encoder, 0);
 		}
+
+		bgfx_encoder_t* encoder = bgfx_encoder_begin(true);
+		bgfx_encoder_touch(encoder, 0);
 
 		// RENDER objects START
 
