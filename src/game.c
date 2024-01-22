@@ -136,7 +136,7 @@ void game(float width, float height, float fps) {
 			Mat4 view = LOOK_AT(playerPos, ADD(playerPos, forward));
 			MAT4_print_to_screen(&view, ++dbgTextIdx, NULL); dbgTextIdx += 5;
 			
-			Mat4 proj = PERSPECTIVE(90.0f, width / height, 0.1f, 100.0f);
+			Mat4 proj = PERSPECTIVE(90.0f * DEG_TO_RAD, width / height, 0.1f, 100.0f);
 			bgfx_set_view_transform(0, &view, &proj);
 			bgfx_set_view_rect(0, 0, 0, (int)width, (int)height);
 		}
