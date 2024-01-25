@@ -14,7 +14,7 @@
 
 #include "utils/consc.h"
 
-struct Object createCube();
+static struct Object createCube();
 
 void game(float width, float height, float fps) {
 	vertex_init();
@@ -173,7 +173,7 @@ void game(float width, float height, float fps) {
 
 // ~~~~~
 
-struct Object createCube() {
+static struct Object createCube() {
 	struct Model* pCubeModel = model_create(
 		(struct Vertex[]) {
 			VERTEX_CTOR(-1.0f,  1.0f,  1.0f, 0xff000000),
