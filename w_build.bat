@@ -6,13 +6,13 @@ SETLOCAL enabledelayedexpansion
 :: with `run` in gdb context)
 SET debug_mode=0
 :: if you don't need extra warnings, just add REM or :: at the start of the line
-SET extra=-Wextra
+SET extra=-Wextra -Werror -Wpedantic
 
 :: choosing compiler
 :: for example (in this case, add `-lstdc++` doesn't needed):
 :: compiler=g++ and std_opt=c++17
 SET compiler=gcc
-SET std_opt=c99
+SET std_opt=c17
 
 SET i=0
 FOR /F "tokens=* delims=" %%x in (paths.txt) DO (
