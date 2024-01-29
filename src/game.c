@@ -106,7 +106,6 @@ void game(float width, float height, float fps) {
 			}
 		}
 
-		// TODO: gimbal lock problem, if playerPos changed by this, let's learn quaternions
 		// X = pitch, Y = yaw
 		const Vec3 forward = VEC3_CTOR(
 			cos(lookRotation.X) * sin(lookRotation.Y),
@@ -148,7 +147,7 @@ void game(float width, float height, float fps) {
 
 		const float angle = counter++ * 0.01f;
 
-		cube.transform = MUL(ROT(angle, AXIS_X), ROT(angle, AXIS_Y));
+		cube.transform = QUAT_TO_MAT4(MUL_Q(QUAT_AA(AXIS_X, angle), QUAT_AA(AXIS_Y, angle)));
 		MAT4_print_to_screen(&cube.transform, ++dbgTextIdx, "cube"); dbgTextIdx += 5;
 		obj_encoder_render(encoder, &cube);
 		

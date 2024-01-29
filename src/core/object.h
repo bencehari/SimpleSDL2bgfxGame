@@ -6,10 +6,11 @@
 #include "../math/HMM_include.h"
 #include "models.h"
 
-#define OBJECT_CTOR(_m, _p) ((struct Object) {HMM_M4D(1.0f), (_m), (_p)})
+#define OBJECT_CTOR(_m, _p) ((struct Object) {MAT4_CTOR, QUAT_CTOR_ZERO, (_m), (_p)})
 
 struct Object {
-	HMM_Mat4 transform;
+	Mat4 transform;
+	Quat rotation;
 	struct Model* model;
 	bgfx_program_handle_t program;
 };

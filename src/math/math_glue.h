@@ -30,12 +30,27 @@ typedef HMM_Vec3 Vec3;
 typedef HMM_Vec4 Vec4;
 #define VEC4_CTOR(_x, _y, _z, _w) (HMM_V4((_x), (_y), (_z), (_w)))
 #define VEC4_V3_CTOR(_a, _w) (HMM_V4V((_a), (_w)))
+#define VEC4_CTOR_ZERO (HMM_V4(0.0f, 0.0f, 0.0f, 0.0f))
 
 typedef HMM_Quat Quat;
 #define QUAT_CTOR(_x, _y, _z, _w) (HMM_Q((_x), (_y), (_z), (_w)))
 #define QUAT_V4_CTOR(_a) (HMM_QV4((_a)))
+#define QUAT_CTOR_ZERO (QUAT_V4_CTOR(VEC4_CTOR_ZERO))
 
 #define QUAT_AA(_a, _b) (HMM_QFromAxisAngle_LH((_a), (_b)))
+
+#define ADD_Q(_a, _b) (HMM_AddQ((_a), (_b)))
+#define SUB_Q(_a, _b) (HMM_SubQ((_a), (_b)))
+#define MUL_Q(_a, _b) _Generic((_a), \
+	Quat: HMM_MulQ, \
+	float: HMM_MulQF \
+)((_a), (_b))
+#define DIV_Q(_a, _b) (HMM_DivQF((_a), (_b)))
+#define DOT_Q(_a, _b) (HMM_DotQ((_a), (_b)))
+#define INV_Q(_a) (HMM_InvQ((_a)))
+#define NORM_Q(_a) (HMM_NormQ((_a)))
+#define NLERP_Q(_a, _b, _c) (HMM_NLerp((_a), (_b), (_c)))
+#define SLERP_Q(_a, _b, _c) (HMM_SLerp((_a), (_b), (_c)))
 
 #define QUAT_TO_MAT4(_a) (HMM_QToM4((_a)))
 
