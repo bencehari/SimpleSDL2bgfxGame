@@ -6,7 +6,7 @@ SETLOCAL enabledelayedexpansion
 :: with `run` in gdb context)
 SET debug_mode=0
 :: if you don't need extra warnings, just add REM or :: at the start of the line
-SET extra=-Wextra -Werror -Wpedantic
+SET extra=-Wextra -Werror -pedantic
 
 :: choosing compiler
 :: for example (in this case, add `-lstdc++` doesn't needed):

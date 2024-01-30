@@ -43,9 +43,6 @@ void game(float width, float height, float fps) {
 		leftDown = false,
 		rightDown = false;
 
-	// temp
-	size_t counter = 0;
-	
 	bool running = true;
 	SDL_Event event;
 	
@@ -145,9 +142,12 @@ void game(float width, float height, float fps) {
 
 		// RENDER objects START
 
-		const float angle = counter++ * 0.01f;
-
-		cube.transform = QUAT_TO_MAT4(MUL_Q(QUAT_AA(AXIS_X, angle), QUAT_AA(AXIS_Y, angle)));
+		static size_t counter = 0;
+		float angle = counter++ * 0.01f;
+		obj_set_rot_xyz(&cube, angle, angle, 0.0f);
+		// TODO: these are not produces the same outcome. Investigate!	
+		// obj_rot_xy(&cube, 0.01f, 0.01f);
+		
 		MAT4_print_to_screen(&cube.transform, ++dbgTextIdx, "cube"); dbgTextIdx += 5;
 		obj_encoder_render(encoder, &cube);
 		
