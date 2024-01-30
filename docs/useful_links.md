@@ -22,3 +22,9 @@
 # Rendering
 
 - [math - Calculating a LookAt matrix - Stack Overflow](https://stackoverflow.com/questions/349050/calculating-a-lookat-matrix)
+
+
+
+# Rotation
+
+- [AnyLeaf articles: Quaternions: A practical guide](https://www.anyleaf.org/blog/quaternions:-a-practical-guide)
