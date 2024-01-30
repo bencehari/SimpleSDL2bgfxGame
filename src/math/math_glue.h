@@ -34,8 +34,8 @@ typedef HMM_Vec4 Vec4;
 
 typedef HMM_Quat Quat;
 #define QUAT_CTOR(_x, _y, _z, _w) (HMM_Q((_x), (_y), (_z), (_w)))
+#define QUAT_IDENTITY (QUAT_CTOR(0.0f, 0.0f, 0.0f, 1.0f))
 #define QUAT_V4_CTOR(_a) (HMM_QV4((_a)))
-#define QUAT_CTOR_ZERO (QUAT_V4_CTOR(VEC4_CTOR_ZERO))
 
 #define QUAT_AA(_a, _b) (HMM_QFromAxisAngle_LH((_a), (_b)))
 
@@ -55,7 +55,7 @@ typedef HMM_Quat Quat;
 #define QUAT_TO_MAT4(_a) (HMM_QToM4((_a)))
 
 typedef HMM_Mat4 Mat4;
-#define MAT4_CTOR (HMM_M4D(1.0f))
+#define MAT4_IDENTITY (HMM_M4D(1.0f))
 #define MAT4_CTOR_ZERO (HMM_M4())
 
 #define MAT4_TO_QUAT(_a) (HMM_M4ToQ_LH((_a)))

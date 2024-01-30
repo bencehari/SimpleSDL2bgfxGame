@@ -69,7 +69,7 @@ void obj_rot_xyz(struct Object* _o, float _xAngle, float _yAngle, float _zAngle)
 }
 
 void obj_set_rot_xyz(struct Object* _o, float _xAngle, float _yAngle, float _zAngle) {
-	_o->transform = MUL(MAT4_CTOR, QUAT_TO_MAT4(MUL_Q(MUL_Q(QUAT_AA(AXIS_X, _xAngle), QUAT_AA(AXIS_Y, _yAngle)), QUAT_AA(AXIS_Z, _zAngle))));
+	_o->transform = MUL(MAT4_IDENTITY, QUAT_TO_MAT4(MUL_Q(MUL_Q(QUAT_AA(AXIS_X, _xAngle), QUAT_AA(AXIS_Y, _yAngle)), QUAT_AA(AXIS_Z, _zAngle))));
 }
 
 void obj_render(const struct Object* _o) {

@@ -6,7 +6,7 @@
 #include "../math/HMM_include.h"
 #include "models.h"
 
-#define OBJECT_CTOR(_m, _p) ((struct Object) {MAT4_CTOR, QUAT_CTOR_ZERO, (_m), (_p)})
+#define OBJECT_CTOR(_m, _p) ((struct Object) {MAT4_IDENTITY, QUAT_IDENTITY, (_m), (_p)})
 
 struct Object {
 	Mat4 transform;
