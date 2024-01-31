@@ -5,71 +5,75 @@
 #define RAD_TO_DEG (HMM_RadToDeg)
 #define DEG_TO_RAD (HMM_DegToRad)
 
-typedef HMM_Vec2 Vec2;
-#define VEC2_CTOR(_x, _y) (HMM_V2((_x), (_y)))
+typedef HMM_Vec2 Vector2;
+#define V2_NEW(_x, _y) (HMM_V2((_x), (_y)))
 
-#define NORM_V2(_a) (HMM_NormV2((_a)))
+#define V2_NORM(_v2) (HMM_NormV2((_v2)))
 
-typedef HMM_Vec3 Vec3;
-#define VEC3_CTOR(_x, _y, _z) (HMM_V3((_x), (_y), (_z)))
+typedef HMM_Vec3 Vector3;
+#define V3_NEW(_x, _y, _z) (HMM_V3((_x), (_y), (_z)))
+#define V3_ONE (V3_NEW(0.0f, 0.0f, 0.0f))
 
-#define ZERO_V3 (VEC3_CTOR(0.0f, 0.0f, 0.0f))
-#define UP_V3 (VEC3_CTOR(0.0f, 1.0f, 0.0f))
-#define DOWN_V3 (VEC3_CTOR(0.0f, -1.0f, 0.0f))
-#define LEFT_V3 (VEC3_CTOR(-1.0f, 0.0f, 0.0f))
-#define RIGHT_V3 (VEC3_CTOR(-1.0f, 0.0f, 0.0f))
-#define FORWARD_V3 (VEC3_CTOR(0.0f, 0.0f, 1.0f))
-#define BACK_V3 (VEC3_CTOR(0.0f, 0.0f, -1.0f))
+#define V3_ZERO (V3_NEW(0.0f, 0.0f, 0.0f))
+#define V3_UP (V3_NEW(0.0f, 1.0f, 0.0f))
+#define V3_DOWN (V3_NEW(0.0f, -1.0f, 0.0f))
+#define V3_LEFT (V3_NEW(-1.0f, 0.0f, 0.0f))
+#define V3_RIGHT (V3_NEW(-1.0f, 0.0f, 0.0f))
+#define V3_FORWARD (V3_NEW(0.0f, 0.0f, 1.0f))
+#define V3_BACK (V3_NEW(0.0f, 0.0f, -1.0f))
 
-#define AXIS_X (RIGHT_V3)
-#define AXIS_Y (UP_V3)
-#define AXIS_Z (FORWARD_V3)
+#define AXIS_X (V3_RIGHT)
+#define AXIS_Y (V3_UP)
+#define AXIS_Z (V3_FORWARD)
 
-#define NORM_V3(_a) (HMM_NormV3((_a)))
+#define V3_NORM(_v3) (HMM_NormV3((_v3)))
 
-typedef HMM_Vec4 Vec4;
-#define VEC4_CTOR(_x, _y, _z, _w) (HMM_V4((_x), (_y), (_z), (_w)))
-#define VEC4_V3_CTOR(_a, _w) (HMM_V4V((_a), (_w)))
-#define VEC4_CTOR_ZERO (HMM_V4(0.0f, 0.0f, 0.0f, 0.0f))
+typedef HMM_Vec4 Vector4;
+#define V4_NEW(_x, _y, _z, _w) (HMM_V4((_x), (_y), (_z), (_w)))
+#define V4_V3_NEW(_v3, _w) (HMM_V4V((_v3), (_w)))
+#define V4_ZERO (HMM_V4(0.0f, 0.0f, 0.0f, 0.0f))
 
-typedef HMM_Quat Quat;
-#define QUAT_CTOR(_x, _y, _z, _w) (HMM_Q((_x), (_y), (_z), (_w)))
-#define QUAT_IDENTITY (QUAT_CTOR(0.0f, 0.0f, 0.0f, 1.0f))
-#define QUAT_V4_CTOR(_a) (HMM_QV4((_a)))
+typedef HMM_Quat Quaternion;
+#define QUAT_NEW(_x, _y, _z, _w) (HMM_Q((_x), (_y), (_z), (_w)))
+#define QUAT_IDENTITY (QUAT_NEW(0.0f, 0.0f, 0.0f, 1.0f))
+#define QUAT_V4_NEW(_v4) (HMM_QV4((_v4)))
 
-#define QUAT_AA(_a, _b) (HMM_QFromAxisAngle_LH((_a), (_b)))
+#define QUAT_AA(_axis, _angle) (HMM_QFromAxisAngle_LH((_axis), (_angle)))
 
-#define ADD_Q(_a, _b) (HMM_AddQ((_a), (_b)))
-#define SUB_Q(_a, _b) (HMM_SubQ((_a), (_b)))
-#define MUL_Q(_a, _b) _Generic((_a), \
-	Quat: HMM_MulQ, \
+#define Q_ADD(_q1, _q2) (HMM_AddQ((_q1), (_q2)))
+#define Q_SUB(_q1, _q2) (HMM_SubQ((_q1), (_q2)))
+#define Q_MUL(_q, _b) _Generic((_q), \
+	Quaternion: HMM_MulQ, \
 	float: HMM_MulQF \
-)((_a), (_b))
-#define DIV_Q(_a, _b) (HMM_DivQF((_a), (_b)))
-#define DOT_Q(_a, _b) (HMM_DotQ((_a), (_b)))
-#define INV_Q(_a) (HMM_InvQ((_a)))
-#define NORM_Q(_a) (HMM_NormQ((_a)))
-#define NLERP_Q(_a, _b, _c) (HMM_NLerp((_a), (_b), (_c)))
-#define SLERP_Q(_a, _b, _c) (HMM_SLerp((_a), (_b), (_c)))
+)((_q), (_b))
+#define Q_DIV(_q1, _q2) (HMM_DivQF((_q1), (_q2)))
+#define Q_DOT(_q1, _q2) (HMM_DotQ((_q1), (_q2)))
+#define Q_INV(_q) (HMM_InvQ((_q)))
+// in case of unit Q, the Q's conjugate (Q*) equals the inverse (Q^-1) of that Q
+#define Q_CONJ(_q) (QUAT_NEW(-((_q).X), -((_q).Y), -((_q).Z), ((_q).W)))
+#define Q_NORM(_q) (HMM_NormQ((_q)))
+#define Q_NLERP(_q1, _f, _q2) (HMM_NLerp((_q1), (_f), (_q2)))
+#define Q_SLERP(_q1, _f, _q2) (HMM_SLerp((_q1), (_f), (_q2)))
 
-#define QUAT_TO_MAT4(_a) (HMM_QToM4((_a)))
+#define QUAT_TO_MAT4(_q) (HMM_QToM4((_q)))
 
-typedef HMM_Mat4 Mat4;
-#define MAT4_IDENTITY (HMM_M4D(1.0f))
-#define MAT4_CTOR_ZERO (HMM_M4())
+typedef HMM_Mat4 Matrix4x4;
+#define M4x4_IDENTITY (HMM_M4D(1.0f))
+#define M4x4_ZERO (HMM_M4())
+#define M4x4_POS(_x, _y, _z) ((Matrix4x4) {{ { 1.0f, 0.0f, 0.0f, (_x) }, { 0.0f, 1.0f, 0.0f, (_y)} , { 0.0f, 0.0f, 1.0f, (_z) }, { 0.0f, 0.0f, 0.0f, 1.0f } }})
 
-#define MAT4_TO_QUAT(_a) (HMM_M4ToQ_LH((_a)))
+#define M4x4_TO_QUAT(_m4x4) (HMM_M4ToQ_LH((_m4x4)))
 
-#define ROT(_a, _b) (HMM_Rotate_LH(_a, _b))
-#define TRANSLATE(_a) (HMM_Translate((_a)))
-#define LOOK_AT(_a, _b) (HMM_LookAt_LH((_a), (_b), UP_V3))
+#define ROT(_m4x4_1, _m4x4_2) (HMM_Rotate_LH(_m4x4_1, _m4x4_2))
+#define TRANSLATE(_m4x4) (HMM_Translate((_m4x4)))
+#define LOOK_AT(_v3_1, _v3_2) (HMM_LookAt_LH((_v3_1), (_v3_2), V3_UP))
 
 #define PERSPECTIVE(_fov, _ratio, _near, _far) \
 	(bgfx_get_caps()->homogeneousDepth ? \
 	HMM_Perspective_LH_NO((_fov), (_ratio), (_near), (_far)) : \
 	HMM_Perspective_LH_ZO((_fov), (_ratio), (_near), (_far)))
 
-// COMMON
+// COMMON (V2, V3, V4, M4x4)
 #define EQ(_a, _b) (HMM_Eq((_a), (_b)))
 #define ADD(_a, _b) (HMM_Add((_a), (_b)))
 #define SUB(_a, _b) (HMM_Sub((_a), (_b)))

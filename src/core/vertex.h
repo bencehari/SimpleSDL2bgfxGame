@@ -12,7 +12,7 @@ struct Vertex {
 
 extern bgfx_vertex_layout_t vertexLayout;
 
-#define VERTEX_CTOR(_x, _y, _z, _c) ((struct Vertex) { (_x), (_y), (_z), (_c) })
+#define VERTEX_NEW(_x, _y, _z, _c) ((struct Vertex) { (_x), (_y), (_z), (_c) })
 
 extern void vertex_init(void);
 

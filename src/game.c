@@ -6,10 +6,11 @@
 #include <SDL2/SDL.h>
 #include <bgfx/c99/bgfx.h>
 
-#include "math/HMM_include.h"
+#include "math/math_include.h"
 #include "core/programs.h"
 #include "core/vertex.h"
 #include "core/models.h"
+#include "core/transform.h"
 #include "core/object.h"
 
 #include "utils/consc.h"
@@ -31,12 +32,12 @@ void game(float width, float height, float fps) {
 	// view related
 	const float moveSpeed = 0.1f;
 	const float rotationSpeed = 1.0f;
-	Vec3 playerPos = VEC3_CTOR(0.0f, 0.0f, -5.0f);
-	Vec2 lookRotation = VEC2_CTOR(0.0f, 0.0f);
+	Vector3 cameraPos = V3_NEW(0.0f, 0.0f, -5.0f);
+	Vector2 lookRotation = V2_NEW(0.0f, 0.0f);
 	
 	// input
-	const float widthRec = 1 / width;
-	const float heightRec = 1 / height;
+	const float widthRec = 1.0f / width;
+	const float heightRec = 1.0f / height;
 	bool
 		forwardDown = false,
 		backDown = false,
@@ -104,7 +105,7 @@ void game(float width, float height, float fps) {
 		}
 
 		// X = pitch, Y = yaw
-		const Vec3 forward = VEC3_CTOR(
+		const Vector3 forward = V3_NEW(
 			cos(lookRotation.X) * sin(lookRotation.Y),
 			-sin(lookRotation.X),
 			cos(lookRotation.X) * cos(lookRotation.Y)
@@ -112,27 +113,27 @@ void game(float width, float height, float fps) {
 		
 		// process input when the mouse is locked in the window
 		if (SDL_GetRelativeMouseMode()) {
-			Vec3 move = ZERO_V3;
+			Vector3 move = V3_ZERO;
 			
 			if (forwardDown) move.Z += 1.0f;
 			if (backDown) move.Z -= 1.0f;
 			if (leftDown) move.X -= 1.0f;
 			if (rightDown) move.X += 1.0f;
 			
-			if (!EQ(move, ZERO_V3)) playerPos = ADD(playerPos, MUL(NORM_V3(move), moveSpeed));
+			if (!EQ(move, V3_ZERO)) cameraPos = ADD(cameraPos, MUL(V3_NORM(move), moveSpeed));
 		}
 		
 		int dbgTextIdx = 1;
-		bgfx_dbg_text_printf(0, dbgTextIdx++, 0x0f, "POSITION: %.3f %.3f %.3f", playerPos.X, playerPos.Y, playerPos.Z);
+		bgfx_dbg_text_printf(0, dbgTextIdx++, 0x0f, "POSITION: %.3f %.3f %.3f", cameraPos.X, cameraPos.Y, cameraPos.Z);
 		bgfx_dbg_text_printf(0, dbgTextIdx++, 0x0f, "   MOUSE: %.3f %.3f", lookRotation.X, lookRotation.Y);
 		bgfx_dbg_text_printf(0, dbgTextIdx++, 0x0f, " FORWARD: %.3f %.3f %.3f", forward.X, forward.Y, forward.Z);
 
 		// calculate view and projection matrix
 		{
-			Mat4 view = LOOK_AT(playerPos, ADD(playerPos, forward));
+			Matrix4x4 view = LOOK_AT(cameraPos, ADD(cameraPos, forward));
 			MAT4_print_to_screen(&view, ++dbgTextIdx, NULL); dbgTextIdx += 5;
 			
-			Mat4 proj = PERSPECTIVE(90.0f * DEG_TO_RAD, width / height, 0.1f, 100.0f);
+			Matrix4x4 proj = PERSPECTIVE(90.0f * DEG_TO_RAD, width / height, 0.1f, 100.0f);
 			bgfx_set_view_transform(0, &view, &proj);
 			bgfx_set_view_rect(0, 0, 0, (int)width, (int)height);
 		}
@@ -142,13 +143,19 @@ void game(float width, float height, float fps) {
 
 		// RENDER objects START
 
-		static size_t counter = 0;
+		/*static size_t counter = 0;
 		float angle = counter++ * 0.01f;
-		obj_set_rot_xyz(&cube, angle, angle, 0.0f);
+		tr_set_rot_xyz(&cube.transform, angle, angle, 0.0f);*/
 		// TODO: these are not produces the same outcome. Investigate!	
-		// obj_rot_xy(&cube, 0.01f, 0.01f);
+		tr_rot_xy(&cube.transform, 0.01f, 0.01f);
 		
-		MAT4_print_to_screen(&cube.transform, ++dbgTextIdx, "cube"); dbgTextIdx += 5;
+		Matrix4x4 cubeDebugM4x4 = MUL(
+			// translation matrix
+			M4x4_POS(cube.transform.translation.X, cube.transform.translation.Y, cube.transform.translation.Z),
+			// rotation matrix
+			QUAT_TO_MAT4(cube.transform.rotation)
+		);
+		MAT4_print_to_screen(&cubeDebugM4x4, ++dbgTextIdx, "cube"); dbgTextIdx += 5;
 		obj_encoder_render(encoder, &cube);
 		
 		// RENDER objects END
@@ -175,14 +182,14 @@ void game(float width, float height, float fps) {
 static struct Object createCube() {
 	struct Model* pCubeModel = model_create(
 		(struct Vertex[]) {
-			VERTEX_CTOR(-1.0f,  1.0f,  1.0f, 0xff000000),
-			VERTEX_CTOR( 1.0f,  1.0f,  1.0f, 0xff0000ff),
-			VERTEX_CTOR(-1.0f, -1.0f,  1.0f, 0xff00ff00),
-			VERTEX_CTOR( 1.0f, -1.0f,  1.0f, 0xff00ffff),
-			VERTEX_CTOR(-1.0f,  1.0f, -1.0f, 0xffff0000),
-			VERTEX_CTOR( 1.0f,  1.0f, -1.0f, 0xffff00ff),
-			VERTEX_CTOR(-1.0f, -1.0f, -1.0f, 0xffffff00),
-			VERTEX_CTOR( 1.0f, -1.0f, -1.0f, 0xffffffff),
+			VERTEX_NEW(-1.0f,  1.0f,  1.0f, 0xff000000),
+			VERTEX_NEW( 1.0f,  1.0f,  1.0f, 0xff0000ff),
+			VERTEX_NEW(-1.0f, -1.0f,  1.0f, 0xff00ff00),
+			VERTEX_NEW( 1.0f, -1.0f,  1.0f, 0xff00ffff),
+			VERTEX_NEW(-1.0f,  1.0f, -1.0f, 0xffff0000),
+			VERTEX_NEW( 1.0f,  1.0f, -1.0f, 0xffff00ff),
+			VERTEX_NEW(-1.0f, -1.0f, -1.0f, 0xffffff00),
+			VERTEX_NEW( 1.0f, -1.0f, -1.0f, 0xffffffff),
 		},
 		8,
 		(uint16_t[]) {
@@ -206,5 +213,5 @@ static struct Object createCube() {
 	
 	bgfx_program_handle_t cubeProgHnd = program_create("vs_cubes.bin", "fs_cubes.bin", true);
 	
-	return OBJECT_CTOR(pCubeModel, cubeProgHnd);
+	return OBJECT_NEW(pCubeModel, cubeProgHnd);
 }
