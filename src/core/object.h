@@ -7,7 +7,7 @@
 #include "transform.h"
 #include "models.h"
 
-#define OBJECT_NEW(_m, _p) ((struct Object) { TRANSFORM_NEW, (_m), (_p)})
+#define OBJECT_NEW(_m, _p) ((struct Object) { TRANSFORM_DEFAULT, (_m), (_p)})
 
 struct Object {
 	struct Transform transform;

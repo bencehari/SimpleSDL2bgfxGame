@@ -14,6 +14,7 @@
 #include "core/object.h"
 
 #include "utils/consc.h"
+#include "utils/debug.h"
 
 static struct Object createCube();
 
@@ -21,6 +22,8 @@ void game(float width, float height, float fps) {
 	vertex_init();
 	programs_init(1);
 	models_init(1);
+	
+	struct Transform camera = TRANSFORM_NEW(V3_NEW(0.0f, 0.0f, -5.0f), QUAT_IDENTITY, V3_ONE);
 	
 	struct Object cube = createCube();
 	
@@ -32,12 +35,11 @@ void game(float width, float height, float fps) {
 	// view related
 	const float moveSpeed = 0.1f;
 	const float rotationSpeed = 1.0f;
-	Vector3 cameraPos = V3_NEW(0.0f, 0.0f, -5.0f);
-	Vector2 lookRotation = V2_NEW(0.0f, 0.0f);
+	Vector2 lookRotation = V2_ZERO;
 	
 	// input
-	const float widthRec = 1.0f / width;
-	const float heightRec = 1.0f / height;
+	const float widthNorm = 1.0f / width;
+	const float heightNorm = 1.0f / height;
 	bool
 		forwardDown = false,
 		backDown = false,
@@ -49,6 +51,8 @@ void game(float width, float height, float fps) {
 	
 	puts(AC_MAGENTA "[GAME LOOP START]" AC_RESET);
 	while (running) {
+		dbg_reset();
+		
 		lastTick = SDL_GetTicks();
 		bgfx_dbg_text_clear(0, false);
 		
@@ -89,8 +93,8 @@ void game(float width, float height, float fps) {
 					if (SDL_GetRelativeMouseMode()) {
 						SDL_MouseMotionEvent* e = (SDL_MouseMotionEvent*)&event;
 						
-						lookRotation.X += DEG_TO_RAD(e->yrel * widthRec * 360.0f * rotationSpeed);
-						lookRotation.Y += DEG_TO_RAD(e->xrel * heightRec * 360.0f * rotationSpeed);
+						lookRotation.X += DEG_TO_RAD(e->yrel * widthNorm * 360.0f * rotationSpeed);
+						lookRotation.Y += DEG_TO_RAD(e->xrel * heightNorm * 360.0f * rotationSpeed);
 					}
 				} break;
 				case SDL_WINDOWEVENT: {
@@ -105,11 +109,7 @@ void game(float width, float height, float fps) {
 		}
 
 		// X = pitch, Y = yaw
-		const Vector3 forward = V3_NEW(
-			cos(lookRotation.X) * sin(lookRotation.Y),
-			-sin(lookRotation.X),
-			cos(lookRotation.X) * cos(lookRotation.Y)
-		);
+		const Vector3 forward = V3_NEW(cos(lookRotation.X) * sin(lookRotation.Y), -sin(lookRotation.X), cos(lookRotation.X) * cos(lookRotation.Y));
 		
 		// process input when the mouse is locked in the window
 		if (SDL_GetRelativeMouseMode()) {
@@ -120,18 +120,18 @@ void game(float width, float height, float fps) {
 			if (leftDown) move.X -= 1.0f;
 			if (rightDown) move.X += 1.0f;
 			
-			if (!V3_EQ(move, V3_ZERO)) cameraPos = V3_ADD(cameraPos, V3_MUL_F(V3_NORM(move), moveSpeed));
+			if (!V3_EQ(move, V3_ZERO)) camera.position = V3_ADD(camera.position, V3_MUL_F(V3_NORM(move), moveSpeed));
 		}
 		
-		int dbgTextIdx = 1;
-		bgfx_dbg_text_printf(0, dbgTextIdx++, 0x0f, "POSITION: %.3f %.3f %.3f", cameraPos.X, cameraPos.Y, cameraPos.Z);
-		bgfx_dbg_text_printf(0, dbgTextIdx++, 0x0f, "   MOUSE: %.3f %.3f", lookRotation.X, lookRotation.Y);
-		bgfx_dbg_text_printf(0, dbgTextIdx++, 0x0f, " FORWARD: %.3f %.3f %.3f", forward.X, forward.Y, forward.Z);
+		dbg_print_to_screen("CAM POS: %.3f %.3f %.3f", camera.position.X, camera.position.Y, camera.position.Z);
+		dbg_print_to_screen("FORWARD: %.3f %.3f %.3f", forward.X, forward.Y, forward.Z);
+		dbg_space(1);
 
 		// calculate view and projection matrix
 		{
-			Matrix4x4 view = LOOK_AT(cameraPos, V3_ADD(cameraPos, forward));
-			MAT4_print_to_screen(&view, ++dbgTextIdx, NULL); dbgTextIdx += 5;
+			Matrix4x4 view = LOOK_AT(camera.position, V3_ADD(camera.position, forward));
+			
+			dbg_m4x4_to_screen(&view, NULL); dbg_space(1);
 			
 			Matrix4x4 proj = PERSPECTIVE(DEG_TO_RAD(90.0f), width / height, 0.1f, 100.0f);
 			bgfx_set_view_transform(0, &view, &proj);
@@ -145,15 +145,16 @@ void game(float width, float height, float fps) {
 
 		tr_rot_xyz(&cube.transform, 0.01f, 0.01f, 0.01f);
 		
-		bgfx_dbg_text_printf(0, ++dbgTextIdx, 0x0f, " cube pos: %.3f %.3f %.3f", cube.transform.position.X, cube.transform.position.Y, cube.transform.position.Z); dbgTextIdx++;
-		
 		Matrix4x4 cubeDebugM4x4 = M4x4_MUL(
 			// translation matrix
 			M4x4_POS(cube.transform.position.X, cube.transform.position.Y, cube.transform.position.Z),
 			// rotation matrix
 			QUAT_TO_MAT4(cube.transform.rotation)
 		);
-		MAT4_print_to_screen(&cubeDebugM4x4, ++dbgTextIdx, "cube"); dbgTextIdx += 5;
+		
+		dbg_m4x4_to_screen(&cubeDebugM4x4, "cube"); dbg_space(1);
+		dbg_print_to_screen("CUBE POS: %.3f %.3f %.3f", cube.transform.position.X, cube.transform.position.Y, cube.transform.position.Z);
+		
 		obj_encoder_render(encoder, &cube);
 		
 		// RENDER objects END

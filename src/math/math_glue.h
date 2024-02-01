@@ -1,5 +1,5 @@
-#ifndef KE_HMM_EXT_H
-#define KE_HMM_EXT_H
+#ifndef KE_MATH_GLUE_H
+#define KE_MATH_GLUE_H
 
 // float
 #define RAD_TO_DEG(_f) ((_f) * HMM_RadToDeg)
@@ -7,6 +7,7 @@
 
 typedef HMM_Vec2 Vector2;
 #define V2_NEW(_x, _y) (HMM_V2((_x), (_y)))
+#define V2_ZERO (V2_NEW(0.0f, 0.0f))
 
 #define V2_EQ(_v2_1, _v2_2) (HMM_EqV2((_v2_1), (_v2_2)))
 
@@ -88,4 +89,4 @@ typedef HMM_Mat4 Matrix4x4;
 	HMM_Perspective_LH_ZO((_fov), (_ratio), (_near), (_far)))
 
 
-#endif // KE_HMM_EXT_H
+#endif // KE_MATH_GLUE_H

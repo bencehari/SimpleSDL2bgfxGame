@@ -12,6 +12,5 @@
 #pragma GCC diagnostic pop
 
 #include "math_glue.h"
-#include "math_debug.h"
 
 #endif // KE_HMM_MATH_H

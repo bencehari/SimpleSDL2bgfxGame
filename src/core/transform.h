@@ -9,7 +9,8 @@ struct Transform {
 	Vector3 scale;
 };
 
-#define TRANSFORM_NEW ((struct Transform) { V3_ZERO, QUAT_IDENTITY, V3_ONE })
+#define TRANSFORM_NEW(_v3_pos, _q_rot, _v3_sc) ((struct Transform) { (_v3_pos), (_q_rot), (_v3_sc) })
+#define TRANSFORM_DEFAULT ((struct Transform) { V3_ZERO, QUAT_IDENTITY, V3_ONE })
 
 extern void tr_rot_x(struct Transform* _t, float _angle);
 extern void tr_rot_y(struct Transform* _t, float _angle);
