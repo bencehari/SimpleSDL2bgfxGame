@@ -51,6 +51,32 @@ make mingw-gcc-debug64
 
 - add the path "to\the\bgfx\" (where the bgfx, bimg and bx folders are) to paths.txt (must be second line and don't forget the \ at the end)
 
+## Editors
+
+### Visual Studio Code
+
+Open File/Preferences/Settings (CTRL+,), select Workspace and search for 'include', then add these items to C_Cpp > Default: Include Path:
+
+- path/to/SDL2/x86_64-mingw32/include/**
+- path/to/bgfx/include/**
+- path/to/bimg/inlcude/**
+- path/to/bx/include/**
+
+Or add them to the .vscode/settings.json file like this:
+
+```json
+{
+    "C_Cpp.default.includePath": [
+        "path/to/SDL2/x86_64-w64-mingw32/include/**",
+        "path/to/bgfx/include/**",
+        "path/to/bimg/include/**",
+        "path/to/bx/include/**"
+    ]
+}
+```
+
+
+
 # Usage
 
 ## Build

@@ -1,4 +1,5 @@
-.build
+.vscode/
+.build/
 paths.txt
 
 assets/shaders/*
