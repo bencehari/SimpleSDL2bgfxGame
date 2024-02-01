@@ -4,7 +4,7 @@
 #include "../math/math_include.h"
 
 struct Transform {
-	Vector3 translation;
+	Vector3 position;
 	Quaternion rotation;
 	Vector3 scale;
 };

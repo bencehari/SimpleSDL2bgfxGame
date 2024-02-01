@@ -1,8 +1,5 @@
 #include "transform.h"
 
-// To rotate a quaternion representing an orientation, perform quaternion multiplication with the rotation quaternion on the left.
-// O′ = R ∘ O
-
 void tr_rot_x(struct Transform* _t, float _angle) {
 	_t->rotation = Q_MUL(QUAT_AA(AXIS_X, _angle), _t->rotation);
 }

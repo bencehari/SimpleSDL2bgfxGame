@@ -12,7 +12,7 @@ SET extra=-Wextra -Werror -Wpedantic
 :: for example (in this case, add `-lstdc++` doesn't needed):
 :: compiler=g++ and std_opt=c++17
 SET compiler=gcc
-SET std_opt=c11
+SET std_opt=c99
 
 SET i=0
 FOR /F "tokens=* delims=" %%x in (paths.txt) DO (

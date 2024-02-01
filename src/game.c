@@ -89,8 +89,8 @@ void game(float width, float height, float fps) {
 					if (SDL_GetRelativeMouseMode()) {
 						SDL_MouseMotionEvent* e = (SDL_MouseMotionEvent*)&event;
 						
-						lookRotation.X += e->yrel * widthRec * 360.0f * rotationSpeed * DEG_TO_RAD;
-						lookRotation.Y += e->xrel * heightRec * 360.0f * rotationSpeed * DEG_TO_RAD;
+						lookRotation.X += DEG_TO_RAD(e->yrel * widthRec * 360.0f * rotationSpeed);
+						lookRotation.Y += DEG_TO_RAD(e->xrel * heightRec * 360.0f * rotationSpeed);
 					}
 				} break;
 				case SDL_WINDOWEVENT: {
@@ -120,7 +120,7 @@ void game(float width, float height, float fps) {
 			if (leftDown) move.X -= 1.0f;
 			if (rightDown) move.X += 1.0f;
 			
-			if (!EQ(move, V3_ZERO)) cameraPos = ADD(cameraPos, MUL(V3_NORM(move), moveSpeed));
+			if (!V3_EQ(move, V3_ZERO)) cameraPos = V3_ADD(cameraPos, V3_MUL_F(V3_NORM(move), moveSpeed));
 		}
 		
 		int dbgTextIdx = 1;
@@ -130,10 +130,10 @@ void game(float width, float height, float fps) {
 
 		// calculate view and projection matrix
 		{
-			Matrix4x4 view = LOOK_AT(cameraPos, ADD(cameraPos, forward));
+			Matrix4x4 view = LOOK_AT(cameraPos, V3_ADD(cameraPos, forward));
 			MAT4_print_to_screen(&view, ++dbgTextIdx, NULL); dbgTextIdx += 5;
 			
-			Matrix4x4 proj = PERSPECTIVE(90.0f * DEG_TO_RAD, width / height, 0.1f, 100.0f);
+			Matrix4x4 proj = PERSPECTIVE(DEG_TO_RAD(90.0f), width / height, 0.1f, 100.0f);
 			bgfx_set_view_transform(0, &view, &proj);
 			bgfx_set_view_rect(0, 0, 0, (int)width, (int)height);
 		}
@@ -143,15 +143,13 @@ void game(float width, float height, float fps) {
 
 		// RENDER objects START
 
-		/*static size_t counter = 0;
-		float angle = counter++ * 0.01f;
-		tr_set_rot_xyz(&cube.transform, angle, angle, 0.0f);*/
-		// TODO: these are not produces the same outcome. Investigate!	
-		tr_rot_xy(&cube.transform, 0.01f, 0.01f);
+		tr_rot_xyz(&cube.transform, 0.01f, 0.01f, 0.01f);
 		
-		Matrix4x4 cubeDebugM4x4 = MUL(
+		bgfx_dbg_text_printf(0, ++dbgTextIdx, 0x0f, " cube pos: %.3f %.3f %.3f", cube.transform.position.X, cube.transform.position.Y, cube.transform.position.Z); dbgTextIdx++;
+		
+		Matrix4x4 cubeDebugM4x4 = M4x4_MUL(
 			// translation matrix
-			M4x4_POS(cube.transform.translation.X, cube.transform.translation.Y, cube.transform.translation.Z),
+			M4x4_POS(cube.transform.position.X, cube.transform.position.Y, cube.transform.position.Z),
 			// rotation matrix
 			QUAT_TO_MAT4(cube.transform.rotation)
 		);
