@@ -38,6 +38,8 @@ typedef HMM_Vec3 Vector3;
 #define AXIS_Z (V3_FORWARD)
 
 #define V3_NORM(_v3) (HMM_NormV3((_v3)))
+#define V3_DOT(_v3_1, _v3_2) (HMM_DotV3((_v3_1), (_v3_2)))
+#define V3_CROSS(_v3_1, _v3_2) (HMM_Cross((_v3_1), (_v3_2)))
 
 typedef HMM_Vec4 Vector4;
 #define V4_NEW(_x, _y, _z, _w) (HMM_V4((_x), (_y), (_z), (_w)))
@@ -58,7 +60,7 @@ typedef HMM_Quat Quaternion;
 #define Q_ADD(_q_1, _q_2) (HMM_AddQ((_q_1), (_q_2)))
 #define Q_SUB(_q_1, _q_2) (HMM_SubQ((_q_1), (_q_2)))
 #define Q_MUL(_q_1, _q_2) (HMM_MulQ((_q_1), (_q_2)))
-#define Q_MUL_F(_q_1, _f) (HMM_MulQ((_q_1), (_f)))
+#define Q_MUL_F(_q, _f) (HMM_MulQ((_q), (_f)))
 #define Q_DIV(_q_1, _q_2) (HMM_DivQF((_q_1), (_q_2)))
 #define Q_DOT(_q_1, _q_2) (HMM_DotQ((_q_1), (_q_2)))
 #define Q_INV(_q) (HMM_InvQ((_q)))

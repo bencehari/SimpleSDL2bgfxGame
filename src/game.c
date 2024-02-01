@@ -18,6 +18,29 @@
 
 static struct Object createCube();
 
+// TODO: find a good place for this
+Vector3 get_forward_from_Q(const Quaternion* _q) {
+	Vector3 u = V3_NEW(_q->X, _q->Y, _q->Z);
+	float s = _q->W;
+	float dot = V3_DOT(u, V3_FORWARD);
+	Vector3 cross = V3_CROSS(u, V3_FORWARD);
+
+	/*
+	2.0f * dot(u, v) * u +
+	(s*s - dot(u, u)) * v +
+	2.0f * s * cross(u, v);
+	*/
+	
+	return
+		V3_ADD(
+			V3_ADD(
+				V3_MUL_F(u, 2.0f * dot),
+				V3_MUL_F(V3_FORWARD, s * s - dot)
+			),
+			V3_MUL_F(cross, 2.0f * s)
+		);
+}
+
 void game(float width, float height, float fps) {
 	vertex_init();
 	programs_init(1);
@@ -35,7 +58,7 @@ void game(float width, float height, float fps) {
 	// view related
 	const float moveSpeed = 0.1f;
 	const float rotationSpeed = 1.0f;
-	Vector2 lookRotation = V2_ZERO;
+	// Vector2 lookRotation = V2_ZERO;
 	
 	// input
 	const float widthNorm = 1.0f / width;
@@ -93,8 +116,14 @@ void game(float width, float height, float fps) {
 					if (SDL_GetRelativeMouseMode()) {
 						SDL_MouseMotionEvent* e = (SDL_MouseMotionEvent*)&event;
 						
-						lookRotation.X += DEG_TO_RAD(e->yrel * widthNorm * 360.0f * rotationSpeed);
-						lookRotation.Y += DEG_TO_RAD(e->xrel * heightNorm * 360.0f * rotationSpeed);
+						/*lookRotation.X += DEG_TO_RAD(e->yrel * widthNorm * 360.0f * rotationSpeed);
+						lookRotation.Y += DEG_TO_RAD(e->xrel * heightNorm * 360.0f * rotationSpeed);*/
+						
+						// TODO: not working... just make a circular mouse movement.
+						tr_rot_xy(&camera,
+							DEG_TO_RAD(e->yrel * widthNorm * 360.0f * rotationSpeed),
+							DEG_TO_RAD(-e->xrel * heightNorm * 360.0f * rotationSpeed)
+						);
 					}
 				} break;
 				case SDL_WINDOWEVENT: {
@@ -109,7 +138,8 @@ void game(float width, float height, float fps) {
 		}
 
 		// X = pitch, Y = yaw
-		const Vector3 forward = V3_NEW(cos(lookRotation.X) * sin(lookRotation.Y), -sin(lookRotation.X), cos(lookRotation.X) * cos(lookRotation.Y));
+		// const Vector3 forward = V3_NEW(cos(lookRotation.X) * sin(lookRotation.Y), -sin(lookRotation.X), cos(lookRotation.X) * cos(lookRotation.Y));
+		const Vector3 forward = get_forward_from_Q(&camera.rotation);
 		
 		// process input when the mouse is locked in the window
 		if (SDL_GetRelativeMouseMode()) {
