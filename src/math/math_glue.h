@@ -15,7 +15,9 @@ typedef HMM_Vec2 Vector2;
 
 typedef HMM_Vec3 Vector3;
 #define V3_NEW(_x, _y, _z) (HMM_V3((_x), (_y), (_z)))
+#define V3_ZERO (V3_NEW(0.0f, 0.0f, 0.0f))
 #define V3_ONE (V3_NEW(0.0f, 0.0f, 0.0f))
+#define V3_FROM_Q(_q) (V3_NEW((_q).X, (_q).Y, (_q).Z))
 
 #define V3_EQ(_v3_1, _v3_2) (HMM_EqV3((_v3_1), (_v3_2)))
 
@@ -23,13 +25,14 @@ typedef HMM_Vec3 Vector3;
 #define V3_SUB(_v3_1, _v3_2) (HMM_SubV3((_v3_1), (_v3_2)))
 #define V3_MUL(_v3_1, _v3_2) (HMM_MulV3((_v3_1), (_v3_2)))
 #define V3_MUL_F(_v3, _f) (HMM_MulV3F((_v3), (_f)))
+// NOT TESTED
+#define V3_MUL_Q(_v3, _q) (V3_FROM_Q(Q_MUL(Q_MUL((_q), (QUAT_V4_NEW(V4_V3_NEW((_v3), 0.0f)))), Q_INV((_q)))))
 #define V3_DIV(_v3_1, _v3_2) (HMM_DivV3((_v3_1), (_v3_2)))
 
-#define V3_ZERO (V3_NEW(0.0f, 0.0f, 0.0f))
 #define V3_UP (V3_NEW(0.0f, 1.0f, 0.0f))
 #define V3_DOWN (V3_NEW(0.0f, -1.0f, 0.0f))
 #define V3_LEFT (V3_NEW(-1.0f, 0.0f, 0.0f))
-#define V3_RIGHT (V3_NEW(-1.0f, 0.0f, 0.0f))
+#define V3_RIGHT (V3_NEW(1.0f, 0.0f, 0.0f))
 #define V3_FORWARD (V3_NEW(0.0f, 0.0f, 1.0f))
 #define V3_BACK (V3_NEW(0.0f, 0.0f, -1.0f))
 
@@ -76,6 +79,7 @@ typedef HMM_Mat4 Matrix4x4;
 #define M4x4_IDENTITY (HMM_M4D(1.0f))
 #define M4x4_ZERO (HMM_M4())
 #define M4x4_POS(_x, _y, _z) ((Matrix4x4) {{ { 1.0f, 0.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f, 0.0f } , { 0.0f, 0.0f, 1.0f, 0.0f }, { (_x), (_y), (_z), 1.0f } }})
+#define M4x4_POS_V3(_v3) ((Matrix4x4) {{ { 1.0f, 0.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f, 0.0f } , { 0.0f, 0.0f, 1.0f, 0.0f }, { (_v3).X, (_v3).Y, (_v3).Z, 1.0f } }})
 
 #define M4x4_MUL(_m4x4_1, _m4x4_2) (HMM_MulM4((_m4x4_1), (_m4x4_2)))
 

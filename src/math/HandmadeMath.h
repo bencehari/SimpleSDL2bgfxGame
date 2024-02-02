@@ -2527,10 +2527,10 @@ static inline HMM_Quat HMM_QFromAxisAngle_RH(HMM_Vec3 Axis, float AngleOfRotatio
     HMM_Quat Result;
 
     HMM_Vec3 AxisNormalized = HMM_NormV3(Axis);
-    float SineOfRotation = HMM_SinF(AngleOfRotation / 2.0f);
+    float SineOfRotation = HMM_SinF(AngleOfRotation * 0.5f);
 
     Result.XYZ = HMM_MulV3F(AxisNormalized, SineOfRotation);
-    Result.W = HMM_CosF(AngleOfRotation / 2.0f);
+    Result.W = HMM_CosF(AngleOfRotation * 0.5f);
 
     return Result;
 }

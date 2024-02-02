@@ -18,29 +18,6 @@
 
 static struct Object createCube();
 
-// TODO: find a good place for this
-Vector3 get_forward_from_Q(const Quaternion* _q) {
-	Vector3 u = V3_NEW(_q->X, _q->Y, _q->Z);
-	float s = _q->W;
-	float dot = V3_DOT(u, V3_FORWARD);
-	Vector3 cross = V3_CROSS(u, V3_FORWARD);
-
-	/*
-	2.0f * dot(u, v) * u +
-	(s*s - dot(u, u)) * v +
-	2.0f * s * cross(u, v);
-	*/
-	
-	return
-		V3_ADD(
-			V3_ADD(
-				V3_MUL_F(u, 2.0f * dot),
-				V3_MUL_F(V3_FORWARD, s * s - dot)
-			),
-			V3_MUL_F(cross, 2.0f * s)
-		);
-}
-
 void game(float width, float height, float fps) {
 	vertex_init();
 	programs_init(1);
@@ -57,12 +34,11 @@ void game(float width, float height, float fps) {
 	
 	// view related
 	const float moveSpeed = 0.1f;
-	const float rotationSpeed = 1.0f;
-	// Vector2 lookRotation = V2_ZERO;
+	// const float rotationSpeed = 1.0f;
 	
 	// input
-	const float widthNorm = 1.0f / width;
-	const float heightNorm = 1.0f / height;
+	// const float widthNorm = 1.0f / width;
+	// const float heightNorm = 1.0f / height;
 	bool
 		forwardDown = false,
 		backDown = false,
@@ -78,6 +54,8 @@ void game(float width, float height, float fps) {
 		
 		lastTick = SDL_GetTicks();
 		bgfx_dbg_text_clear(0, false);
+		
+		Vector2 TEMP_mouse = {0};
 		
 		while (SDL_PollEvent(&event)) {
 			switch (event.type) {
@@ -116,14 +94,12 @@ void game(float width, float height, float fps) {
 					if (SDL_GetRelativeMouseMode()) {
 						SDL_MouseMotionEvent* e = (SDL_MouseMotionEvent*)&event;
 						
-						/*lookRotation.X += DEG_TO_RAD(e->yrel * widthNorm * 360.0f * rotationSpeed);
-						lookRotation.Y += DEG_TO_RAD(e->xrel * heightNorm * 360.0f * rotationSpeed);*/
-						
-						// TODO: not working... just make a circular mouse movement.
-						tr_rot_xy(&camera,
-							DEG_TO_RAD(e->yrel * widthNorm * 360.0f * rotationSpeed),
-							DEG_TO_RAD(-e->xrel * heightNorm * 360.0f * rotationSpeed)
-						);
+						/*
+							x = DEG_TO_RAD(e->yrel * widthNorm * 360.0f * rotationSpeed);
+							y = DEG_TO_RAD(e->xrel * heightNorm * 360.0f * rotationSpeed);
+						*/
+
+						TEMP_mouse = V2_NEW(e->xrel, e->yrel);
 					}
 				} break;
 				case SDL_WINDOWEVENT: {
@@ -136,10 +112,6 @@ void game(float width, float height, float fps) {
 				} break;
 			}
 		}
-
-		// X = pitch, Y = yaw
-		// const Vector3 forward = V3_NEW(cos(lookRotation.X) * sin(lookRotation.Y), -sin(lookRotation.X), cos(lookRotation.X) * cos(lookRotation.Y));
-		const Vector3 forward = get_forward_from_Q(&camera.rotation);
 		
 		// process input when the mouse is locked in the window
 		if (SDL_GetRelativeMouseMode()) {
@@ -153,15 +125,16 @@ void game(float width, float height, float fps) {
 			if (!V3_EQ(move, V3_ZERO)) camera.position = V3_ADD(camera.position, V3_MUL_F(V3_NORM(move), moveSpeed));
 		}
 		
+		dbg_print_to_screen("MOUSE_X: %.3f", TEMP_mouse.X);
+		dbg_print_to_screen("MOUSE_Y: %.3f", TEMP_mouse.Y);
+		dbg_space(1);
+		
 		dbg_print_to_screen("CAM POS: %.3f %.3f %.3f", camera.position.X, camera.position.Y, camera.position.Z);
-		dbg_print_to_screen("FORWARD: %.3f %.3f %.3f", forward.X, forward.Y, forward.Z);
 		dbg_space(1);
 
 		// calculate view and projection matrix
 		{
-			Matrix4x4 view = LOOK_AT(camera.position, V3_ADD(camera.position, forward));
-			
-			dbg_m4x4_to_screen(&view, NULL); dbg_space(1);
+			Matrix4x4 view = LOOK_AT(camera.position, V3_ADD(camera.position, V3_FORWARD));
 			
 			Matrix4x4 proj = PERSPECTIVE(DEG_TO_RAD(90.0f), width / height, 0.1f, 100.0f);
 			bgfx_set_view_transform(0, &view, &proj);
@@ -174,16 +147,6 @@ void game(float width, float height, float fps) {
 		// RENDER objects START
 
 		tr_rot_xyz(&cube.transform, 0.01f, 0.01f, 0.01f);
-		
-		Matrix4x4 cubeDebugM4x4 = M4x4_MUL(
-			// translation matrix
-			M4x4_POS(cube.transform.position.X, cube.transform.position.Y, cube.transform.position.Z),
-			// rotation matrix
-			QUAT_TO_MAT4(cube.transform.rotation)
-		);
-		
-		dbg_m4x4_to_screen(&cubeDebugM4x4, "cube"); dbg_space(1);
-		dbg_print_to_screen("CUBE POS: %.3f %.3f %.3f", cube.transform.position.X, cube.transform.position.Y, cube.transform.position.Z);
 		
 		obj_encoder_render(encoder, &cube);
 		
