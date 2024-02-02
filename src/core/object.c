@@ -2,7 +2,7 @@
 
 void obj_render(const struct Object* _o) {
 	Matrix4x4 t = M4x4_POS(_o->transform.position.X, _o->transform.position.Y, _o->transform.position.Z);
-	Matrix4x4 r = QUAT_TO_MAT4(_o->transform.rotation);
+	Matrix4x4 r = Q_TO_M4x4(_o->transform.rotation);
 	
 	bgfx_set_transform(M4x4_MUL(t, r).Elements, 1);
 		
@@ -14,7 +14,7 @@ void obj_render(const struct Object* _o) {
 
 void obj_encoder_render(bgfx_encoder_t* _encoder, const struct Object* _o) {
 	Matrix4x4 t = M4x4_POS(_o->transform.position.X, _o->transform.position.Y, _o->transform.position.Z);
-	Matrix4x4 r = QUAT_TO_MAT4(_o->transform.rotation);
+	Matrix4x4 r = Q_TO_M4x4(_o->transform.rotation);
 	
 	bgfx_encoder_set_transform(_encoder, M4x4_MUL(t, r).Elements, 1);
 		

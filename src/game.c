@@ -23,7 +23,7 @@ void game(float width, float height, float fps) {
 	programs_init(1);
 	models_init(1);
 	
-	struct Transform camera = TRANSFORM_NEW(V3_NEW(0.0f, 0.0f, -5.0f), QUAT_IDENTITY, V3_ONE);
+	struct Transform camera = TRANSFORM_NEW(V3_NEW(0.0f, 0.0f, -5.0f), Q_IDENTITY, V3_ONE);
 	
 	struct Object cube = createCube();
 	

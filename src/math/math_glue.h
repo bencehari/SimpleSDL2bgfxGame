@@ -54,11 +54,11 @@ typedef HMM_Vec4 Vector4;
 #define V4_MUL(_v4_1, _v4_2) (HMM_MulV4((_v4_1), (_v4_2)))
 
 typedef HMM_Quat Quaternion;
-#define QUAT_NEW(_x, _y, _z, _w) (HMM_Q((_x), (_y), (_z), (_w)))
-#define QUAT_IDENTITY (QUAT_NEW(0.0f, 0.0f, 0.0f, 1.0f))
-#define QUAT_V4_NEW(_v4) (HMM_QV4((_v4)))
+#define Q_NEW(_x, _y, _z, _w) (HMM_Q((_x), (_y), (_z), (_w)))
+#define Q_IDENTITY (Q_NEW(0.0f, 0.0f, 0.0f, 1.0f))
+#define Q_V4_NEW(_v4) (HMM_QV4((_v4)))
 
-#define QUAT_AA(_axis, _angle) (HMM_QFromAxisAngle_LH((_axis), (_angle)))
+#define Q_AA(_axis, _angle) (HMM_QFromAxisAngle_LH((_axis), (_angle)))
 
 #define Q_ADD(_q_1, _q_2) (HMM_AddQ((_q_1), (_q_2)))
 #define Q_SUB(_q_1, _q_2) (HMM_SubQ((_q_1), (_q_2)))
@@ -68,12 +68,12 @@ typedef HMM_Quat Quaternion;
 #define Q_DOT(_q_1, _q_2) (HMM_DotQ((_q_1), (_q_2)))
 #define Q_INV(_q) (HMM_InvQ((_q)))
 // in case of unit Q, the Q's conjugate (Q*) equals the inverse (Q^-1) of that Q
-#define Q_CONJ(_q) (QUAT_NEW(-((_q).X), -((_q).Y), -((_q).Z), ((_q).W)))
+#define Q_CONJ(_q) (Q_NEW(-((_q).X), -((_q).Y), -((_q).Z), ((_q).W)))
 #define Q_NORM(_q) (HMM_NormQ((_q)))
 #define Q_NLERP(_q_1, _f, _q_2) (HMM_NLerp((_q_1), (_f), (_q_2)))
 #define Q_SLERP(_q_1, _f, _q_2) (HMM_SLerp((_q_1), (_f), (_q_2)))
 
-#define QUAT_TO_MAT4(_q) (HMM_QToM4((_q)))
+#define Q_TO_M4x4(_q) (HMM_QToM4((_q)))
 
 typedef HMM_Mat4 Matrix4x4;
 #define M4x4_IDENTITY (HMM_M4D(1.0f))
@@ -83,7 +83,7 @@ typedef HMM_Mat4 Matrix4x4;
 
 #define M4x4_MUL(_m4x4_1, _m4x4_2) (HMM_MulM4((_m4x4_1), (_m4x4_2)))
 
-#define M4x4_TO_QUAT(_m4x4) (HMM_M4ToQ_LH((_m4x4)))
+#define M4x4_TO_Q(_m4x4) (HMM_M4ToQ_LH((_m4x4)))
 
 #define ROT(_m4x4_1, _m4x4_2) (HMM_Rotate_LH((_m4x4_1), (_m4x4_2)))
 #define TRANSLATE(_m4x4) (HMM_Translate((_m4x4)))
