@@ -3,7 +3,7 @@
 
 #include <bgfx/c99/bgfx.h>
 
-#include "../math/math_include.h"
+#include "../math/math.h"
 #include "transform.h"
 #include "models.h"
 

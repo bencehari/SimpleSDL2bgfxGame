@@ -6,7 +6,7 @@
 #include <SDL2/SDL.h>
 #include <bgfx/c99/bgfx.h>
 
-#include "math/math_include.h"
+#include "math/math.h"
 #include "core/programs.h"
 #include "core/vertex.h"
 #include "core/models.h"
@@ -34,11 +34,11 @@ void game(float width, float height, float fps) {
 	
 	// view related
 	const float moveSpeed = 0.1f;
-	// const float rotationSpeed = 1.0f;
+	const float rotationSpeed = 2.0f;
 	
 	// input
-	// const float widthNorm = 1.0f / width;
-	// const float heightNorm = 1.0f / height;
+	const float widthNorm = 1.0f / width;
+	const float heightNorm = 1.0f / height;
 	bool
 		forwardDown = false,
 		backDown = false,
@@ -55,7 +55,7 @@ void game(float width, float height, float fps) {
 		lastTick = SDL_GetTicks();
 		bgfx_dbg_text_clear(0, false);
 		
-		Vector2 TEMP_mouse = {0};
+		Vector2 cameraRotation = {0};
 		
 		while (SDL_PollEvent(&event)) {
 			switch (event.type) {
@@ -94,12 +94,10 @@ void game(float width, float height, float fps) {
 					if (SDL_GetRelativeMouseMode()) {
 						SDL_MouseMotionEvent* e = (SDL_MouseMotionEvent*)&event;
 						
-						/*
-							x = DEG_TO_RAD(e->yrel * widthNorm * 360.0f * rotationSpeed);
-							y = DEG_TO_RAD(e->xrel * heightNorm * 360.0f * rotationSpeed);
-						*/
-
-						TEMP_mouse = V2_NEW(e->xrel, e->yrel);
+						cameraRotation = V2_NEW(
+							-DEG_TO_RAD(e->yrel * widthNorm * 90.0f * rotationSpeed),
+							-DEG_TO_RAD(e->xrel * heightNorm * 90.0f * rotationSpeed)
+						);
 					}
 				} break;
 				case SDL_WINDOWEVENT: {
@@ -125,16 +123,13 @@ void game(float width, float height, float fps) {
 			if (!V3_EQ(move, V3_ZERO)) camera.position = V3_ADD(camera.position, V3_MUL_F(V3_NORM(move), moveSpeed));
 		}
 		
-		dbg_print_to_screen("MOUSE_X: %.3f", TEMP_mouse.X);
-		dbg_print_to_screen("MOUSE_Y: %.3f", TEMP_mouse.Y);
-		dbg_space(1);
+		dbg_print_to_screen("CAM POSITION: %.3f %.3f %.3f", camera.position.X, camera.position.Y, camera.position.Z);
 		
-		dbg_print_to_screen("CAM POS: %.3f %.3f %.3f", camera.position.X, camera.position.Y, camera.position.Z);
-		dbg_space(1);
+		tr_fps_rotate(&camera, cameraRotation);
 
 		// calculate view and projection matrix
 		{
-			Matrix4x4 view = LOOK_AT(camera.position, V3_ADD(camera.position, V3_FORWARD));
+			Matrix4x4 view = LOOK_AT(camera.position, tr_get_look_at(&camera));
 			
 			Matrix4x4 proj = PERSPECTIVE(DEG_TO_RAD(90.0f), width / height, 0.1f, 100.0f);
 			bgfx_set_view_transform(0, &view, &proj);
@@ -145,8 +140,6 @@ void game(float width, float height, float fps) {
 		bgfx_encoder_touch(encoder, 0);
 
 		// RENDER objects START
-
-		tr_rot_xyz(&cube.transform, 0.01f, 0.01f, 0.01f);
 		
 		obj_encoder_render(encoder, &cube);
 		

@@ -1,7 +1,7 @@
 #ifndef KE_DEBUG_H
 #define KE_DEBUG_H
 
-#include "../math/math_include.h"
+#include "../math/math.h"
 
 extern void dbg_print_to_screen(const char* _format, ...);
 

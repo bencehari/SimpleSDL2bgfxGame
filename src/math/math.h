@@ -1,5 +1,15 @@
-#ifndef KE_MATH_GLUE_H
-#define KE_MATH_GLUE_H
+#ifndef KE_MATH_H
+#define KE_MATH_H
+
+#ifndef HANDMADE_MATH__USE_C11_GENERICS
+#define HANDMADE_MATH__USE_C11_GENERICS 0
+#endif // HANDMADE_MATH__USE_C11_GENERICS
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wmissing-braces"
+#pragma GCC diagnostic ignored "-Wpedantic"
+#include "HandmadeMath.h"
+#pragma GCC diagnostic pop
 
 // float
 #define RAD_TO_DEG(_f) ((_f) * HMM_RadToDeg)
@@ -10,6 +20,8 @@ typedef HMM_Vec2 Vector2;
 #define V2_ZERO (V2_NEW(0.0f, 0.0f))
 
 #define V2_EQ(_v2_1, _v2_2) (HMM_EqV2((_v2_1), (_v2_2)))
+
+#define V2_MUL_F(_v2, _f) (V2_MulF((_v2), (_f)))
 
 #define V2_NORM(_v2) (HMM_NormV2((_v2)))
 
@@ -25,8 +37,6 @@ typedef HMM_Vec3 Vector3;
 #define V3_SUB(_v3_1, _v3_2) (HMM_SubV3((_v3_1), (_v3_2)))
 #define V3_MUL(_v3_1, _v3_2) (HMM_MulV3((_v3_1), (_v3_2)))
 #define V3_MUL_F(_v3, _f) (HMM_MulV3F((_v3), (_f)))
-// NOT TESTED
-#define V3_MUL_Q(_v3, _q) (V3_FROM_Q(Q_MUL(Q_MUL((_q), (QUAT_V4_NEW(V4_V3_NEW((_v3), 0.0f)))), Q_INV((_q)))))
 #define V3_DIV(_v3_1, _v3_2) (HMM_DivV3((_v3_1), (_v3_2)))
 
 #define V3_UP (V3_NEW(0.0f, 1.0f, 0.0f))
@@ -93,6 +103,25 @@ typedef HMM_Mat4 Matrix4x4;
 	(bgfx_get_caps()->homogeneousDepth ? \
 	HMM_Perspective_LH_NO((_fov), (_ratio), (_near), (_far)) : \
 	HMM_Perspective_LH_ZO((_fov), (_ratio), (_near), (_far)))
+	
+static const Vector3 globalForward = {{ 0.0f, 0.0f, 1.0f }};
+static const Vector3 globalUp = {{ 0.0f, 1.0f, 0.0f }};
+static const Vector3 globalRight = {{ 1.0f, 0.0f, 0.0f }};
 
+static inline Vector3 rotate_v3_by_q(const Vector3* _v3, const Quaternion* _q) {
+	Vector3 u = V3_NEW(_q->X, _q->Y, _q->Z);
+    float s = _q->W;
+	
+	float dot = V3_DOT(u, *_v3);
+	Vector3 cross = V3_CROSS(u, *_v3);
 
-#endif // KE_MATH_GLUE_H
+	return V3_ADD(
+		V3_ADD(
+			V3_MUL_F(u, 2.0f * dot),
+			V3_MUL_F(*_v3, (s * s - V3_DOT(u, u)))
+		),
+		V3_MUL_F(cross, 2.0f * s)
+	);
+}
+
+#endif // KE_MATH_H
