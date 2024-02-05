@@ -34,7 +34,7 @@ void game(float width, float height, float fps) {
 	
 	// view related
 	const float moveSpeed = 0.1f;
-	const float rotationSpeed = 2.0f;
+	const float rotationSpeed = 3.0f;
 	
 	// input
 	const float widthNorm = 1.0f / width;
@@ -43,8 +43,14 @@ void game(float width, float height, float fps) {
 		forwardDown = false,
 		backDown = false,
 		leftDown = false,
-		rightDown = false;
+		rightDown = false,
+		elevateDown = false,
+		descendDown = false;
+	bool
+		freeMove = true,
+		upDownMove = true;
 
+	// system
 	bool running = true;
 	SDL_Event event;
 	
@@ -70,6 +76,8 @@ void game(float width, float height, float fps) {
 						case SDLK_a: leftDown = true; break;
 						case SDLK_RIGHT:
 						case SDLK_d: rightDown = true; break;
+						case SDLK_e: elevateDown = true; break;
+						case SDLK_q: descendDown = true; break;
 					}
 				} break;
 				case SDL_KEYUP: {
@@ -83,6 +91,8 @@ void game(float width, float height, float fps) {
 						case SDLK_a: leftDown = false; break;
 						case SDLK_RIGHT:
 						case SDLK_d: rightDown = false; break;
+						case SDLK_e: elevateDown = false; break;
+						case SDLK_q: descendDown = false; break;
 					}
 				} break;
 				case SDL_MOUSEBUTTONDOWN: {
@@ -111,21 +121,42 @@ void game(float width, float height, float fps) {
 			}
 		}
 		
+		// TODO: limit X rotation to avoid flipping
+		tr_fps_rotate(&camera, cameraRotation);
+		
 		// process input when the mouse is locked in the window
 		if (SDL_GetRelativeMouseMode()) {
 			Vector3 move = V3_ZERO;
 			
-			if (forwardDown) move.Z += 1.0f;
-			if (backDown) move.Z -= 1.0f;
-			if (leftDown) move.X -= 1.0f;
-			if (rightDown) move.X += 1.0f;
+			if (forwardDown || backDown) {
+				if (forwardDown != backDown) {
+					Vector3 fwd = tr_get_forward(&camera);
+					
+					if (freeMove) move = forwardDown ? fwd : V3_MUL_F(fwd, -1.0f);
+				}
+			}
+			if (leftDown || rightDown) {
+				if (leftDown != rightDown) {
+					Vector3 right = tr_get_right(&camera);
+					
+					if (freeMove) move = V3_ADD(move, rightDown ? right : V3_MUL_F(right, -1.0f));
+				}
+			}
 			
-			if (!V3_EQ(move, V3_ZERO)) camera.position = V3_ADD(camera.position, V3_MUL_F(V3_NORM(move), moveSpeed));
+			if (upDownMove) {
+				if (elevateDown || descendDown) {
+					if (elevateDown != descendDown) {
+						Vector3 up = tr_get_up(&camera);
+						
+						move = V3_ADD(move, elevateDown ? up : V3_MUL_F(up, -1.0f));
+					}
+				}
+			}
+			
+			if (!V3_EQ(move, V3_ZERO)) camera.position = V3_ADD(camera.position, V3_MUL_F(move, moveSpeed));
 		}
 		
 		dbg_print_to_screen("CAM POSITION: %.3f %.3f %.3f", camera.position.X, camera.position.Y, camera.position.Z);
-		
-		tr_fps_rotate(&camera, cameraRotation);
 
 		// calculate view and projection matrix
 		{

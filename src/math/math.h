@@ -21,7 +21,7 @@ typedef HMM_Vec2 Vector2;
 
 #define V2_EQ(_v2_1, _v2_2) (HMM_EqV2((_v2_1), (_v2_2)))
 
-#define V2_MUL_F(_v2, _f) (V2_MulF((_v2), (_f)))
+#define V2_MUL_F(_v2, _f) (HMM_MulV2F((_v2), (_f)))
 
 #define V2_NORM(_v2) (HMM_NormV2((_v2)))
 
