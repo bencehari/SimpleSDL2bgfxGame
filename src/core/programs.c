@@ -36,8 +36,16 @@ void programs_cleanup(void) {
 }
 
 bgfx_program_handle_t program_create(const char* _vertexShader, const char* _fragmentShader, bool _destroyShaders) {
-	bgfx_shader_handle_t vertexShaderHnd = load_shader(_vertexShader);
-	bgfx_shader_handle_t fragmentShaderHnd = load_shader(_fragmentShader);
+	bgfx_shader_handle_t vertexShaderHnd = {0};
+	bgfx_shader_handle_t fragmentShaderHnd = {0};
+	
+	if (!load_shader(_vertexShader, &vertexShaderHnd)) {
+		// TODO: load fallback shader
+	}
+	
+	if (!load_shader(_fragmentShader, &fragmentShaderHnd)) {
+		// TODO: load fallback shader
+	}
 	
 	programs[currentProgramIndex] = bgfx_create_program(vertexShaderHnd, fragmentShaderHnd, _destroyShaders);
 

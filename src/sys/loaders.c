@@ -4,10 +4,18 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "../utils/file.h"
 #include "../utils/consc.h"
 
-// TODO: handle errors like invalid path, fopen returns NULL, etc.
-bgfx_shader_handle_t load_shader(const char* _filename) {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+struct Model* load_external_obj_model(const char* _objPath, const bgfx_vertex_layout_t _vertexLayout) {
+#pragma GCC diagnostic pop
+
+	return NULL;
+}
+
+bool load_shader(const char* _filename, bgfx_shader_handle_t* _shaderHandle) {
 	const char* shaderPath;
 	
 	switch (bgfx_get_renderer_type()) {
@@ -36,12 +44,9 @@ bgfx_shader_handle_t load_shader(const char* _filename) {
 	
 	// printf(AC_YELLOW "%s\n" AC_RESET, filePath);
 	
-	FILE* file = fopen(filePath, "rb");
-	// if (file == NULL) printf(AC_YELLOW "file is NULL\n" AC_RESET);
-	
-	fseek(file, 0, SEEK_END);
-	long fileSize = ftell(file);
-	fseek(file, 0, SEEK_SET);
+	FILE* file = NULL;
+	long fileSize = 0;
+	if (!file_get_size(filePath, &fileSize, &file)) return false;
 	
 	// printf(AC_YELLOW "fileSize: %ld\n" AC_RESET, fileSize);
 	
@@ -50,5 +55,9 @@ bgfx_shader_handle_t load_shader(const char* _filename) {
 	mem->data[mem->size - 1] = '\0';
 	fclose(file);
 	
-	return bgfx_create_shader(mem);
+	bgfx_shader_handle_t h = bgfx_create_shader(mem);
+	
+	*_shaderHandle = h;
+	
+	return true;
 }

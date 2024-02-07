@@ -16,7 +16,7 @@
 #include "utils/consc.h"
 #include "utils/debug.h"
 
-static struct Object createCube();
+static struct Object createCube(bgfx_program_handle_t _programHandle);
 
 void game(float width, float height, float fps) {
 	vertex_init();
@@ -24,8 +24,11 @@ void game(float width, float height, float fps) {
 	models_init(1);
 	
 	struct Transform camera = TRANSFORM_NEW(V3_NEW(0.0f, 0.0f, -5.0f), Q_IDENTITY, V3_ONE);
+
+	// init assets
+	bgfx_program_handle_t programHandle = program_create("vs_cubes.bin", "fs_cubes.bin", true);
 	
-	struct Object cube = createCube();
+	struct Object cube = createCube(programHandle);
 	
 	// FPS
 	int milliPeriod = (int)(1.0 / (double)fps * 1000);
@@ -195,7 +198,7 @@ void game(float width, float height, float fps) {
 
 // ~~~~~
 
-static struct Object createCube() {
+static struct Object createCube(bgfx_program_handle_t _programHandle) {
 	struct Model* pCubeModel = model_create(
 		(struct Vertex[]) {
 			VERTEX_NEW(-1.0f,  1.0f,  1.0f, 0xff000000),
@@ -227,7 +230,5 @@ static struct Object createCube() {
 	
 	// model_print(pCubeModel, true, true);
 	
-	bgfx_program_handle_t cubeProgHnd = program_create("vs_cubes.bin", "fs_cubes.bin", true);
-	
-	return OBJECT_NEW(pCubeModel, cubeProgHnd);
+	return OBJECT_NEW(pCubeModel, _programHandle);
 }
