@@ -23,6 +23,11 @@
 
 - [math - Calculating a LookAt matrix - Stack Overflow](https://stackoverflow.com/questions/349050/calculating-a-lookat-matrix)
 
+#### OBJ
+
+- [java - Converting quadriladerals in an OBJ file into triangles? - Stack Overflow](https://stackoverflow.com/questions/23723993/converting-quadriladerals-in-an-obj-file-into-triangles) (to get to know that triangle strips/fans are exist...)
+- [Wavefront OBJ — Blender Manual](https://docs.blender.org/manual/en/latest/files/import_export/obj.html) (...but based on Blender's docs, those are quads)
+
 
 
 # Rotation

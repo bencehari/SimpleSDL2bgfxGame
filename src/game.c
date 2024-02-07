@@ -7,6 +7,7 @@
 #include <bgfx/c99/bgfx.h>
 
 #include "math/math.h"
+#include "sys/loaders.h"
 #include "core/programs.h"
 #include "core/vertex.h"
 #include "core/models.h"
@@ -29,6 +30,10 @@ void game(float width, float height, float fps) {
 	bgfx_program_handle_t programHandle = program_create("vs_cubes.bin", "fs_cubes.bin", true);
 	
 	struct Object cube = createCube(programHandle);
+	
+	// test
+	struct Model suzanne = {0};
+	load_external_obj_model("assets/models/suzanne.obj", &vertexLayout, &suzanne);
 	
 	// FPS
 	int milliPeriod = (int)(1.0 / (double)fps * 1000);

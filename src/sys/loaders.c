@@ -9,10 +9,40 @@
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
-struct Model* load_external_obj_model(const char* _objPath, const bgfx_vertex_layout_t _vertexLayout) {
+// more resource intensive loading of OBJ file
+// TODO: pack all assets before build for runtime use!
+bool load_external_obj_model(const char* _objPath, const bgfx_vertex_layout_t* _vertexLayout, struct Model* _model) {
 #pragma GCC diagnostic pop
+	FILE* file = fopen(_objPath, "r");
+	if (file == NULL) {
+		printf(AC_YELLOW "file is NULL: %s\n" AC_RESET, _objPath);
+		return false;
+	}
+	
+	char c;
+	int vertices = 0;
+	// it is a triangle strip, and not usable in this form
+	int faces = 0;
+	while ((c = getc(file)) != EOF) {
+		if (c == 'v') {
+			if (getc(file) == ' ') {
+				vertices++;
+				while ((c = getc(file)) != '\n' && c != EOF) ;
+			}
+		}
+		else if (c == 'f') {
+			if (getc(file) == ' ') {
+				faces++;
+				while ((c = getc(file)) != '\n' && c != EOF) ;
+			}
+		}
+	}
+	
+	printf("\"%s\"\nvertex count: %d\nface count: %d\n", _objPath, vertices, faces);
+	
+	fclose(file);
 
-	return NULL;
+	return true;
 }
 
 bool load_shader(const char* _filename, bgfx_shader_handle_t* _shaderHandle) {
