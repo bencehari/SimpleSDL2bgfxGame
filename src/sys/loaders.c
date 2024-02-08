@@ -4,6 +4,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "../core/vertex.h"
+
 #include "../utils/file.h"
 #include "../utils/consc.h"
 
@@ -20,25 +22,63 @@ bool load_external_obj_model(const char* _objPath, const bgfx_vertex_layout_t* _
 	}
 	
 	char c;
-	int vertices = 0;
-	// it is a triangle strip, and not usable in this form
-	int faces = 0;
+	int vert = 0;
+	int tris = 0;
 	while ((c = getc(file)) != EOF) {
 		if (c == 'v') {
 			if (getc(file) == ' ') {
-				vertices++;
+				vert++;
 				while ((c = getc(file)) != '\n' && c != EOF) ;
 			}
 		}
 		else if (c == 'f') {
 			if (getc(file) == ' ') {
-				faces++;
+				int vCount = 1;
+				while ((c = getc(file)) != '\n' && c != EOF) {
+					if (c == ' ') vCount++;
+				}
+				if (vCount == 4) tris += 2;
+				else if (vCount == 3) tris++;
+			}
+		}
+	}
+	
+	printf("\"%s\"\nvertex count: %d\ntri count: %d\n", _objPath, vert, tris);
+	
+	struct Vertex vertices[vert];
+	// uint16_t indices[tris * 3];
+	
+	int vIndex = 0;
+	// int iIndex = 0;
+	
+	rewind(file);
+	
+	while ((c = getc(file)) != EOF) {
+		if (c == 'v') {
+			if (getc(file) == ' ') {
+				float x, y, z;
+				int n = fscanf(file, "%f %f %f", &x, &y, &z);
+				
+				if (n != 3) {
+					printf("Failed to match vertex data.");
+					// TODO: now what?
+				}
+				else {
+					vertices[vIndex] = VERTEX_NEW(x, y, z, 0xffffffff);
+				}
+				vIndex++;
+			}
+		}
+		else if (c == 'f') {
+			if (getc(file) == ' ') {
 				while ((c = getc(file)) != '\n' && c != EOF) ;
 			}
 		}
 	}
 	
-	printf("\"%s\"\nvertex count: %d\nface count: %d\n", _objPath, vertices, faces);
+	for (int i = 0; i < vert; i++) {
+		printf("%f %f %f\n", vertices[i].x, vertices[i].y, vertices[i].z);
+	}
 	
 	fclose(file);
 
