@@ -2,14 +2,10 @@
 #define KE_MATH_H
 
 #ifndef HANDMADE_MATH__USE_C11_GENERICS
-#define HANDMADE_MATH__USE_C11_GENERICS 0
-#endif // HANDMADE_MATH__USE_C11_GENERICS
+	#define HANDMADE_MATH__USE_C11_GENERICS 0
+#endif
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wmissing-braces"
-#pragma GCC diagnostic ignored "-Wpedantic"
 #include "HandmadeMath.h"
-#pragma GCC diagnostic pop
 
 // float
 #define RAD_TO_DEG(_f) ((_f) * HMM_RadToDeg)
@@ -108,20 +104,6 @@ static const Vector3 globalForward = {{ 0.0f, 0.0f, 1.0f }};
 static const Vector3 globalUp = {{ 0.0f, 1.0f, 0.0f }};
 static const Vector3 globalRight = {{ 1.0f, 0.0f, 0.0f }};
 
-static inline Vector3 rotate_v3_by_q(const Vector3* _v3, const Quaternion* _q) {
-	Vector3 u = V3_NEW(_q->X, _q->Y, _q->Z);
-    float s = _q->W;
-	
-	float dot = V3_DOT(u, *_v3);
-	Vector3 cross = V3_CROSS(u, *_v3);
-
-	return V3_ADD(
-		V3_ADD(
-			V3_MUL_F(u, 2.0f * dot),
-			V3_MUL_F(*_v3, (s * s - V3_DOT(u, u)))
-		),
-		V3_MUL_F(cross, 2.0f * s)
-	);
-}
+extern Vector3 rotate_v3_by_q(const Vector3* _v3, const Quaternion* _q);
 
 #endif // KE_MATH_H
