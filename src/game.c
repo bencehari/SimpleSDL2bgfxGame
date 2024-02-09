@@ -144,6 +144,11 @@ void game(float width, float height, float fps) {
 					Vector3 fwd = tr_get_forward(&camera);
 					
 					if (freeMove) move = forwardDown ? fwd : V3_MUL_F(fwd, -1.0f);
+					else {
+						float Y = move.Y;
+						move = forwardDown ? fwd : V3_MUL_F(fwd, -1.0f);
+						move.Y = Y;
+					}
 				}
 			}
 			if (leftDown || rightDown) {
@@ -151,20 +156,32 @@ void game(float width, float height, float fps) {
 					Vector3 right = tr_get_right(&camera);
 					
 					if (freeMove) move = V3_ADD(move, rightDown ? right : V3_MUL_F(right, -1.0f));
+					else {
+						float Y = move.Y;
+						move = V3_ADD(move, rightDown ? right : V3_MUL_F(right, -1.0f));
+						move.Y = Y;
+					}
 				}
 			}
 			
 			if (upDownMove) {
 				if (elevateDown || descendDown) {
 					if (elevateDown != descendDown) {
-						Vector3 up = tr_get_up(&camera);
-						
-						move = V3_ADD(move, elevateDown ? up : V3_MUL_F(up, -1.0f));
+						if (freeMove) {
+							Vector3 up = tr_get_up(&camera);
+							move = V3_ADD(move, elevateDown ? up : V3_MUL_F(up, -1.0f));
+						}
+						else {
+							move = V3_ADD(move, elevateDown ? V3_UP : V3_MUL_F(V3_UP, -1.0f));
+						}
 					}
 				}
 			}
-			
-			if (!V3_EQ(move, V3_ZERO)) camera.position = V3_ADD(camera.position, V3_MUL_F(move, moveSpeed));
+
+			if (!V3_EQ(move, V3_ZERO)) {
+				if (!freeMove) move = V3_NORM(move);
+				camera.position = V3_ADD(camera.position, V3_MUL_F(move, moveSpeed));
+			}
 		}
 		
 		dbg_print_to_screen("CAM POSITION: %.3f %.3f %.3f", camera.position.X, camera.position.Y, camera.position.Z);
