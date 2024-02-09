@@ -22,7 +22,7 @@ static struct Object createCube(bgfx_program_handle_t _programHandle);
 void game(float width, float height, float fps) {
 	vertex_init();
 	programs_init(1);
-	models_init(1);
+	models_init(2);
 	
 	struct Transform camera = TRANSFORM_NEW(V3_NEW(0.0f, 0.0f, -5.0f), Q_IDENTITY, V3_ONE);
 
@@ -32,8 +32,11 @@ void game(float width, float height, float fps) {
 	struct Object cube = createCube(programHandle);
 	
 	// test
-	struct Model suzanne = {0};
-	load_external_obj_model("assets/models/suzanne.obj", &vertexLayout, &suzanne);
+	struct Model* suzanneModel = NULL;
+	load_external_obj_model("assets/models/suzanne.obj", &vertexLayout, &suzanneModel);
+	
+	struct Object suzanne = OBJECT_NEW(suzanneModel, programHandle);
+	suzanne.transform.position = V3_NEW(5.0f, 0.0f, 0.0f);
 	
 	// FPS
 	int milliPeriod = (int)(1.0 / (double)fps * 1000);
@@ -181,6 +184,7 @@ void game(float width, float height, float fps) {
 		// RENDER objects START
 		
 		obj_encoder_render(encoder, &cube);
+		obj_encoder_render(encoder, &suzanne);
 		
 		// RENDER objects END
 		
