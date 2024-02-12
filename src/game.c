@@ -33,7 +33,7 @@ void game(float width, float height, float fps) {
 	
 	// test
 	struct Model* suzanneModel = NULL;
-	load_external_obj_model("assets/models/suzanne.obj", &vertexLayout, &suzanneModel, CLOCKWISE);
+	load_external_obj_model("assets/models/suzanne.obj", &vertexLayout, &suzanneModel, INDICES_ORDER_AUTO);
 	
 	struct Object suzanne = OBJECT_NEW(suzanneModel, programHandle);
 	suzanne.transform.position = V3_NEW(5.0f, 0.0f, 0.0f);

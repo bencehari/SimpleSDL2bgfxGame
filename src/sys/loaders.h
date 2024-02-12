@@ -9,8 +9,9 @@
 #include "../core/object.h"
 
 enum IndicesOrder {
-	CLOCKWISE,
-	COUNTERCLOCKWISE
+	INDICES_ORDER_AUTO,
+	INDICES_ORDER_CLOCKWISE,
+	INDICES_ORDER_COUNTERCLOCKWISE
 };
 
 extern bool load_external_obj_model(const char* _objPath, const bgfx_vertex_layout_t* _vertexLayout, struct Model** _model, enum IndicesOrder _order);

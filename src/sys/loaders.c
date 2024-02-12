@@ -23,11 +23,26 @@ bool load_external_obj_model(const char* _objPath, const bgfx_vertex_layout_t* _
 	char c;
 	int vert = 0;
 	int tris = 0;
+	
+	// _oreder == INDICES_ORDER_AUTO
+	bool detectOrder = _order == INDICES_ORDER_AUTO ? true : false;
+	Vector3 normal = V3_ZERO;
+	
 	while ((c = getc(file)) != EOF) {
 		if (c == 'v') {
-			if (getc(file) == ' ') {
+			if ((c = getc(file)) == ' ') {
 				vert++;
 				while ((c = getc(file)) != '\n' && c != EOF) ;
+			}
+			else if (detectOrder && c == 'n') {
+				int n = fscanf(file, "%f %f %f", &normal.X, &normal.Y, &normal.Z);
+				
+				if (n != 3) {
+					printf(AC_RED "Failed to match vertex normal data." AC_RESET);
+					result = false;
+					goto close;
+				}
+				detectOrder = false;
 			}
 		}
 		else if (c == 'f') {
@@ -44,13 +59,21 @@ bool load_external_obj_model(const char* _objPath, const bgfx_vertex_layout_t* _
 	
 	// printf("\"%s\"\nvertex count: %d\ntri count: %d\n", _objPath, vert, tris);
 	
-	struct Vertex vertices[vert];
-	uint16_t indices[tris * 3];
+	struct Vertex* vertices = malloc(sizeof(struct Vertex) * vert);
+	uint16_t* indices = malloc(sizeof(uint16_t) * tris * 3);
 	
 	int vIndex = 0;
 	int iIndex = 0;
 	
 	rewind(file);
+	
+	if (_order == INDICES_ORDER_AUTO) {
+		if (V3_EQ(normal, V3_ZERO)) {
+			printf(AC_RED "Failed to retrive vertex normal." AC_RESET);
+			result = false;
+			goto cleanup;
+		}
+	}
 	
 	while ((c = getc(file)) != EOF) {
 		if (c == 'v') {
@@ -61,7 +84,7 @@ bool load_external_obj_model(const char* _objPath, const bgfx_vertex_layout_t* _
 				if (n != 3) {
 					printf(AC_RED "Failed to match vertex data." AC_RESET);
 					result = false;
-					goto end;
+					goto cleanup;
 				}
 				else {
 					vertices[vIndex] = VERTEX_NEW(x, y, z, vIndex % 2 == 0 ? 0xffffffff : (vIndex % 3 == 0 ? 0xff0000ff : 0xff00ff00));
@@ -80,45 +103,63 @@ bool load_external_obj_model(const char* _objPath, const bgfx_vertex_layout_t* _
 				int n = fscanf(file,
 					"%d/%d/%d %d/%d/%d %d/%d/%d %d/%d/%d",
 					&v1, &vt1, &vn1, &v2, &vt2, &vn2, &v3, &vt3, &vn3, &v4, &vt4, &vn4);
+				
+				// we store indexes 0 based
+				v1--; vt1--; vn1--;
+				v2--; vt2--; vn2--;
+				v3--; vt3--; vn3--;
+				v4--; vt4--; vn4--;
+
+				if (_order == INDICES_ORDER_AUTO) {
+					Vector3 a = V3_NEW(vertices[v1].x, vertices[v1].y, vertices[v1].z);
+					Vector3 b = V3_NEW(vertices[v2].x, vertices[v2].y, vertices[v2].z);
+					Vector3 c = V3_NEW(vertices[v3].x, vertices[v3].y, vertices[v3].z);
+					
+					// calculate normal clockwise
+					Vector3 normCalculated = V3_NORM(V3_CROSS(V3_SUB(b, a), V3_SUB(c, a)));
+					
+					// hopefully that will be enough
+					_order = V3_DOT(normal, normCalculated) >= 0.99f ? INDICES_ORDER_CLOCKWISE : INDICES_ORDER_COUNTERCLOCKWISE;
+				}
 
 				if (n == 12) {
 					// Blender arranges indices clockwise, while bgfx processes counterclockwise
-					if (_order == CLOCKWISE) {
-						indices[iIndex++] = v3 - 1;
-						indices[iIndex++] = v2 - 1;
-						indices[iIndex++] = v1 - 1;
+					if (_order == INDICES_ORDER_CLOCKWISE) {
+						indices[iIndex++] = v3;
+						indices[iIndex++] = v2;
+						indices[iIndex++] = v1;
 						
-						indices[iIndex++] = v4 - 1;
-						indices[iIndex++] = v3 - 1;
-						indices[iIndex++] = v1 - 1;
+						indices[iIndex++] = v4;
+						indices[iIndex++] = v3;
+						indices[iIndex++] = v1;
 					}
 					else {
-						indices[iIndex++] = v1 - 1;
-						indices[iIndex++] = v2 - 1;
-						indices[iIndex++] = v3 - 1;
+						indices[iIndex++] = v1;
+						indices[iIndex++] = v2;
+						indices[iIndex++] = v3;
 						
-						indices[iIndex++] = v1 - 1;
-						indices[iIndex++] = v3 - 1;
-						indices[iIndex++] = v4 - 1;
+						indices[iIndex++] = v1;
+						indices[iIndex++] = v3;
+						indices[iIndex++] = v4;
 					}
 					
 				}
 				else if (n == 9) {
-					if (_order == CLOCKWISE) {
-						indices[iIndex++] = v3 - 1;
-						indices[iIndex++] = v2 - 1;
-						indices[iIndex++] = v1 - 1;
+					if (_order == INDICES_ORDER_CLOCKWISE) {
+						indices[iIndex++] = v3;
+						indices[iIndex++] = v2;
+						indices[iIndex++] = v1;
 					}
 					else {
-						indices[iIndex++] = v1 - 1;
-						indices[iIndex++] = v2 - 1;
-						indices[iIndex++] = v3 - 1;
+						indices[iIndex++] = v1;
+						indices[iIndex++] = v2;
+						indices[iIndex++] = v3;
 					}
 				}
 				else {
 					printf(AC_RED "Failed to match tri/quad data." AC_RESET);
 					result = false;
-					goto end;
+					goto cleanup;
 				}
 			}
 		}
@@ -130,9 +171,12 @@ bool load_external_obj_model(const char* _objPath, const bgfx_vertex_layout_t* _
 	for (int i = 1, j = 2; j < tris * 3; i++, j += 3) printf("%d:\t%d %d %d\n", i, indices[j - 2], indices[j - 1], indices[j]);*/
 	
 	*_model = model_create(vertices, vert, indices, tris * 3, _vertexLayout);
+
+cleanup:
+	free(vertices);
+	free(indices);
 	
-end:
-	
+close:
 	fclose(file);
 
 	return result;
