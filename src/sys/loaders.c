@@ -11,7 +11,7 @@
 
 // more resource intensive loading of OBJ file
 // TODO: pack all assets before build for runtime use!
-bool load_external_obj_model(const char* _objPath, const bgfx_vertex_layout_t* _vertexLayout, struct Model** _model) {
+bool load_external_obj_model(const char* _objPath, const bgfx_vertex_layout_t* _vertexLayout, struct Model** _model, enum IndicesOrder _order) {
 	FILE* file = fopen(_objPath, "r");
 	if (file == NULL) {
 		printf(AC_RED "file is NULL: %s\n" AC_RESET, _objPath);
@@ -82,20 +82,38 @@ bool load_external_obj_model(const char* _objPath, const bgfx_vertex_layout_t* _
 					&v1, &vt1, &vn1, &v2, &vt2, &vn2, &v3, &vt3, &vn3, &v4, &vt4, &vn4);
 
 				if (n == 12) {
-					// Blender arranges indices clockwise,
-					// while bgfx processes counterclockwise
-					indices[iIndex++] = v3 - 1;
-					indices[iIndex++] = v2 - 1;
-					indices[iIndex++] = v1 - 1;
+					// Blender arranges indices clockwise, while bgfx processes counterclockwise
+					if (_order == CLOCKWISE) {
+						indices[iIndex++] = v3 - 1;
+						indices[iIndex++] = v2 - 1;
+						indices[iIndex++] = v1 - 1;
+						
+						indices[iIndex++] = v4 - 1;
+						indices[iIndex++] = v3 - 1;
+						indices[iIndex++] = v1 - 1;
+					}
+					else {
+						indices[iIndex++] = v1 - 1;
+						indices[iIndex++] = v2 - 1;
+						indices[iIndex++] = v3 - 1;
+						
+						indices[iIndex++] = v1 - 1;
+						indices[iIndex++] = v3 - 1;
+						indices[iIndex++] = v4 - 1;
+					}
 					
-					indices[iIndex++] = v4 - 1;
-					indices[iIndex++] = v3 - 1;
-					indices[iIndex++] = v1 - 1;
 				}
 				else if (n == 9) {
-					indices[iIndex++] = v3 - 1;
-					indices[iIndex++] = v2 - 1;
-					indices[iIndex++] = v1 - 1;
+					if (_order == CLOCKWISE) {
+						indices[iIndex++] = v3 - 1;
+						indices[iIndex++] = v2 - 1;
+						indices[iIndex++] = v1 - 1;
+					}
+					else {
+						indices[iIndex++] = v1 - 1;
+						indices[iIndex++] = v2 - 1;
+						indices[iIndex++] = v3 - 1;
+					}
 				}
 				else {
 					printf(AC_RED "Failed to match tri/quad data." AC_RESET);
