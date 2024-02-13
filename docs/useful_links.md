@@ -34,3 +34,10 @@
 
 - [AnyLeaf articles: Quaternions: A practical guide](https://www.anyleaf.org/blog/quaternions:-a-practical-guide)
 - [c++ - Rotating vector3 by a quaternion - Game Development Stack Exchange](https://gamedev.stackexchange.com/questions/28395/rotating-vector3-by-a-quaternion)
+
+
+
+# Assets
+
+- Skeleton Mage: [KayKit - Character Pack : Skeletons by Kay Lousberg (itch.io)](https://kaylousberg.itch.io/kaykit-skeletons)
+

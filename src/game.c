@@ -22,7 +22,7 @@ static struct Object createCube(bgfx_program_handle_t _programHandle);
 void game(float width, float height, float fps) {
 	vertex_init();
 	programs_init(1);
-	models_init(2);
+	models_init(3);
 	
 	struct Transform camera = TRANSFORM_NEW(V3_NEW(0.0f, 0.0f, -5.0f), Q_IDENTITY, V3_ONE);
 
@@ -33,10 +33,16 @@ void game(float width, float height, float fps) {
 	
 	// test
 	struct Model* suzanneModel = NULL;
-	load_external_obj_model("assets/models/suzanne.obj", &vertexLayout, &suzanneModel, INDICES_ORDER_AUTO);
-	
+	load_external_obj_geometry("assets/models/suzanne.obj", &vertexLayout, &suzanneModel, INDICES_ORDER_AUTO);
 	struct Object suzanne = OBJECT_NEW(suzanneModel, programHandle);
 	suzanne.transform.position = V3_NEW(5.0f, 0.0f, 0.0f);
+	
+	
+	struct Model* skeletonMageModel = NULL;
+	// for now, it loads all object as one from .obj
+	load_external_obj_geometry("assets/models/Skeleton_Mage.obj", &vertexLayout, &skeletonMageModel, INDICES_ORDER_AUTO);
+	struct Object skeletonMage = OBJECT_NEW(skeletonMageModel, programHandle);
+	skeletonMage.transform.position = V3_NEW(-5.0f, 0.0f, 0.0f);
 	
 	// FPS
 	int milliPeriod = (int)(1.0 / (double)fps * 1000);
@@ -202,6 +208,7 @@ void game(float width, float height, float fps) {
 		
 		obj_encoder_render(encoder, &cube);
 		obj_encoder_render(encoder, &suzanne);
+		obj_encoder_render(encoder, &skeletonMage);
 		
 		// RENDER objects END
 		

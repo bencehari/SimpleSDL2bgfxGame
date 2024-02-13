@@ -9,9 +9,11 @@
 #include "../utils/file.h"
 #include "../utils/consc.h"
 
-// more resource intensive loading of OBJ file
+// resource intensive loading of .obj file
 // TODO: pack all assets before build for runtime use!
-bool load_external_obj_model(const char* _objPath, const bgfx_vertex_layout_t* _vertexLayout, struct Model** _model, enum IndicesOrder _order) {
+bool load_external_obj_geometry(const char* _objPath, const bgfx_vertex_layout_t* _vertexLayout, struct Model** _model, enum IndicesOrder _order) {
+	// TODO: handle multi-object .obj
+	
 	FILE* file = fopen(_objPath, "r");
 	if (file == NULL) {
 		printf(AC_RED "file is NULL: %s\n" AC_RESET, _objPath);
@@ -24,7 +26,6 @@ bool load_external_obj_model(const char* _objPath, const bgfx_vertex_layout_t* _
 	int vert = 0;
 	int tris = 0;
 	
-	// _oreder == INDICES_ORDER_AUTO
 	bool detectOrder = _order == INDICES_ORDER_AUTO ? true : false;
 	Vector3 normal = V3_ZERO;
 	
@@ -118,8 +119,14 @@ bool load_external_obj_model(const char* _objPath, const bgfx_vertex_layout_t* _
 					// calculate normal clockwise
 					Vector3 normCalculated = V3_NORM(V3_CROSS(V3_SUB(b, a), V3_SUB(c, a)));
 					
-					// hopefully that will be enough
-					_order = V3_DOT(normal, normCalculated) >= 0.99f ? INDICES_ORDER_CLOCKWISE : INDICES_ORDER_COUNTERCLOCKWISE;
+					// hopefully that will be enough.
+					// EDIT: changed to 0.95 from 0.99
+					// theoretically dot > 0.0f would be enough, but it is strange that even 0.975 happened, maybe should investigate this
+					_order = V3_DOT(normal, normCalculated) >= 0.95f ? INDICES_ORDER_CLOCKWISE : INDICES_ORDER_COUNTERCLOCKWISE;
+					
+					/*printf(AC_YELLOW "determine indices order for \"%s\"\n" AC_RESET
+						"           normal: %f %f %f\nnormal calculated: %f %f %f\nDOT: %f\n",
+						_objPath, normal.X, normal.Y, normal.Z, normCalculated.X, normCalculated.Y, normCalculated.Z, V3_DOT(normal, normCalculated));*/
 				}
 
 				if (n == 12) {
