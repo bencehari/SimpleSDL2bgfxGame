@@ -138,7 +138,7 @@ void game(float width, float height, float fps) {
 		}
 		
 		// TODO: limit X rotation to avoid flipping
-		tr_fps_rotate(&camera, cameraRotation);
+		camera.fpsRotate(cameraRotation);
 		
 		// process input when the mouse is locked in the window
 		if (SDL_GetRelativeMouseMode()) {
@@ -146,7 +146,7 @@ void game(float width, float height, float fps) {
 			
 			if (forwardDown || backDown) {
 				if (forwardDown != backDown) {
-					Vector3 fwd = tr_get_forward(&camera);
+					Vector3 fwd = camera.getForward();
 					
 					if (freeMove) move = forwardDown ? fwd : (fwd * -1.0f);
 					else {
@@ -158,7 +158,7 @@ void game(float width, float height, float fps) {
 			}
 			if (leftDown || rightDown) {
 				if (leftDown != rightDown) {
-					Vector3 right = tr_get_right(&camera);
+					Vector3 right = camera.getRight();
 					
 					if (freeMove) move += rightDown ? right : (right * -1.0f);
 					else {
@@ -173,7 +173,7 @@ void game(float width, float height, float fps) {
 				if (elevateDown || descendDown) {
 					if (elevateDown != descendDown) {
 						if (freeMove) {
-							Vector3 up = tr_get_up(&camera);
+							Vector3 up = camera.getUp();
 							move += elevateDown ? up : (up * -1.0f);
 						}
 						else {
@@ -193,7 +193,7 @@ void game(float width, float height, float fps) {
 
 		// calculate view and projection matrix
 		{
-			Matrix4x4 view = LOOK_AT(camera.position, tr_get_look_at(&camera));
+			Matrix4x4 view = LOOK_AT(camera.position, camera.getLookAt());
 			
 			Matrix4x4 proj = PERSPECTIVE(DEG_TO_RAD(90.0f), width / height, 0.1f, 100.0f);
 			bgfx::setViewTransform(0, &view, &proj);
