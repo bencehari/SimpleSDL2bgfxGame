@@ -11,7 +11,7 @@ static bool initialized;
 
 static int programCount;
 static int currentProgramIndex = 0;
-static bgfx_program_handle_t* programs;
+static bgfx::ProgramHandle* programs;
 
 void programs_init(int _maxProgramCount) {
 	if (initialized) {
@@ -20,24 +20,24 @@ void programs_init(int _maxProgramCount) {
 	}
 	
 	programCount = _maxProgramCount;
-	programs = (bgfx_program_handle_t*)malloc(sizeof(bgfx_program_handle_t) * _maxProgramCount);
+	programs = (bgfx::ProgramHandle*)malloc(sizeof(bgfx::ProgramHandle) * _maxProgramCount);
 	
 	initialized = true;
 }
 
 void programs_cleanup(void) {
 	while (--currentProgramIndex >= 0) {
-		bgfx_destroy_program(programs[currentProgramIndex]);
+		bgfx::destroy(programs[currentProgramIndex]);
 		free(&programs[currentProgramIndex]);
 	}
 	
-	programs = NULL;
+	programs = nullptr;
 	initialized = false;
 }
 
-bgfx_program_handle_t program_create(const char* _vertexShader, const char* _fragmentShader, bool _destroyShaders) {
-	bgfx_shader_handle_t vertexShaderHnd = {0};
-	bgfx_shader_handle_t fragmentShaderHnd = {0};
+bgfx::ProgramHandle program_create(const char* _vertexShader, const char* _fragmentShader, bool _destroyShaders) {
+	bgfx::ShaderHandle vertexShaderHnd = {0};
+	bgfx::ShaderHandle fragmentShaderHnd = {0};
 	
 	if (!load_shader(_vertexShader, &vertexShaderHnd)) {
 		// TODO: load fallback shader
@@ -47,7 +47,7 @@ bgfx_program_handle_t program_create(const char* _vertexShader, const char* _fra
 		// TODO: load fallback shader
 	}
 	
-	programs[currentProgramIndex] = bgfx_create_program(vertexShaderHnd, fragmentShaderHnd, _destroyShaders);
+	programs[currentProgramIndex] = bgfx::createProgram(vertexShaderHnd, fragmentShaderHnd, _destroyShaders);
 
 	return programs[currentProgramIndex++];
 }

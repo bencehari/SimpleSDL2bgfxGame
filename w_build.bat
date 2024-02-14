@@ -47,7 +47,7 @@ CLS
 IF NOT EXIST .build MKDIR .build
 IF NOT EXIST ".build\SDL2.dll" COPY "bin\SDL2.dll" ".build\SDL2.dll"
 
-:: @echo on
+@echo on
 
 :: -lgdi32: https://learn.microsoft.com/en-us/windows/win32/gdi/windows-gdi
 :: doesn't seem right for me because of 32bit stuff, but bgfx requires it.
@@ -58,7 +58,6 @@ IF NOT EXIST ".build\SDL2.dll" COPY "bin\SDL2.dll" ".build\SDL2.dll"
  -I%sdl_path%include^
  -I%bgfx_path%bgfx\include^
  -I%bgfx_path%bimg\include^
- -I%bgfx_path%bx\include^
  -L%sdl_path%lib^
  -L%bgfx_path%bgfx\.build\win64_mingw-gcc\bin^
  %dbg_flags%^
@@ -75,3 +74,5 @@ IF NOT EXIST ".build\SDL2.dll" COPY "bin\SDL2.dll" ".build\SDL2.dll"
  && %run_cmd%
  
  :: -lstdc++^
+ :: -I%bgfx_path%bx\include^
+ 

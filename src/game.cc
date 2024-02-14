@@ -4,7 +4,7 @@
 #include <stdbool.h>
 
 #include <SDL2/SDL.h>
-#include <bgfx/c99/bgfx.h>
+#include <bgfx/bgfx.h>
 
 #include "math/math.h"
 #include "sys/loaders.h"
@@ -17,7 +17,7 @@
 #include "utils/consc.h"
 #include "utils/debug.h"
 
-static Object createCube(bgfx_program_handle_t _programHandle);
+static Object createCube(bgfx::ProgramHandle _programHandle);
 
 void game(float width, float height, float fps) {
 	vertex_init();
@@ -27,7 +27,7 @@ void game(float width, float height, float fps) {
 	Transform camera(V3_NEW(0.0f, 0.0f, -5.0f), Q_IDENTITY, V3_ONE);
 
 	// init assets
-	bgfx_program_handle_t programHandle = program_create("vs_cubes.bin", "fs_cubes.bin", true);
+	bgfx::ProgramHandle programHandle = program_create("vs_cubes.bin", "fs_cubes.bin", true);
 	
 	Object cube = createCube(programHandle);
 	
@@ -75,7 +75,7 @@ void game(float width, float height, float fps) {
 		dbg_reset();
 		
 		lastTick = SDL_GetTicks();
-		bgfx_dbg_text_clear(0, false);
+		bgfx::dbgTextClear(0, false);
 		
 		Vector2 cameraRotation = V2_ZERO;
 		
@@ -196,24 +196,24 @@ void game(float width, float height, float fps) {
 			Matrix4x4 view = LOOK_AT(camera.position, tr_get_look_at(&camera));
 			
 			Matrix4x4 proj = PERSPECTIVE(DEG_TO_RAD(90.0f), width / height, 0.1f, 100.0f);
-			bgfx_set_view_transform(0, &view, &proj);
-			bgfx_set_view_rect(0, 0, 0, (int)width, (int)height);
+			bgfx::setViewTransform(0, &view, &proj);
+			bgfx::setViewRect(0, 0, 0, (int)width, (int)height);
 		}
 
-		bgfx_encoder_t* encoder = bgfx_encoder_begin(true);
-		bgfx_encoder_touch(encoder, 0);
+		bgfx::Encoder* encoder = bgfx::begin(true);
+		bgfx::touch(0);
 
 		// RENDER objects START
 		
-		cube.encoder_render(*encoder);
-		suzanne.encoder_render(*encoder);
-		skeletonMage.encoder_render(*encoder);
+		cube.render();
+		suzanne.render();
+		skeletonMage.render();
 		
 		// RENDER objects END
 		
-		bgfx_encoder_end(encoder);
+		bgfx::end(encoder);
 		
-		bgfx_frame(false);
+		bgfx::frame(false);
 		
 		currentTick = SDL_GetTicks();
 		int sleep = milliPeriod - (currentTick - lastTick);
@@ -230,7 +230,7 @@ void game(float width, float height, float fps) {
 
 // ~~~~~
 
-static Object createCube(bgfx_program_handle_t _programHandle) {
+static Object createCube(bgfx::ProgramHandle _programHandle) {
 	Vertex vertices[] = {
 		Vertex(-1.0f,  1.0f,  1.0f, 0xff000000),
 		Vertex( 1.0f,  1.0f,  1.0f, 0xff0000ff),
@@ -256,7 +256,7 @@ static Object createCube(bgfx_program_handle_t _programHandle) {
 		6, 3, 7,
 	};
 	
-	Model* pCubeModel = model_create(vertices, 8, indices, 36, &vertexLayout);
+	Model* pCubeModel = model_create(vertices, 8, indices, 36, vertexLayout);
 	
 	// model_print(pCubeModel, true, true);
 	

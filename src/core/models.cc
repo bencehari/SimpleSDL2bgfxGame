@@ -13,8 +13,8 @@ static int currentModelIndex;
 static Model* models;
 
 void Model::cleanup(void) {
-	bgfx_destroy_vertex_buffer(vertexBufferHnd);
-	bgfx_destroy_index_buffer(indexBufferHnd);
+	bgfx::destroy(vertexBufferHnd);
+	bgfx::destroy(indexBufferHnd);
 	
 	free(vertices);
 	free(indices);
@@ -72,7 +72,7 @@ void models_cleanup(void) {
 	initialized = false;
 }
 
-Model* model_create(const Vertex _vertices[], int _verticesLen, const uint16_t _indices[], int _indicesLen, const bgfx_vertex_layout_t* _vertexLayout) {
+Model* model_create(const Vertex _vertices[], int _verticesLen, const uint16_t _indices[], int _indicesLen, const bgfx::VertexLayout& _vertexLayout) {
 	if (currentModelIndex >= modelCount) {
 		puts(AC_YELLOW "Max model count reached." AC_RESET);
 		return NULL;
@@ -93,8 +93,8 @@ Model* model_create(const Vertex _vertices[], int _verticesLen, const uint16_t _
 		_verticesLen,
 		pindices,
 		_indicesLen,
-		bgfx_create_vertex_buffer(bgfx_make_ref(pvertices, verticesSize), _vertexLayout, BGFX_BUFFER_NONE),
-		bgfx_create_index_buffer(bgfx_make_ref(pindices, indicesSize), BGFX_BUFFER_NONE)
+		bgfx::createVertexBuffer(bgfx::makeRef(pvertices, verticesSize), _vertexLayout, BGFX_BUFFER_NONE),
+		bgfx::createIndexBuffer(bgfx::makeRef(pindices, indicesSize), BGFX_BUFFER_NONE)
 	);
 	
 	return &models[currentModelIndex++];

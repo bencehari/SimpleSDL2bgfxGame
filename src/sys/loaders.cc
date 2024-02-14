@@ -11,11 +11,11 @@
 
 // resource intensive loading of .obj file
 // TODO: pack all assets before build for runtime use!
-bool load_external_obj_geometry(const char* _objPath, const bgfx_vertex_layout_t* _vertexLayout, Model** _model, enum IndicesOrder _order) {
+bool load_external_obj_geometry(const char* _objPath, const bgfx::VertexLayout* _vertexLayout, Model** _model, enum IndicesOrder _order) {
 	// TODO: handle multi-object .obj
 	
 	FILE* file = fopen(_objPath, "r");
-	if (file == NULL) {
+	if (file == nullptr) {
 		printf(AC_RED "file is NULL: %s\n" AC_RESET, _objPath);
 		return false;
 	}
@@ -178,7 +178,7 @@ bool load_external_obj_geometry(const char* _objPath, const bgfx_vertex_layout_t
 		puts(AC_YELLOW "INDICES" AC_RESET);
 		for (int i = 1, j = 2; j < tris * 3; i++, j += 3) printf("%d:\t%d %d %d\n", i, indices[j - 2], indices[j - 1], indices[j]);*/
 		
-		*_model = model_create(vertices, vert, indices, tris * 3, _vertexLayout);
+		*_model = model_create(vertices, vert, indices, tris * 3, *_vertexLayout);
 
 cleanup:
 		free(vertices);
@@ -191,21 +191,21 @@ close:
 	return result;
 }
 
-bool load_shader(const char* _filename, bgfx_shader_handle_t* _shaderHandle) {
+bool load_shader(const char* _filename, bgfx::ShaderHandle* _shaderHandle) {
 	const char* shaderPath;
 	
-	switch (bgfx_get_renderer_type()) {
-		case BGFX_RENDERER_TYPE_NOOP:
-		case BGFX_RENDERER_TYPE_AGC: shaderPath = "assets/shaders/dx9/"; break;
-		case BGFX_RENDERER_TYPE_DIRECT3D11:
-		case BGFX_RENDERER_TYPE_DIRECT3D12: shaderPath = "assets/shaders/dx11/"; break;
-		case BGFX_RENDERER_TYPE_GNM: shaderPath = "assets/shaders/pssl/"; break;
-		case BGFX_RENDERER_TYPE_METAL: shaderPath = "assets/shaders/metal/"; break;
-		case BGFX_RENDERER_TYPE_NVN: break;
-		case BGFX_RENDERER_TYPE_OPENGLES: shaderPath = "assets/shaders/essl"; break;
-		case BGFX_RENDERER_TYPE_OPENGL: shaderPath = "assets/shaders/glsl/"; break;
-		case BGFX_RENDERER_TYPE_VULKAN: shaderPath = "assets/shaders/spirv/"; break;
-		case BGFX_RENDERER_TYPE_COUNT: break;
+	switch (bgfx::getRendererType()) {
+		case bgfx::RendererType::Noop:
+		case bgfx::RendererType::Agc:			shaderPath = "assets/shaders/dx9/"; break;
+		case bgfx::RendererType::Direct3D11:
+		case bgfx::RendererType::Direct3D12:	shaderPath = "assets/shaders/dx11/"; break;
+		case bgfx::RendererType::Gnm:			shaderPath = "assets/shaders/pssl/"; break;
+		case bgfx::RendererType::Metal:			shaderPath = "assets/shaders/metal/"; break;
+		case bgfx::RendererType::Nvn:			break;
+		case bgfx::RendererType::OpenGLES:		shaderPath = "assets/shaders/essl"; break;
+		case bgfx::RendererType::OpenGL:		shaderPath = "assets/shaders/glsl/"; break;
+		case bgfx::RendererType::Vulkan:		shaderPath = "assets/shaders/spirv/"; break;
+		case bgfx::RendererType::Count:			break;
 	}
 	
 	// printf(AC_YELLOW "ShaderName: '%s'.\nPath: '%s'\n" AC_RESET, _filename, shaderPath);
@@ -220,18 +220,18 @@ bool load_shader(const char* _filename, bgfx_shader_handle_t* _shaderHandle) {
 	
 	// printf(AC_YELLOW "%s\n" AC_RESET, filePath);
 	
-	FILE* file = NULL;
+	FILE* file = nullptr;
 	long fileSize = 0;
 	if (!file_get_size(filePath, &fileSize, &file)) return false;
 	
 	// printf(AC_YELLOW "fileSize: %ld\n" AC_RESET, fileSize);
 	
-	const bgfx_memory_t* mem = bgfx_alloc(fileSize + 1);
+	const bgfx::Memory* mem = bgfx::alloc(fileSize + 1);
 	fread(mem->data, 1, fileSize, file);
 	mem->data[mem->size - 1] = '\0';
 	fclose(file);
 	
-	bgfx_shader_handle_t h = bgfx_create_shader(mem);
+	bgfx::ShaderHandle h = bgfx::createShader(mem);
 	
 	*_shaderHandle = h;
 	

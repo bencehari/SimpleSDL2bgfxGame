@@ -69,7 +69,7 @@ typedef HMM_Mat4 Matrix4x4;
 #define LOOK_AT(_v3_1, _v3_2) (HMM_LookAt_LH((_v3_1), (_v3_2), V3_UP))
 
 #define PERSPECTIVE(_fov, _ratio, _near, _far) \
-	(bgfx_get_caps()->homogeneousDepth ? \
+	(bgfx::getCaps()->homogeneousDepth ? \
 	HMM_Perspective_LH_NO((_fov), (_ratio), (_near), (_far)) : \
 	HMM_Perspective_LH_ZO((_fov), (_ratio), (_near), (_far)))
 

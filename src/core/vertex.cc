@@ -1,10 +1,11 @@
 #include "vertex.h"
 
-bgfx_vertex_layout_t vertexLayout;
+bgfx::VertexLayout vertexLayout;
 
 void vertex_init(void) {
-	bgfx_vertex_layout_begin(&vertexLayout, BGFX_RENDERER_TYPE_COUNT);
-	bgfx_vertex_layout_add(&vertexLayout, BGFX_ATTRIB_POSITION, 3, BGFX_ATTRIB_TYPE_FLOAT, false, false);
-	bgfx_vertex_layout_add(&vertexLayout, BGFX_ATTRIB_COLOR0, 4, BGFX_ATTRIB_TYPE_UINT8, true, false);
-	bgfx_vertex_layout_end(&vertexLayout);
+	vertexLayout
+		.begin()
+			.add(bgfx::Attrib::Position, 3, bgfx::AttribType::Float, false, false)
+			.add(bgfx::Attrib::Color0, 4, bgfx::AttribType::Uint8, true, false)
+		.end();
 }
