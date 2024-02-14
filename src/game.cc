@@ -148,10 +148,10 @@ void game(float width, float height, float fps) {
 				if (forwardDown != backDown) {
 					Vector3 fwd = tr_get_forward(&camera);
 					
-					if (freeMove) move = forwardDown ? fwd : V3_MUL_F(fwd, -1.0f);
+					if (freeMove) move = forwardDown ? fwd : (fwd * -1.0f);
 					else {
 						float Y = move.Y;
-						move = forwardDown ? fwd : V3_MUL_F(fwd, -1.0f);
+						move = forwardDown ? fwd : (fwd * -1.0f);
 						move.Y = Y;
 					}
 				}
@@ -160,10 +160,10 @@ void game(float width, float height, float fps) {
 				if (leftDown != rightDown) {
 					Vector3 right = tr_get_right(&camera);
 					
-					if (freeMove) move = V3_ADD(move, rightDown ? right : V3_MUL_F(right, -1.0f));
+					if (freeMove) move += rightDown ? right : (right * -1.0f);
 					else {
 						float Y = move.Y;
-						move = V3_ADD(move, rightDown ? right : V3_MUL_F(right, -1.0f));
+						move += rightDown ? right : (right * -1.0f);
 						move.Y = Y;
 					}
 				}
@@ -174,18 +174,18 @@ void game(float width, float height, float fps) {
 					if (elevateDown != descendDown) {
 						if (freeMove) {
 							Vector3 up = tr_get_up(&camera);
-							move = V3_ADD(move, elevateDown ? up : V3_MUL_F(up, -1.0f));
+							move += elevateDown ? up : (up * -1.0f);
 						}
 						else {
-							move = V3_ADD(move, elevateDown ? V3_UP : V3_MUL_F(V3_UP, -1.0f));
+							move += elevateDown ? V3_UP : (V3_UP * -1.0f);
 						}
 					}
 				}
 			}
 
-			if (!V3_EQ(move, V3_ZERO)) {
+			if (move != V3_ZERO) {
 				if (!freeMove) move = V3_NORM(move);
-				camera.position = V3_ADD(camera.position, V3_MUL_F(move, moveSpeed));
+				camera.position += (move * moveSpeed);
 			}
 		}
 		

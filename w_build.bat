@@ -4,7 +4,7 @@ SETLOCAL enabledelayedexpansion
 :: 0 disables debug mode
 :: any other value sets flags and runs the app with GDB (you need to start the app
 :: with `run` in gdb context)
-SET debug_mode=1
+SET debug_mode=0
 :: if you don't need extra warnings, just add REM or :: at the start of the line
 SET extra=-Wextra -Werror -Wpedantic
 

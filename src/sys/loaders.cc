@@ -70,7 +70,7 @@ bool load_external_obj_geometry(const char* _objPath, const bgfx_vertex_layout_t
 		rewind(file);
 		
 		if (_order == INDICES_ORDER_AUTO) {
-			if (V3_EQ(normal, V3_ZERO)) {
+			if (normal == V3_ZERO) {
 				printf(AC_RED "Failed to retrive vertex normal." AC_RESET);
 				result = false;
 				goto cleanup;
@@ -118,7 +118,7 @@ bool load_external_obj_geometry(const char* _objPath, const bgfx_vertex_layout_t
 						Vector3 c = V3_NEW(vertices[v3].x, vertices[v3].y, vertices[v3].z);
 						
 						// calculate normal clockwise
-						Vector3 normCalculated = V3_NORM(V3_CROSS(V3_SUB(b, a), V3_SUB(c, a)));
+						Vector3 normCalculated = V3_NORM(V3_CROSS(b - a, c - a));
 						
 						// hopefully that will be enough.
 						// EDIT: changed to 0.95 from 0.99
