@@ -20,7 +20,7 @@ void programs_init(int _maxProgramCount) {
 	}
 	
 	programCount = _maxProgramCount;
-	programs = malloc(sizeof(bgfx_program_handle_t) * _maxProgramCount);
+	programs = (bgfx_program_handle_t*)malloc(sizeof(bgfx_program_handle_t) * _maxProgramCount);
 	
 	initialized = true;
 }

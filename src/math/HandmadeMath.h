@@ -151,6 +151,9 @@
 #endif
 
 #ifdef __cplusplus
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpedantic"
+
 extern "C"
 {
 #endif
@@ -567,6 +570,8 @@ extern HMM_Quat HMM_QFromAxisAngle_LH(HMM_Vec3 Axis, float AngleOfRotation);
 
 #ifdef __cplusplus
 }
+
+#pragma GCC diagnostic pop
 #endif
 
 #ifdef __cplusplus

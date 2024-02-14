@@ -84,8 +84,8 @@ typedef HMM_Quat Quaternion;
 typedef HMM_Mat4 Matrix4x4;
 #define M4x4_IDENTITY (HMM_M4D(1.0f))
 #define M4x4_ZERO (HMM_M4())
-#define M4x4_POS(_x, _y, _z) ((Matrix4x4) {{ { 1.0f, 0.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f, 0.0f } , { 0.0f, 0.0f, 1.0f, 0.0f }, { (_x), (_y), (_z), 1.0f } }})
-#define M4x4_POS_V3(_v3) ((Matrix4x4) {{ { 1.0f, 0.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f, 0.0f } , { 0.0f, 0.0f, 1.0f, 0.0f }, { (_v3).X, (_v3).Y, (_v3).Z, 1.0f } }})
+#define M4x4_POS(_x, _y, _z) {{ { 1.0f, 0.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f, 0.0f } , { 0.0f, 0.0f, 1.0f, 0.0f }, { (_x), (_y), (_z), 1.0f } }}
+#define M4x4_POS_V3(_v3) {{ { 1.0f, 0.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f, 0.0f } , { 0.0f, 0.0f, 1.0f, 0.0f }, { (_v3).X, (_v3).Y, (_v3).Z, 1.0f } }}
 
 #define M4x4_MUL(_m4x4_1, _m4x4_2) (HMM_MulM4((_m4x4_1), (_m4x4_2)))
 
@@ -100,9 +100,9 @@ typedef HMM_Mat4 Matrix4x4;
 	HMM_Perspective_LH_NO((_fov), (_ratio), (_near), (_far)) : \
 	HMM_Perspective_LH_ZO((_fov), (_ratio), (_near), (_far)))
 	
-static const Vector3 globalForward = {{ 0.0f, 0.0f, 1.0f }};
-static const Vector3 globalUp = {{ 0.0f, 1.0f, 0.0f }};
-static const Vector3 globalRight = {{ 1.0f, 0.0f, 0.0f }};
+static const Vector3 globalForward = V3_FORWARD;
+static const Vector3 globalUp = V3_UP;
+static const Vector3 globalRight = V3_RIGHT;
 
 extern Vector3 rotate_v3_by_q(const Vector3* _v3, const Quaternion* _q);
 

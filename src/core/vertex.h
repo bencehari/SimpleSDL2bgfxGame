@@ -8,11 +8,11 @@
 struct Vertex {
 	float x, y, z;
 	uint32_t abgr;
+	
+	Vertex(float _x, float _y, float _z, uint32_t _abgr) : x(_x), y(_y), z(_z), abgr(_abgr) {}
 };
 
 extern bgfx_vertex_layout_t vertexLayout;
-
-#define VERTEX_NEW(_x, _y, _z, _c) ((struct Vertex) { (_x), (_y), (_z), (_c) })
 
 extern void vertex_init(void);
 

@@ -17,31 +17,30 @@
 #include "utils/consc.h"
 #include "utils/debug.h"
 
-static struct Object createCube(bgfx_program_handle_t _programHandle);
+static Object createCube(bgfx_program_handle_t _programHandle);
 
 void game(float width, float height, float fps) {
 	vertex_init();
 	programs_init(1);
 	models_init(3);
 	
-	struct Transform camera = TRANSFORM_NEW(V3_NEW(0.0f, 0.0f, -5.0f), Q_IDENTITY, V3_ONE);
+	Transform camera(V3_NEW(0.0f, 0.0f, -5.0f), Q_IDENTITY, V3_ONE);
 
 	// init assets
 	bgfx_program_handle_t programHandle = program_create("vs_cubes.bin", "fs_cubes.bin", true);
 	
-	struct Object cube = createCube(programHandle);
+	Object cube = createCube(programHandle);
 	
 	// test
-	struct Model* suzanneModel = NULL;
+	Model* suzanneModel = NULL;
 	load_external_obj_geometry("assets/models/suzanne.obj", &vertexLayout, &suzanneModel, INDICES_ORDER_AUTO);
-	struct Object suzanne = OBJECT_NEW(suzanneModel, programHandle);
+	Object suzanne(suzanneModel, programHandle);
 	suzanne.transform.position = V3_NEW(5.0f, 0.0f, 0.0f);
 	
-	
-	struct Model* skeletonMageModel = NULL;
+	Model* skeletonMageModel = NULL;
 	// for now, it loads all object as one from .obj
 	load_external_obj_geometry("assets/models/Skeleton_Mage.obj", &vertexLayout, &skeletonMageModel, INDICES_ORDER_AUTO);
-	struct Object skeletonMage = OBJECT_NEW(skeletonMageModel, programHandle);
+	Object skeletonMage(skeletonMageModel, programHandle);
 	skeletonMage.transform.position = V3_NEW(-5.0f, 0.0f, 0.0f);
 	
 	// FPS
@@ -78,7 +77,7 @@ void game(float width, float height, float fps) {
 		lastTick = SDL_GetTicks();
 		bgfx_dbg_text_clear(0, false);
 		
-		Vector2 cameraRotation = {0};
+		Vector2 cameraRotation = V2_ZERO;
 		
 		while (SDL_PollEvent(&event)) {
 			switch (event.type) {
@@ -206,9 +205,9 @@ void game(float width, float height, float fps) {
 
 		// RENDER objects START
 		
-		obj_encoder_render(encoder, &cube);
-		obj_encoder_render(encoder, &suzanne);
-		obj_encoder_render(encoder, &skeletonMage);
+		cube.encoder_render(*encoder);
+		suzanne.encoder_render(*encoder);
+		skeletonMage.encoder_render(*encoder);
 		
 		// RENDER objects END
 		
@@ -231,37 +230,35 @@ void game(float width, float height, float fps) {
 
 // ~~~~~
 
-static struct Object createCube(bgfx_program_handle_t _programHandle) {
-	struct Model* pCubeModel = model_create(
-		(struct Vertex[]) {
-			VERTEX_NEW(-1.0f,  1.0f,  1.0f, 0xff000000),
-			VERTEX_NEW( 1.0f,  1.0f,  1.0f, 0xff0000ff),
-			VERTEX_NEW(-1.0f, -1.0f,  1.0f, 0xff00ff00),
-			VERTEX_NEW( 1.0f, -1.0f,  1.0f, 0xff00ffff),
-			VERTEX_NEW(-1.0f,  1.0f, -1.0f, 0xffff0000),
-			VERTEX_NEW( 1.0f,  1.0f, -1.0f, 0xffff00ff),
-			VERTEX_NEW(-1.0f, -1.0f, -1.0f, 0xffffff00),
-			VERTEX_NEW( 1.0f, -1.0f, -1.0f, 0xffffffff),
-		},
-		8,
-		(uint16_t[]) {
-			0, 1, 2, // 0
-			1, 3, 2,
-			4, 6, 5, // 2
-			5, 6, 7,
-			0, 2, 4, // 4
-			4, 2, 6,
-			1, 5, 3, // 6
-			5, 7, 3,
-			0, 4, 1, // 8
-			4, 5, 1,
-			2, 3, 6, // 10
-			6, 3, 7,
-		},
-		36,
-		&vertexLayout);
+static Object createCube(bgfx_program_handle_t _programHandle) {
+	Vertex vertices[] = {
+		Vertex(-1.0f,  1.0f,  1.0f, 0xff000000),
+		Vertex( 1.0f,  1.0f,  1.0f, 0xff0000ff),
+		Vertex(-1.0f, -1.0f,  1.0f, 0xff00ff00),
+		Vertex( 1.0f, -1.0f,  1.0f, 0xff00ffff),
+		Vertex(-1.0f,  1.0f, -1.0f, 0xffff0000),
+		Vertex( 1.0f,  1.0f, -1.0f, 0xffff00ff),
+		Vertex(-1.0f, -1.0f, -1.0f, 0xffffff00),
+		Vertex( 1.0f, -1.0f, -1.0f, 0xffffffff),
+	};
+	uint16_t indices[] = {
+		0, 1, 2, // 0
+		1, 3, 2,
+		4, 6, 5, // 2
+		5, 6, 7,
+		0, 2, 4, // 4
+		4, 2, 6,
+		1, 5, 3, // 6
+		5, 7, 3,
+		0, 4, 1, // 8
+		4, 5, 1,
+		2, 3, 6, // 10
+		6, 3, 7,
+	};
+	
+	Model* pCubeModel = model_create(vertices, 8, indices, 36, &vertexLayout);
 	
 	// model_print(pCubeModel, true, true);
 	
-	return OBJECT_NEW(pCubeModel, _programHandle);
+	return Object(pCubeModel, _programHandle);
 }

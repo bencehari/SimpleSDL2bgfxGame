@@ -4,15 +4,17 @@ SETLOCAL enabledelayedexpansion
 :: 0 disables debug mode
 :: any other value sets flags and runs the app with GDB (you need to start the app
 :: with `run` in gdb context)
-SET debug_mode=0
+SET debug_mode=1
 :: if you don't need extra warnings, just add REM or :: at the start of the line
 SET extra=-Wextra -Werror -Wpedantic
 
 :: choosing compiler
 :: for example (in this case, add `-lstdc++` doesn't needed):
 :: compiler=g++ and std_opt=c++17
-SET compiler=gcc
-SET std_opt=c17
+SET compiler=g++
+SET std_opt=c++17
+:: SET compiler=gcc
+:: SET std_opt=c17
 
 SET i=0
 FOR /F "tokens=* delims=" %%x in (paths.txt) DO (
@@ -38,14 +40,14 @@ IF %debug_mode%==0 (
 
 :: add *.c files from src folder
 SET source_files=
-FOR /f "usebackq delims=" %%a IN (`DIR /s /b ".\src\*.c"`) DO SET source_files=!source_files! %%a
+FOR /f "usebackq delims=" %%a IN (`DIR /s /b ".\src\*.cc"`) DO SET source_files=!source_files! %%a
 
 CLS
 
 IF NOT EXIST .build MKDIR .build
 IF NOT EXIST ".build\SDL2.dll" COPY "bin\SDL2.dll" ".build\SDL2.dll"
 
-@echo on
+:: @echo on
 
 :: -lgdi32: https://learn.microsoft.com/en-us/windows/win32/gdi/windows-gdi
 :: doesn't seem right for me because of 32bit stuff, but bgfx requires it.
@@ -68,7 +70,8 @@ IF NOT EXIST ".build\SDL2.dll" COPY "bin\SDL2.dll" ".build\SDL2.dll"
  -lbimg%mode%^
  -lbimg_decode%mode%^
  -lbx%mode%^
- -lstdc++^
  -lgdi32^
  -o .build/output.exe^
  && %run_cmd%
+ 
+ :: -lstdc++^
