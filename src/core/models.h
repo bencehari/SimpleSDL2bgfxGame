@@ -13,7 +13,7 @@
 class Model {
 private:
 	unsigned int id;
-	Vertex* vertices;
+	Vertex_PosColor* vertices;
 	uint16_t* indices;
 	
 public:
@@ -28,7 +28,7 @@ public:
 	
 	Model(
 		int _id,
-		Vertex _vertices[],
+		Vertex_PosColor _vertices[],
 		int _verticesLen,
 		uint16_t _indices[],
 		int _indicesLen,
@@ -71,6 +71,6 @@ extern void cleanupModelManager(void);
  *
  * @return Pointer to the created Model.
 */
-extern Model* createModel(const Vertex _vertices[], int _verticesLen, const uint16_t _indices[], int _indicesLen, const bgfx::VertexLayout& _vertexLayout);
+extern Model* createModel(const Vertex_PosColor _vertices[], int _verticesLen, const uint16_t _indices[], int _indicesLen, const bgfx::VertexLayout& _vertexLayout);
 
 #endif // KE_MODELS_H

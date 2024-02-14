@@ -20,7 +20,7 @@
 static Object createCube(bgfx::ProgramHandle _programHandle);
 
 void game(float width, float height, float fps) {
-	vertex_init();
+	initVertexVariants();
 	initProgramManager(1);
 	initModelManager(3);
 	
@@ -33,13 +33,13 @@ void game(float width, float height, float fps) {
 	
 	// test
 	Model* suzanneModel = NULL;
-	load_external_obj_geometry("assets/models/suzanne.obj", &vertexLayout, &suzanneModel, INDICES_ORDER_AUTO);
+	load_external_obj_geometry("assets/models/suzanne.obj", &Vertex_PosColor::layout, &suzanneModel, INDICES_ORDER_AUTO);
 	Object suzanne(suzanneModel, programHandle);
 	suzanne.transform.position = V3_NEW(5.0f, 0.0f, 0.0f);
 	
 	Model* skeletonMageModel = NULL;
 	// for now, it loads all object as one from .obj
-	load_external_obj_geometry("assets/models/Skeleton_Mage.obj", &vertexLayout, &skeletonMageModel, INDICES_ORDER_AUTO);
+	load_external_obj_geometry("assets/models/Skeleton_Mage.obj", &Vertex_PosColor::layout, &skeletonMageModel, INDICES_ORDER_AUTO);
 	Object skeletonMage(skeletonMageModel, programHandle);
 	skeletonMage.transform.position = V3_NEW(-5.0f, 0.0f, 0.0f);
 	
@@ -231,15 +231,15 @@ void game(float width, float height, float fps) {
 // ~~~~~
 
 static Object createCube(bgfx::ProgramHandle _programHandle) {
-	Vertex vertices[] = {
-		Vertex(-1.0f,  1.0f,  1.0f, 0xff000000),
-		Vertex( 1.0f,  1.0f,  1.0f, 0xff0000ff),
-		Vertex(-1.0f, -1.0f,  1.0f, 0xff00ff00),
-		Vertex( 1.0f, -1.0f,  1.0f, 0xff00ffff),
-		Vertex(-1.0f,  1.0f, -1.0f, 0xffff0000),
-		Vertex( 1.0f,  1.0f, -1.0f, 0xffff00ff),
-		Vertex(-1.0f, -1.0f, -1.0f, 0xffffff00),
-		Vertex( 1.0f, -1.0f, -1.0f, 0xffffffff),
+	Vertex_PosColor vertices[] = {
+		Vertex_PosColor(-1.0f,  1.0f,  1.0f, 0xff000000),
+		Vertex_PosColor( 1.0f,  1.0f,  1.0f, 0xff0000ff),
+		Vertex_PosColor(-1.0f, -1.0f,  1.0f, 0xff00ff00),
+		Vertex_PosColor( 1.0f, -1.0f,  1.0f, 0xff00ffff),
+		Vertex_PosColor(-1.0f,  1.0f, -1.0f, 0xffff0000),
+		Vertex_PosColor( 1.0f,  1.0f, -1.0f, 0xffff00ff),
+		Vertex_PosColor(-1.0f, -1.0f, -1.0f, 0xffffff00),
+		Vertex_PosColor( 1.0f, -1.0f, -1.0f, 0xffffffff),
 	};
 	uint16_t indices[] = {
 		0, 1, 2, // 0
@@ -256,7 +256,7 @@ static Object createCube(bgfx::ProgramHandle _programHandle) {
 		6, 3, 7,
 	};
 	
-	Model* pCubeModel = createModel(vertices, 8, indices, 36, vertexLayout);
+	Model* pCubeModel = createModel(vertices, 8, indices, 36, Vertex_PosColor::layout);
 	
 	// model_print(pCubeModel, true, true);
 	

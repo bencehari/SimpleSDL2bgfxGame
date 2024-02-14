@@ -61,7 +61,7 @@ bool load_external_obj_geometry(const char* _objPath, const bgfx::VertexLayout* 
 	// printf("\"%s\"\nvertex count: %d\ntri count: %d\n", _objPath, vert, tris);
 	
 	{
-		Vertex* vertices = (Vertex*)malloc(sizeof(struct Vertex) * vert);
+		Vertex_PosColor* vertices = (Vertex_PosColor*)malloc(sizeof(struct Vertex_PosColor) * vert);
 		uint16_t* indices = (uint16_t*)malloc(sizeof(uint16_t) * tris * 3);
 		
 		int vIndex = 0;
@@ -89,7 +89,7 @@ bool load_external_obj_geometry(const char* _objPath, const bgfx::VertexLayout* 
 						goto cleanup;
 					}
 					else {
-						vertices[vIndex] = Vertex(x, y, z, vIndex % 2 == 0 ? 0xffffffff : (vIndex % 3 == 0 ? 0xff0000ff : 0xff00ff00));
+						vertices[vIndex] = Vertex_PosColor(x, y, z, vIndex % 2 == 0 ? 0xffffffff : (vIndex % 3 == 0 ? 0xff0000ff : 0xff00ff00));
 					}
 					vIndex++;
 				}
