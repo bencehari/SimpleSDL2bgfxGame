@@ -22,7 +22,7 @@ static Object createCube(bgfx::ProgramHandle _programHandle);
 void game(float width, float height, float fps) {
 	vertex_init();
 	programs_init(1);
-	models_init(3);
+	initModelManager(3);
 	
 	Transform camera(V3_NEW(0.0f, 0.0f, -5.0f), Q_IDENTITY, V3_ONE);
 
@@ -223,7 +223,7 @@ void game(float width, float height, float fps) {
 	puts(AC_MAGENTA "[SHUTTING DOWN]" AC_RESET);
 
 	puts(AC_MAGENTA "Cleaning up models..." AC_RESET);
-	models_cleanup();
+	cleanupModelManager();
 	puts(AC_MAGENTA "Cleaning up programs..." AC_RESET);
 	programs_cleanup();
 }
@@ -256,7 +256,7 @@ static Object createCube(bgfx::ProgramHandle _programHandle) {
 		6, 3, 7,
 	};
 	
-	Model* pCubeModel = model_create(vertices, 8, indices, 36, vertexLayout);
+	Model* pCubeModel = createModel(vertices, 8, indices, 36, vertexLayout);
 	
 	// model_print(pCubeModel, true, true);
 	

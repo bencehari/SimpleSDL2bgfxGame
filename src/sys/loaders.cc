@@ -178,7 +178,7 @@ bool load_external_obj_geometry(const char* _objPath, const bgfx::VertexLayout* 
 		puts(AC_YELLOW "INDICES" AC_RESET);
 		for (int i = 1, j = 2; j < tris * 3; i++, j += 3) printf("%d:\t%d %d %d\n", i, indices[j - 2], indices[j - 1], indices[j]);*/
 		
-		*_model = model_create(vertices, vert, indices, tris * 3, *_vertexLayout);
+		*_model = createModel(vertices, vert, indices, tris * 3, *_vertexLayout);
 
 cleanup:
 		free(vertices);

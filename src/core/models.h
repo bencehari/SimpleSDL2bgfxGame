@@ -7,9 +7,12 @@
 
 #include "vertex.h"
 
+/**
+ * @brief Model class contains all information fro bgfx to render a geometry.
+*/
 class Model {
 private:
-	int id;
+	unsigned int id;
 	Vertex* vertices;
 	uint16_t* indices;
 	
@@ -41,9 +44,33 @@ public:
 		indexBufferHnd(_indexBufferHnd) {}
 };
 
-extern void models_init(int _maxModelCount);
-extern void models_cleanup(void);
+/**
+ * @brief Initializes the Model Manager
+ *
+ * It reservers enough space in memory for models.
+ *
+ * @param _maxModelCount Maximum number of models it can create.
+*/
+extern void initModelManager(int _maxModelCount);
 
-extern Model* model_create(const Vertex _vertices[], int _verticesLen, const uint16_t _indices[], int _indicesLen, const bgfx::VertexLayout& _vertexLayout);
+/**
+ * @brief Free up space reserved for models.
+*/
+extern void cleanupModelManager(void);
+
+/**
+ * @brief Creates the model.
+ *
+ * Creates and returns the model using bgfx. Indices must be in counter clockwise order.
+ *
+ * @param _vertices Vertex array.
+ * @param _verticesLen Length of _vertices.
+ * @param _indices uint16_t array of indices.
+ * @param _indicesLen Length of _indices.
+ * @param _vertexLayout bgfx::VertexLayout.
+ *
+ * @return Pointer to the created Model.
+*/
+extern Model* createModel(const Vertex _vertices[], int _verticesLen, const uint16_t _indices[], int _indicesLen, const bgfx::VertexLayout& _vertexLayout);
 
 #endif // KE_MODELS_H

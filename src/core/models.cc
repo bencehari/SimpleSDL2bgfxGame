@@ -6,11 +6,7 @@
 
 #include "../utils/consc.h"
 
-static bool initialized;
-
-static int modelCount;
-static int currentModelIndex;
-static Model* models;
+// Model class
 
 void Model::cleanup(void) {
 	bgfx::destroy(vertexBufferHnd);
@@ -50,10 +46,18 @@ void Model::print(bool _printVertices, bool _printIndices) {
 	printf(AC_CYAN "\n[MODEL INFO END]\n" AC_RESET);
 }
 
-void models_init(int _maxModelCount) {
+// ModelManager
+
+static bool initialized;
+
+static int modelCount;
+static int currentModelIndex;
+static Model* models;
+
+void initModelManager(int _maxModelCount) {
 	if (initialized) {
-		models_cleanup();
-		currentModelIndex = 0;
+		puts("Already initialized.");
+		return;
 	}
 	
 	modelCount = _maxModelCount;
@@ -62,20 +66,21 @@ void models_init(int _maxModelCount) {
 	initialized = true;
 }
 
-void models_cleanup(void) {
+void cleanupModelManager(void) {
 	while (--currentModelIndex >= 0) {
 		models[currentModelIndex].cleanup();
 		free(&models[currentModelIndex]);
 	}
 	
-	models = NULL;
+	models = nullptr;
+	currentModelIndex = 0;
 	initialized = false;
 }
 
-Model* model_create(const Vertex _vertices[], int _verticesLen, const uint16_t _indices[], int _indicesLen, const bgfx::VertexLayout& _vertexLayout) {
+Model* createModel(const Vertex _vertices[], int _verticesLen, const uint16_t _indices[], int _indicesLen, const bgfx::VertexLayout& _vertexLayout) {
 	if (currentModelIndex >= modelCount) {
 		puts(AC_YELLOW "Max model count reached." AC_RESET);
-		return NULL;
+		return nullptr;
 	}
 
 	size_t verticesSize = sizeof(Vertex) * _verticesLen;
