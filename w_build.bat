@@ -57,7 +57,6 @@ IF NOT EXIST ".build\SDL2.dll" COPY "bin\SDL2.dll" ".build\SDL2.dll"
  %source_files%^
  -I%sdl_path%include^
  -I%bgfx_path%bgfx\include^
- -I%bgfx_path%bimg\include^
  -L%sdl_path%lib^
  -L%bgfx_path%bgfx\.build\win64_mingw-gcc\bin^
  %dbg_flags%^
@@ -67,12 +66,15 @@ IF NOT EXIST ".build\SDL2.dll" COPY "bin\SDL2.dll" ".build\SDL2.dll"
  -lSDL2^
  -lbgfx%mode%^
  -lbimg%mode%^
- -lbimg_decode%mode%^
  -lbx%mode%^
  -lgdi32^
  -o .build/output.exe^
  && %run_cmd%
  
  :: -lstdc++^
+ 
+ :: -I%bgfx_path%bimg\include^
  :: -I%bgfx_path%bx\include^
+ 
+ :: -lbimg_decode%mode%^
  
