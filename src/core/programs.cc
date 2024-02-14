@@ -13,10 +13,10 @@ static int programCount;
 static int currentProgramIndex = 0;
 static bgfx::ProgramHandle* programs;
 
-void programs_init(int _maxProgramCount) {
+void initProgramManager(int _maxProgramCount) {
 	if (initialized) {
-		programs_cleanup();
-		currentProgramIndex = 0;
+		puts("Already initialized.");
+		return;
 	}
 	
 	programCount = _maxProgramCount;
@@ -25,17 +25,18 @@ void programs_init(int _maxProgramCount) {
 	initialized = true;
 }
 
-void programs_cleanup(void) {
+void cleanupProgramManager(void) {
 	while (--currentProgramIndex >= 0) {
 		bgfx::destroy(programs[currentProgramIndex]);
 		free(&programs[currentProgramIndex]);
 	}
 	
 	programs = nullptr;
+	currentProgramIndex = 0;
 	initialized = false;
 }
 
-bgfx::ProgramHandle program_create(const char* _vertexShader, const char* _fragmentShader, bool _destroyShaders) {
+bgfx::ProgramHandle createProgram(const char* _vertexShader, const char* _fragmentShader, bool _destroyShaders) {
 	bgfx::ShaderHandle vertexShaderHnd = {0};
 	bgfx::ShaderHandle fragmentShaderHnd = {0};
 	

@@ -7,6 +7,9 @@
 #include "transform.h"
 #include "models.h"
 
+/**
+ * @brief Object class represent a visible entity.
+*/
 class Object {
 private:
 	Model* model;

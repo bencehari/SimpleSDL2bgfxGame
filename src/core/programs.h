@@ -5,9 +5,31 @@
 
 #include <bgfx/bgfx.h>
 
-extern void programs_init(int _maxProgramCount);
-extern void programs_cleanup(void);
+/**
+ * @brief Initializes the Program Manager
+ *
+ * It reservers enough space in memory for program handles.
+ *
+ * @param _maxProgramCount Maximum number of programs it can create.
+*/
+extern void initProgramManager(int _maxProgramCount);
 
-extern bgfx::ProgramHandle program_create(const char* _vertexShader, const char* _fragmentShader, bool _destroyShaders);
+/**
+ * @brief Free up space reserved for program handles.
+*/
+extern void cleanupProgramManager(void);
+
+/**
+ * @brief Creates the program.
+ *
+ * Creates and returns the program handle using bgfx. Operates only on binary (.bin) shaders shipped with the bgfx examples.
+ *
+ * @param _vertexShader Path to the vertex shader.
+ * @param _fragmentShader Path to the fragment shader.
+ * @param _destroyShaders Should the shaders destroyed with the program.
+ *
+ * @return The created bgfx::ProgramHandle.
+*/
+extern bgfx::ProgramHandle createProgram(const char* _vertexShader, const char* _fragmentShader, bool _destroyShaders);
 
 #endif // KE_PROGRAMS_H

@@ -21,13 +21,13 @@ static Object createCube(bgfx::ProgramHandle _programHandle);
 
 void game(float width, float height, float fps) {
 	vertex_init();
-	programs_init(1);
+	initProgramManager(1);
 	initModelManager(3);
 	
 	Transform camera(V3_NEW(0.0f, 0.0f, -5.0f), Q_IDENTITY, V3_ONE);
 
 	// init assets
-	bgfx::ProgramHandle programHandle = program_create("vs_cubes.bin", "fs_cubes.bin", true);
+	bgfx::ProgramHandle programHandle = createProgram("vs_cubes.bin", "fs_cubes.bin", true);
 	
 	Object cube = createCube(programHandle);
 	
@@ -225,7 +225,7 @@ void game(float width, float height, float fps) {
 	puts(AC_MAGENTA "Cleaning up models..." AC_RESET);
 	cleanupModelManager();
 	puts(AC_MAGENTA "Cleaning up programs..." AC_RESET);
-	programs_cleanup();
+	cleanupProgramManager();
 }
 
 // ~~~~~
