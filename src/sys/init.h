@@ -5,7 +5,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-extern bool sys_initialize(uint32_t _flags, int _width, int _height);
-extern void sys_cleanup(void);
+extern bool initSystem(uint32_t _flags, int _width, int _height);
+extern void cleanupSystem(void);
 
 #endif // KE_INIT_H

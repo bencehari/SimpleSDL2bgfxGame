@@ -40,11 +40,11 @@ bgfx::ProgramHandle createProgram(const char* _vertexShader, const char* _fragme
 	bgfx::ShaderHandle vertexShaderHnd = {0};
 	bgfx::ShaderHandle fragmentShaderHnd = {0};
 	
-	if (!load_shader(_vertexShader, &vertexShaderHnd)) {
+	if (!loadShader(_vertexShader, &vertexShaderHnd)) {
 		// TODO: load fallback shader
 	}
 	
-	if (!load_shader(_fragmentShader, &fragmentShaderHnd)) {
+	if (!loadShader(_fragmentShader, &fragmentShaderHnd)) {
 		// TODO: load fallback shader
 	}
 	

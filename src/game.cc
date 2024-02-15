@@ -33,13 +33,13 @@ void game(float width, float height, float fps) {
 	
 	// test
 	Model* suzanneModel = NULL;
-	load_external_obj_geometry("assets/models/suzanne.obj", &Vertex_PosColor::layout, &suzanneModel, INDICES_ORDER_AUTO);
+	loadExternalGeometry_OBJ("assets/models/suzanne.obj", &Vertex_PosColor::layout, &suzanneModel, INDICES_ORDER_AUTO);
 	Object suzanne(suzanneModel, programHandle);
 	suzanne.transform.position = V3_NEW(5.0f, 0.0f, 0.0f);
 	
 	Model* skeletonMageModel = NULL;
 	// for now, it loads all object as one from .obj
-	load_external_obj_geometry("assets/models/Skeleton_Mage.obj", &Vertex_PosColor::layout, &skeletonMageModel, INDICES_ORDER_AUTO);
+	loadExternalGeometry_OBJ("assets/models/Skeleton_Mage.obj", &Vertex_PosColor::layout, &skeletonMageModel, INDICES_ORDER_AUTO);
 	Object skeletonMage(skeletonMageModel, programHandle);
 	skeletonMage.transform.position = V3_NEW(-5.0f, 0.0f, 0.0f);
 	

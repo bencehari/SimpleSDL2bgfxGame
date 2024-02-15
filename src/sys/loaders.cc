@@ -11,7 +11,7 @@
 
 // resource intensive loading of .obj file
 // TODO: pack all assets before build for runtime use!
-bool load_external_obj_geometry(const char* _objPath, const bgfx::VertexLayout* _vertexLayout, Model** _model, enum IndicesOrder _order) {
+bool loadExternalGeometry_OBJ(const char* _objPath, const bgfx::VertexLayout* _vertexLayout, Model** _model, enum IndicesOrder _order) {
 	// TODO: handle multi-object .obj
 	
 	FILE* file = fopen(_objPath, "r");
@@ -191,7 +191,7 @@ close:
 	return result;
 }
 
-bool load_shader(const char* _filename, bgfx::ShaderHandle* _shaderHandle) {
+bool loadShader(const char* _filename, bgfx::ShaderHandle* _shaderHandle) {
 	const char* shaderPath;
 	
 	switch (bgfx::getRendererType()) {

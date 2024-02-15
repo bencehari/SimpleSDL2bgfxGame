@@ -15,7 +15,7 @@ static void printDetectedPlatform(void);
 
 static SDL_Window* window;
 
-bool sys_initialize(uint32_t _flags, int _width, int _height) {
+bool initSystem(uint32_t _flags, int _width, int _height) {
 	printf("SDL_Init... ");
 	if (SDL_Init(_flags) != 0) {
 		printf("\n" AC_RED "Error initializing SDL: %s" AC_RESET "\n", SDL_GetError());
@@ -128,7 +128,7 @@ bool sys_initialize(uint32_t _flags, int _width, int _height) {
 	return true;
 }
 
-void sys_cleanup(void) {
+void cleanupSystem(void) {
 	puts(AC_MAGENTA "Cleaning up bgfx..." AC_RESET);
 	bgfx::shutdown();
 	while (bgfx::renderFrame(1) != bgfx::RenderFrame::NoContext) {};

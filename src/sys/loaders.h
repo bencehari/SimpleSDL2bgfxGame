@@ -14,8 +14,8 @@ enum IndicesOrder {
 	INDICES_ORDER_COUNTERCLOCKWISE
 };
 
-extern bool load_external_obj_geometry(const char* _objPath, const bgfx::VertexLayout* _vertexLayout, Model** _model, enum IndicesOrder _order);
+extern bool loadExternalGeometry_OBJ(const char* _objPath, const bgfx::VertexLayout* _vertexLayout, Model** _model, enum IndicesOrder _order);
 
-extern bool load_shader(const char* _filename, bgfx::ShaderHandle* _shaderHandle);
+extern bool loadShader(const char* _filename, bgfx::ShaderHandle* _shaderHandle);
 
 #endif // LOADERS_H

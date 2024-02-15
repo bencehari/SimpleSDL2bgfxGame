@@ -29,14 +29,14 @@ int main(int argc, char* argv[]) {
 		// SDL_INIT_NOPARACHUTE
 		;
 	
-	if (!sys_initialize(initFlags, WIDTH, HEIGHT)) {
+	if (!initSystem(initFlags, WIDTH, HEIGHT)) {
 		printf("Initialization failed. Terminating...");
 		return 0;
 	}
 	
 	game(WIDTH_F, HEIGHT_F, FPS);
 	
-	sys_cleanup();
+	cleanupSystem();
 	puts(AC_MAGENTA "DONE" AC_RESET);
 	
 	return 0;
