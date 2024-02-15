@@ -19,7 +19,7 @@
 
 static Object createCube(bgfx::ProgramHandle _programHandle);
 
-void game(float width, float height, float fps) {
+void game(float _width, float _height, float _fps) {
 	initVertexVariants();
 	initProgramManager(1);
 	initModelManager(3);
@@ -44,7 +44,7 @@ void game(float width, float height, float fps) {
 	skeletonMage.transform.position = V3_NEW(-5.0f, 0.0f, 0.0f);
 	
 	// FPS
-	int milliPeriod = (int)(1.0 / (double)fps * 1000);
+	int milliPeriod = (int)(1.0 / (double)_fps * 1000);
 	Uint32 lastTick;
 	Uint32 currentTick;
 	
@@ -53,8 +53,8 @@ void game(float width, float height, float fps) {
 	const float rotationSpeed = 3.0f;
 	
 	// input
-	const float widthNorm = 1.0f / width;
-	const float heightNorm = 1.0f / height;
+	const float widthNorm = 1.0f / _width;
+	const float heightNorm = 1.0f / _height;
 	bool
 		forwardDown = false,
 		backDown = false,
@@ -193,9 +193,9 @@ void game(float width, float height, float fps) {
 		{
 			Matrix4x4 view = LOOK_AT(camera.position, camera.getLookAt());
 			
-			Matrix4x4 proj = PERSPECTIVE(DEG_TO_RAD(90.0f), width / height, 0.1f, 100.0f);
+			Matrix4x4 proj = PERSPECTIVE(DEG_TO_RAD(90.0f), _width / _height, 0.1f, 100.0f);
 			bgfx::setViewTransform(0, &view, &proj);
-			bgfx::setViewRect(0, 0, 0, (int)width, (int)height);
+			bgfx::setViewRect(0, 0, 0, (int)_width, (int)_height);
 		}
 
 		bgfx::Encoder* encoder = bgfx::begin(true);

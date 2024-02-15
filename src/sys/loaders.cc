@@ -222,7 +222,7 @@ bool loadShader(const char* _filename, bgfx::ShaderHandle* _shaderHandle) {
 	
 	FILE* file = nullptr;
 	long fileSize = 0;
-	if (!file_get_size(filePath, &fileSize, &file)) return false;
+	if (!getFileSize(filePath, fileSize, &file)) return false;
 	
 	// printf(AC_YELLOW "fileSize: %ld\n" AC_RESET, fileSize);
 	
