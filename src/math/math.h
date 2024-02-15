@@ -73,7 +73,7 @@ typedef HMM_Mat4 Matrix4x4;
 	HMM_Perspective_LH_NO((_fov), (_ratio), (_near), (_far)) : \
 	HMM_Perspective_LH_ZO((_fov), (_ratio), (_near), (_far)))
 
-/*
+/**
  * @brief Rotates a Vector3 by a Quaternion.
  *
  * @return Rotated Vector3.
