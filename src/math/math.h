@@ -73,11 +73,12 @@ typedef HMM_Mat4 Matrix4x4;
 	HMM_Perspective_LH_NO((_fov), (_ratio), (_near), (_far)) : \
 	HMM_Perspective_LH_ZO((_fov), (_ratio), (_near), (_far)))
 
-static const Vector3 globalForward = V3_FORWARD;
-static const Vector3 globalUp = V3_UP;
-static const Vector3 globalRight = V3_RIGHT;
-
-static inline Vector3 rotate_v3_by_q(const Vector3& _v3, const Quaternion& _q) {
+/*
+ * @brief Rotates a Vector3 by a Quaternion.
+ *
+ * @return Rotated Vector3.
+*/
+static inline Vector3 rotate(const Vector3& _v3, const Quaternion& _q) {
 	Vector3 u = V3_NEW(_q.X, _q.Y, _q.Z);
     float s = _q.W;
 	
