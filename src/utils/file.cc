@@ -3,7 +3,7 @@
 
 bool getFileSize(const char* _filePath, long& _fileSize, FILE** _file) {
 	*_file = fopen(_filePath, "rb");
-	if (_file == NULL) {
+	if (_file == nullptr) {
 		printf(AC_YELLOW "file is NULL: %s\n" AC_RESET, _filePath);
 		return false;
 	}

@@ -22,7 +22,7 @@ namespace dbg {
 	}
 
 	void m4x4ToScreen(const Matrix4x4* _m, const char* _name) {
-		if (_name == NULL) bgfx::dbgTextPrintf(0, row++, 0x0f, "[TRANSFORM MATRIX]");
+		if (_name == nullptr) bgfx::dbgTextPrintf(0, row++, 0x0f, "[TRANSFORM MATRIX]");
 		else bgfx::dbgTextPrintf(0, row++, 0x0f, "[TRANSFORM MATRIX (%s)]", _name);
 		bgfx::dbgTextPrintf(0, row++, 0x0f, "%6.2f %6.2f %6.2f %6.2f", _m->Elements[0][0], _m->Elements[1][0], _m->Elements[2][0], _m->Elements[3][0]);
 		bgfx::dbgTextPrintf(0, row++, 0x0f, "%6.2f %6.2f %6.2f %6.2f", _m->Elements[0][1], _m->Elements[1][1], _m->Elements[2][1], _m->Elements[3][1]);

@@ -21,12 +21,12 @@ void Model::print(bool _printVertices, bool _printIndices) {
 		id,
 		verticesLen,
 		indicesLen,
-		vertices == NULL ? "false" : "true",
-		indices == NULL ? "false" : "true",
+		vertices == nullptr ? "false" : "true",
+		indices == nullptr ? "false" : "true",
 		vertexBufferHnd.idx,
 		indexBufferHnd.idx);
 	
-	if (_printVertices && vertices != NULL) {
+	if (_printVertices && vertices != nullptr) {
 		printf(AC_CYAN "  [VERTICES]\n" AC_RESET);
 		for (int i = 0; i < verticesLen; i++) {
 			printf("    %8.2f %8.2f %8.2f\t\t0x%08x\n",
@@ -37,7 +37,7 @@ void Model::print(bool _printVertices, bool _printIndices) {
 		}
 	}
 	
-	if (_printIndices && indices != NULL) {
+	if (_printIndices && indices != nullptr) {
 		printf(AC_CYAN"  [INDICES]\n" AC_RESET);
 		for (int i = 2; i < indicesLen; i += 3) {
 			printf("%8d %8d %8d\n", indices[i - 2], indices[i - 1], indices[i]);

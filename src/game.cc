@@ -32,12 +32,12 @@ void game(float _width, float _height, float _fps) {
 	Object cube = createCube(programHandle);
 	
 	// test
-	Model* suzanneModel = NULL;
+	Model* suzanneModel = nullptr;
 	loadExternalGeometry_OBJ("assets/models/suzanne.obj", &Vertex_PosColor::layout, &suzanneModel, INDICES_ORDER_AUTO);
 	Object suzanne(suzanneModel, programHandle);
 	suzanne.transform.position = V3_NEW(5.0f, 0.0f, 0.0f);
 	
-	Model* skeletonMageModel = NULL;
+	Model* skeletonMageModel = nullptr;
 	// for now, it loads all object as one from .obj
 	loadExternalGeometry_OBJ("assets/models/Skeleton_Mage.obj", &Vertex_PosColor::layout, &skeletonMageModel, INDICES_ORDER_AUTO);
 	Object skeletonMage(skeletonMageModel, programHandle);

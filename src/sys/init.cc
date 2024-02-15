@@ -110,11 +110,11 @@ bool initSystem(uint32_t _flags, int _width, int _height) {
 		"backBuffer:   %s\n"
 		"backBufferDS: %s\n",
 		bgfx::RendererType::Noop != init.type ? (AC_GREEN "!Noop" AC_RESET) : (AC_RED "Noop" AC_RESET), init.type, init.platformData.type,
-		NULL == init.platformData.ndt ? (AC_RED "NULL" AC_RESET) : (AC_GREEN "NOT NULL" AC_RESET),
-		NULL == init.platformData.nwh ? (AC_RED "NULL" AC_RESET) : (AC_GREEN "NOT NULL" AC_RESET),
-		NULL == init.platformData.context ? (AC_RED "NULL" AC_RESET) : (AC_GREEN "NOT NULL" AC_RESET),
-		NULL == init.platformData.backBuffer ? (AC_RED "NULL" AC_RESET) : (AC_GREEN "NOT NULL" AC_RESET),
-		NULL == init.platformData.backBufferDS ? (AC_RED "NULL" AC_RESET) : (AC_GREEN "NOT NULL" AC_RESET));
+		init.platformData.ndt == nullptr ? (AC_RED "NULL" AC_RESET) : (AC_GREEN "NOT NULL" AC_RESET),
+		init.platformData.nwh == nullptr ? (AC_RED "NULL" AC_RESET) : (AC_GREEN "NOT NULL" AC_RESET),
+		init.platformData.context == nullptr ? (AC_RED "NULL" AC_RESET) : (AC_GREEN "NOT NULL" AC_RESET),
+		init.platformData.backBuffer == nullptr ? (AC_RED "NULL" AC_RESET) : (AC_GREEN "NOT NULL" AC_RESET),
+		init.platformData.backBufferDS == nullptr ? (AC_RED "NULL" AC_RESET) : (AC_GREEN "NOT NULL" AC_RESET));
 	// */
 
 	printf("bgfx_init... ");
