@@ -9,13 +9,13 @@
 
 #define WIDTH 1024
 #define HEIGHT 768
-#define WIDTH_F 1024.0
-#define HEIGHT_F 768.0
-#define FPS 60
+#define WIDTH_F 1024.0f
+#define HEIGHT_F 768.0f
+#define FPS 60.0f
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
-int main(int argc, char* argv[]) {
+int main(int _argc, char* _argv[]) {
 #pragma GCC diagnostic pop
 	Uint32 initFlags =
 		SDL_INIT_TIMER |
@@ -29,14 +29,14 @@ int main(int argc, char* argv[]) {
 		// SDL_INIT_NOPARACHUTE
 		;
 	
-	if (!sys_initialize(initFlags, WIDTH, HEIGHT)) {
+	if (!initSystem(initFlags, WIDTH, HEIGHT)) {
 		printf("Initialization failed. Terminating...");
 		return 0;
 	}
 	
 	game(WIDTH_F, HEIGHT_F, FPS);
 	
-	sys_cleanup();
+	cleanupSystem();
 	puts(AC_MAGENTA "DONE" AC_RESET);
 	
 	return 0;

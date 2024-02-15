@@ -3,20 +3,69 @@
 
 #include "../math/math.h"
 
+/**
+ * @brief Transform struct contains position, orientation and scale data.
+*/
 struct Transform {
 	Vector3 position;
 	Quaternion rotation;
 	Vector3 scale;
+	
+	Transform(Vector3 _position, Quaternion _rotation, Vector3 _scale) :
+		position(_position),
+		rotation(_rotation),
+		scale(_scale) {}
+
+	/**
+	 * @brief Rotates the transform based on input.
+	 *
+	 * Expects _input as rotation on X and Y axis in radians.
+	 *
+	 * @param _input Mouse input.
+	*/
+	void fpsRotate(const Vector2 _input);
+
+	/**
+	 * @brief Calculates forward vector.
+	 *
+	 * Calculates normalized forward (local Z+) Vector3 in world space.
+	 *
+	 * @return Normalized Vector3.
+	*/
+	Vector3 getForward(void);
+	
+	/**
+	 * @brief Calculates right vector.
+	 *
+	 * Calculates normalized right (lcoal X+) Vector3 in world space.
+	 *
+	 * @return Normalized Vector3.
+	*/
+	Vector3 getRight(void);
+	
+	/**
+	 * @brief Calculates up vector.
+	 *
+	 * Calculates normalized up (local Y+) Vector3 in world space.
+	 *
+	 * @return Normalized Vector3.
+	*/
+	Vector3 getUp(void);
+	
+	/**
+	 * @brief Calculates look at vector.
+	 *
+	 * Calculates normalized forward (local Z+) Vector3 in world space
+	 * from actual world position.
+	 *
+	 * @return Normalized Vector3.
+	*/
+	Vector3 getLookAt(void);
 };
 
-#define TRANSFORM_NEW(_v3_pos, _q_rot, _v3_sc) ((struct Transform) { (_v3_pos), (_q_rot), (_v3_sc) })
-#define TRANSFORM_DEFAULT ((struct Transform) { V3_ZERO, Q_IDENTITY, V3_ONE })
-
-extern void tr_fps_rotate(struct Transform* _t, const Vector2 _input);
-
-extern Vector3 tr_get_forward(const struct Transform* _t);
-extern Vector3 tr_get_right(const struct Transform* _t);
-extern Vector3 tr_get_up(const struct Transform* _t);
-extern Vector3 tr_get_look_at(const struct Transform* _t);
+/**
+ * @brief Creates a Transform with proper default values.
+*/
+#define TRANSFORM_NEW Transform(V3_ZERO, Q_IDENTITY, V3_ONE)
 
 #endif // KE_TRANSFORM_H

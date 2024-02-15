@@ -11,8 +11,10 @@ SET extra=-Wextra -Werror -Wpedantic
 :: choosing compiler
 :: for example (in this case, add `-lstdc++` doesn't needed):
 :: compiler=g++ and std_opt=c++17
-SET compiler=gcc
-SET std_opt=c17
+SET compiler=g++
+SET std_opt=c++17
+:: SET compiler=gcc
+:: SET std_opt=c17
 
 SET i=0
 FOR /F "tokens=* delims=" %%x in (paths.txt) DO (
@@ -38,7 +40,7 @@ IF %debug_mode%==0 (
 
 :: add *.c files from src folder
 SET source_files=
-FOR /f "usebackq delims=" %%a IN (`DIR /s /b ".\src\*.c"`) DO SET source_files=!source_files! %%a
+FOR /f "usebackq delims=" %%a IN (`DIR /s /b ".\src\*.cc"`) DO SET source_files=!source_files! %%a
 
 CLS
 
@@ -55,8 +57,6 @@ IF NOT EXIST ".build\SDL2.dll" COPY "bin\SDL2.dll" ".build\SDL2.dll"
  %source_files%^
  -I%sdl_path%include^
  -I%bgfx_path%bgfx\include^
- -I%bgfx_path%bimg\include^
- -I%bgfx_path%bx\include^
  -L%sdl_path%lib^
  -L%bgfx_path%bgfx\.build\win64_mingw-gcc\bin^
  %dbg_flags%^
@@ -66,9 +66,15 @@ IF NOT EXIST ".build\SDL2.dll" COPY "bin\SDL2.dll" ".build\SDL2.dll"
  -lSDL2^
  -lbgfx%mode%^
  -lbimg%mode%^
- -lbimg_decode%mode%^
  -lbx%mode%^
- -lstdc++^
  -lgdi32^
  -o .build/output.exe^
  && %run_cmd%
+ 
+ :: -lstdc++^
+ 
+ :: -I%bgfx_path%bimg\include^
+ :: -I%bgfx_path%bx\include^
+ 
+ :: -lbimg_decode%mode%^
+ 

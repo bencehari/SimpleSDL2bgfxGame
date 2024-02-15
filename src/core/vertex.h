@@ -3,17 +3,28 @@
 
 #include <stdint.h>
 
-#include <bgfx/c99/bgfx.h>
+#include <bgfx/bgfx.h>
 
-struct Vertex {
+// TODO: this whole logic is wrong!
+// Vertex_PosColor everywhere is a big no-no.
+// Figure out something for generalize this!
+
+/**
+ * @brief Vertex with additional color data.
+*/
+struct Vertex_PosColor {
 	float x, y, z;
 	uint32_t abgr;
+
+	Vertex_PosColor(float _x, float _y, float _z, uint32_t _abgr) : x(_x), y(_y), z(_z), abgr(_abgr) {}
+	
+	static bgfx::VertexLayout layout;
+	static void init(void);
 };
 
-extern bgfx_vertex_layout_t vertexLayout;
-
-#define VERTEX_NEW(_x, _y, _z, _c) ((struct Vertex) { (_x), (_y), (_z), (_c) })
-
-extern void vertex_init(void);
+/**
+ * @brief Initializes static Vertex datas (currently only that one).
+*/
+extern void initVertexVariants(void);
 
 #endif // KE_VERTEX_H
