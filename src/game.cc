@@ -72,10 +72,8 @@ void game(float width, float height, float fps) {
 	
 	puts(AC_MAGENTA "[GAME LOOP START]" AC_RESET);
 	while (running) {
-		dbg_reset();
-		
+		dbg::reset();
 		lastTick = SDL_GetTicks();
-		bgfx::dbgTextClear(0, false);
 		
 		Vector2 cameraRotation = V2_ZERO;
 		
@@ -189,7 +187,7 @@ void game(float width, float height, float fps) {
 			}
 		}
 		
-		dbg_print_to_screen("CAM POSITION: %.3f %.3f %.3f", camera.position.X, camera.position.Y, camera.position.Z);
+		dbg::printToScreen("CAM POSITION: %.3f %.3f %.3f", camera.position.X, camera.position.Y, camera.position.Z);
 
 		// calculate view and projection matrix
 		{
