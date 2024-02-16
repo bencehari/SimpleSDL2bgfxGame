@@ -17,31 +17,28 @@
 #include "utils/consc.h"
 #include "utils/debug.h"
 
-static Object createCube(bgfx::ProgramHandle _programHandle);
-
 void game(float _width, float _height, float _fps) {
-	initVertexVariants();
-	initProgramManager(1);
-	initModelManager(3);
+	VertexManager::init();
+	ProgramManager::init(1);
+	ModelManager::init(3);
+	ObjectManager::init(3);
 	
 	Transform camera(V3_NEW(0.0f, 0.0f, -5.0f), Q_IDENTITY, V3_ONE);
 
 	// init assets
-	bgfx::ProgramHandle programHandle = createProgram("vs_cubes.bin", "fs_cubes.bin", true);
+	bgfx::ProgramHandle programHandle = ProgramManager::create("vs_cubes.bin", "fs_cubes.bin", true);
 	
-	Object cube = createCube(programHandle);
+	/*Object* cube =*/ ObjectManager::createTestCube(programHandle);
 	
 	// test
-	Model* suzanneModel = nullptr;
-	loadExternalGeometry_OBJ("assets/models/suzanne.obj", &Vertex_PosColor::layout, &suzanneModel, INDICES_ORDER_AUTO);
-	Object suzanne(suzanneModel, programHandle);
-	suzanne.transform.position = V3_NEW(5.0f, 0.0f, 0.0f);
-	
-	Model* skeletonMageModel = nullptr;
+	Model* suzanneModel = loadExternalGeometry_OBJ("assets/models/suzanne.obj", &Vertex_PosColor::layout, INDICES_ORDER_AUTO);
+	Object* suzanne = Object::create(suzanneModel, programHandle);
+	suzanne->transform.position = V3_NEW(5.0f, 0.0f, 0.0f);
+
 	// for now, it loads all object as one from .obj
-	loadExternalGeometry_OBJ("assets/models/Skeleton_Mage.obj", &Vertex_PosColor::layout, &skeletonMageModel, INDICES_ORDER_AUTO);
-	Object skeletonMage(skeletonMageModel, programHandle);
-	skeletonMage.transform.position = V3_NEW(-5.0f, 0.0f, 0.0f);
+	Model* skeletonMageModel = loadExternalGeometry_OBJ("assets/models/Skeleton_Mage.obj", &Vertex_PosColor::layout, INDICES_ORDER_AUTO);
+	Object* skeletonMage = Object::create(skeletonMageModel, programHandle);
+	skeletonMage->transform.position = V3_NEW(-5.0f, 0.0f, 0.0f);
 	
 	// FPS
 	int milliPeriod = (int)(1.0 / (double)_fps * 1000);
@@ -203,9 +200,7 @@ void game(float _width, float _height, float _fps) {
 
 		// RENDER objects START
 		
-		cube.render();
-		suzanne.render();
-		skeletonMage.render();
+		ObjectManager::render();
 		
 		// RENDER objects END
 		
@@ -216,47 +211,17 @@ void game(float _width, float _height, float _fps) {
 		currentTick = SDL_GetTicks();
 		int sleep = milliPeriod - (currentTick - lastTick);
 		if (sleep > 0) SDL_Delay(sleep);
+		
+		// for testing shutdown
+		// break;
 	}
 	
 	puts(AC_MAGENTA "[SHUTTING DOWN]" AC_RESET);
 
+	puts(AC_MAGENTA "Cleaning up objects..." AC_RESET);
+	ObjectManager::cleanup();
 	puts(AC_MAGENTA "Cleaning up models..." AC_RESET);
-	cleanupModelManager();
+	ModelManager::cleanup();
 	puts(AC_MAGENTA "Cleaning up programs..." AC_RESET);
-	cleanupProgramManager();
-}
-
-// ~~~~~
-
-static Object createCube(bgfx::ProgramHandle _programHandle) {
-	Vertex_PosColor vertices[] = {
-		Vertex_PosColor(-1.0f,  1.0f,  1.0f, 0xff000000),
-		Vertex_PosColor( 1.0f,  1.0f,  1.0f, 0xff0000ff),
-		Vertex_PosColor(-1.0f, -1.0f,  1.0f, 0xff00ff00),
-		Vertex_PosColor( 1.0f, -1.0f,  1.0f, 0xff00ffff),
-		Vertex_PosColor(-1.0f,  1.0f, -1.0f, 0xffff0000),
-		Vertex_PosColor( 1.0f,  1.0f, -1.0f, 0xffff00ff),
-		Vertex_PosColor(-1.0f, -1.0f, -1.0f, 0xffffff00),
-		Vertex_PosColor( 1.0f, -1.0f, -1.0f, 0xffffffff),
-	};
-	uint16_t indices[] = {
-		0, 1, 2, // 0
-		1, 3, 2,
-		4, 6, 5, // 2
-		5, 6, 7,
-		0, 2, 4, // 4
-		4, 2, 6,
-		1, 5, 3, // 6
-		5, 7, 3,
-		0, 4, 1, // 8
-		4, 5, 1,
-		2, 3, 6, // 10
-		6, 3, 7,
-	};
-	
-	Model* pCubeModel = createModel(vertices, 8, indices, 36, Vertex_PosColor::layout);
-	
-	// model_print(pCubeModel, true, true);
-	
-	return Object(pCubeModel, _programHandle);
+	ProgramManager::cleanup();
 }

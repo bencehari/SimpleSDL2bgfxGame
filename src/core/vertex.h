@@ -22,9 +22,11 @@ struct Vertex_PosColor {
 	static void init(void);
 };
 
-/**
- * @brief Initializes static Vertex datas (currently only that one).
-*/
-extern void initVertexVariants(void);
+namespace VertexManager {
+	/**
+	 * @brief Initializes static Vertex datas (currently only that one).
+	*/
+	extern void init(void);
+}
 
 #endif // KE_VERTEX_H

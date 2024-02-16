@@ -22,10 +22,11 @@ enum IndicesOrder {
  *
  * @param _objPath Path to the .obj file.
  * @param _vertexLayout bgfx::VertexLayout of the Model.
- * @param _model Pointer to the Model to load data into.
  * @param _order Indices order for how to process the .obj data.
+ *
+ * @return Pointer to the created Model or nullptr on error.
 */
-extern bool loadExternalGeometry_OBJ(const char* _objPath, const bgfx::VertexLayout* _vertexLayout, Model** _model, enum IndicesOrder _order);
+extern Model* loadExternalGeometry_OBJ(const char* _objPath, const bgfx::VertexLayout* _vertexLayout, enum IndicesOrder _order);
 
 /**
  * @brief Loads shader.

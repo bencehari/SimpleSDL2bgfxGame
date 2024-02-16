@@ -102,13 +102,13 @@ bool initSystem(uint32_t _flags, int _width, int _height) {
 	( 2) Count
 	*/
 	printf(
-		AC_YELLOW "bgfx Init data:\n" AC_RESET
+		AC_YELLOW "\nbgfx Init data:\n" AC_RESET
 		"Type:         %s (%d, pd: %d)\n"
 		"ndt:          %s\n"
 		"nwh:          %s\n"
 		"context:      %s\n"
 		"backBuffer:   %s\n"
-		"backBufferDS: %s\n",
+		"backBufferDS: %s\n\n",
 		bgfx::RendererType::Noop != init.type ? (AC_GREEN "!Noop" AC_RESET) : (AC_RED "Noop" AC_RESET), init.type, init.platformData.type,
 		init.platformData.ndt == nullptr ? (AC_RED "NULL" AC_RESET) : (AC_GREEN "NOT NULL" AC_RESET),
 		init.platformData.nwh == nullptr ? (AC_RED "NULL" AC_RESET) : (AC_GREEN "NOT NULL" AC_RESET),

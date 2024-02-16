@@ -11,16 +11,16 @@
 
 // resource intensive loading of .obj file
 // TODO: pack all assets before build for runtime use!
-bool loadExternalGeometry_OBJ(const char* _objPath, const bgfx::VertexLayout* _vertexLayout, Model** _model, enum IndicesOrder _order) {
+Model* loadExternalGeometry_OBJ(const char* _objPath, const bgfx::VertexLayout* _vertexLayout, IndicesOrder _order) {
 	// TODO: handle multi-object .obj
 	
 	FILE* file = fopen(_objPath, "r");
 	if (file == nullptr) {
 		printf(AC_RED "file is NULL: %s\n" AC_RESET, _objPath);
-		return false;
+		return nullptr;
 	}
 	
-	bool result = true;
+	Model* model = nullptr;
 	
 	char c;
 	int vert = 0;
@@ -40,7 +40,6 @@ bool loadExternalGeometry_OBJ(const char* _objPath, const bgfx::VertexLayout* _v
 				
 				if (n != 3) {
 					printf(AC_RED "Failed to match vertex normal data." AC_RESET);
-					result = false;
 					goto close;
 				}
 				detectOrder = false;
@@ -72,7 +71,6 @@ bool loadExternalGeometry_OBJ(const char* _objPath, const bgfx::VertexLayout* _v
 		if (_order == INDICES_ORDER_AUTO) {
 			if (normal == V3_ZERO) {
 				printf(AC_RED "Failed to retrive vertex normal." AC_RESET);
-				result = false;
 				goto cleanup;
 			}
 		}
@@ -85,7 +83,6 @@ bool loadExternalGeometry_OBJ(const char* _objPath, const bgfx::VertexLayout* _v
 					
 					if (n != 3) {
 						printf(AC_RED "Failed to match vertex data." AC_RESET);
-						result = false;
 						goto cleanup;
 					}
 					else {
@@ -166,7 +163,6 @@ bool loadExternalGeometry_OBJ(const char* _objPath, const bgfx::VertexLayout* _v
 					}
 					else {
 						printf(AC_RED "Failed to match tri/quad data." AC_RESET);
-						result = false;
 						goto cleanup;
 					}
 				}
@@ -178,7 +174,7 @@ bool loadExternalGeometry_OBJ(const char* _objPath, const bgfx::VertexLayout* _v
 		puts(AC_YELLOW "INDICES" AC_RESET);
 		for (int i = 1, j = 2; j < tris * 3; i++, j += 3) printf("%d:\t%d %d %d\n", i, indices[j - 2], indices[j - 1], indices[j]);*/
 		
-		*_model = createModel(vertices, vert, indices, tris * 3, *_vertexLayout);
+		model = ModelManager::create(vertices, vert, indices, tris * 3, *_vertexLayout);
 
 cleanup:
 		free(vertices);
@@ -188,7 +184,7 @@ cleanup:
 close:
 	fclose(file);
 
-	return result;
+	return model;
 }
 
 bool loadShader(const char* _filename, bgfx::ShaderHandle* _shaderHandle) {

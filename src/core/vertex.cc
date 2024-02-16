@@ -10,6 +10,8 @@ void Vertex_PosColor::init(void) {
 		.end();
 }
 
-void initVertexVariants(void) {
-	Vertex_PosColor::init();
+namespace VertexManager {
+	void init(void) {
+		Vertex_PosColor::init();
+	}
 }

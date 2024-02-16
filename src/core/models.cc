@@ -8,6 +8,10 @@
 
 // Model class
 
+Model* Model::create(Vertex_PosColor _vertices[], int _verticesLen, uint16_t _indices[], int _indicesLen, bgfx::VertexLayout& _vertexLayout) {
+	return ModelManager::create(_vertices, _verticesLen, _indices, _indicesLen, _vertexLayout);
+}
+
 void Model::cleanup(void) {
 	bgfx::destroy(vertexBufferHnd);
 	bgfx::destroy(indexBufferHnd);
@@ -46,61 +50,62 @@ void Model::print(bool _printVertices, bool _printIndices) {
 	printf(AC_CYAN "\n[MODEL INFO END]\n" AC_RESET);
 }
 
-// ModelManager
+namespace ModelManager {
+	static bool initialized;
 
-static bool initialized;
+	static int maxModelCount;
+	static int currentIndex;
+	static Model* models;
 
-static int modelCount;
-static int currentModelIndex;
-static Model* models;
-
-void initModelManager(int _maxModelCount) {
-	if (initialized) {
-		puts("Already initialized.");
-		return;
-	}
-	
-	modelCount = _maxModelCount;
-	models = (Model*)malloc(sizeof(Model) * _maxModelCount);
-	
-	initialized = true;
-}
-
-void cleanupModelManager(void) {
-	while (--currentModelIndex >= 0) {
-		models[currentModelIndex].cleanup();
-		free(&models[currentModelIndex]);
-	}
-	
-	models = nullptr;
-	currentModelIndex = 0;
-	initialized = false;
-}
-
-Model* createModel(const Vertex_PosColor _vertices[], int _verticesLen, const uint16_t _indices[], int _indicesLen, const bgfx::VertexLayout& _vertexLayout) {
-	if (currentModelIndex >= modelCount) {
-		puts(AC_YELLOW "Max model count reached." AC_RESET);
-		return nullptr;
+	void init(int _maxModelCount) {
+		if (initialized) {
+			puts("Already initialized.");
+			return;
+		}
+		
+		maxModelCount = _maxModelCount;
+		models = (Model*)malloc(sizeof(Model) * _maxModelCount);
+		
+		initialized = true;
 	}
 
-	size_t verticesSize = sizeof(Vertex_PosColor) * _verticesLen;
-	size_t indicesSize = sizeof(uint16_t) * _indicesLen;
+	void cleanup(void) {
+		while (--currentIndex >= 0) {
+			models[currentIndex].cleanup();
+		}
+		
+		free(models);
 
-	Vertex_PosColor* pvertices = (Vertex_PosColor*)malloc(verticesSize);
-	memcpy(pvertices, _vertices, verticesSize);
-	
-	uint16_t* pindices = (uint16_t*)malloc(indicesSize);
-	memcpy(pindices, _indices, indicesSize);
-	
-	models[currentModelIndex] = Model(
-		currentModelIndex,
-		pvertices,
-		_verticesLen,
-		pindices,
-		_indicesLen,
-		bgfx::createVertexBuffer(bgfx::makeRef(pvertices, verticesSize), _vertexLayout, BGFX_BUFFER_NONE),
-		bgfx::createIndexBuffer(bgfx::makeRef(pindices, indicesSize), BGFX_BUFFER_NONE)
-	);
-	
-	return &models[currentModelIndex++];
+		models = nullptr;
+		currentIndex = 0;
+		initialized = false;
+	}
+
+	Model* create(const Vertex_PosColor _vertices[], int _verticesLen, const uint16_t _indices[], int _indicesLen, const bgfx::VertexLayout& _vertexLayout) {
+		if (currentIndex >= maxModelCount) {
+			puts(AC_YELLOW "Max model count reached." AC_RESET);
+			return nullptr;
+		}
+
+		size_t verticesSize = sizeof(Vertex_PosColor) * _verticesLen;
+		size_t indicesSize = sizeof(uint16_t) * _indicesLen;
+
+		Vertex_PosColor* pvertices = (Vertex_PosColor*)malloc(verticesSize);
+		memcpy(pvertices, _vertices, verticesSize);
+		
+		uint16_t* pindices = (uint16_t*)malloc(indicesSize);
+		memcpy(pindices, _indices, indicesSize);
+		
+		models[currentIndex] = Model(
+			currentIndex,
+			pvertices,
+			_verticesLen,
+			pindices,
+			_indicesLen,
+			bgfx::createVertexBuffer(bgfx::makeRef(pvertices, verticesSize), _vertexLayout, BGFX_BUFFER_NONE),
+			bgfx::createIndexBuffer(bgfx::makeRef(pindices, indicesSize), BGFX_BUFFER_NONE)
+		);
+		
+		return &models[currentIndex++];
+	}
 }
