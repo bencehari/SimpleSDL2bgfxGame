@@ -87,13 +87,13 @@ namespace ModelManager {
 			return nullptr;
 		}
 
-		size_t verticesSize = sizeof(Vertex_PosColor) * _verticesLen;
-		size_t indicesSize = sizeof(uint16_t) * _indicesLen;
+		size_t verticesSize { sizeof(Vertex_PosColor) * _verticesLen };
+		size_t indicesSize { sizeof(uint16_t) * _indicesLen };
 
-		Vertex_PosColor* pvertices = (Vertex_PosColor*)malloc(verticesSize);
+		Vertex_PosColor* pvertices { (Vertex_PosColor*)malloc(verticesSize) };
 		memcpy(pvertices, _vertices, verticesSize);
 		
-		uint16_t* pindices = (uint16_t*)malloc(indicesSize);
+		uint16_t* pindices { (uint16_t*)malloc(indicesSize) };
 		memcpy(pindices, _indices, indicesSize);
 		
 		models[currentIndex] = Model(

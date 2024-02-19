@@ -7,8 +7,8 @@ Object* Object::create(Model* _model, bgfx::ProgramHandle _program, Transform _t
 }
 
 void Object::render(void) {
-	Matrix4x4 t = M4x4_POS(transform.position.X, transform.position.Y, transform.position.Z);
-	Matrix4x4 r = Q_TO_M4x4(transform.rotation);
+	Matrix4x4 t M4x4_POS(transform.position.X, transform.position.Y, transform.position.Z);
+	Matrix4x4 r Q_TO_M4x4(transform.rotation);
 	
 	bgfx::setTransform((t * r).Elements, 1);
 		
@@ -83,7 +83,7 @@ namespace ObjectManager {
 			6, 3, 7,
 		};
 		
-		Model* pCubeModel = ModelManager::create(vertices, 8, indices, 36, Vertex_PosColor::layout);
+		Model* pCubeModel { ModelManager::create(vertices, 8, indices, 36, Vertex_PosColor::layout) };
 		
 		// pCubeModel.print(true, true);
 		

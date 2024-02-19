@@ -31,40 +31,40 @@ void game(float _width, float _height, float _fps) {
 	/*Object* cube =*/ ObjectManager::createTestCube(programHandle);
 	
 	// test
-	Model* suzanneModel = loadExternalGeometry_OBJ("assets/models/suzanne.obj", &Vertex_PosColor::layout, INDICES_ORDER_AUTO);
-	Object* suzanne = Object::create(suzanneModel, programHandle);
+	Model* suzanneModel { loadExternalGeometry_OBJ("assets/models/suzanne.obj", &Vertex_PosColor::layout, INDICES_ORDER_AUTO) };
+	Object* suzanne { Object::create(suzanneModel, programHandle) };
 	suzanne->transform.position = V3_NEW(5.0f, 0.0f, 0.0f);
 
 	// for now, it loads all object as one from .obj
-	Model* skeletonMageModel = loadExternalGeometry_OBJ("assets/models/Skeleton_Mage.obj", &Vertex_PosColor::layout, INDICES_ORDER_AUTO);
-	Object* skeletonMage = Object::create(skeletonMageModel, programHandle);
+	Model* skeletonMageModel { loadExternalGeometry_OBJ("assets/models/Skeleton_Mage.obj", &Vertex_PosColor::layout, INDICES_ORDER_AUTO) };
+	Object* skeletonMage { Object::create(skeletonMageModel, programHandle) };
 	skeletonMage->transform.position = V3_NEW(-5.0f, 0.0f, 0.0f);
 	
 	// FPS
-	int milliPeriod = (int)(1.0 / (double)_fps * 1000);
+	int milliPeriod { (int)(1.0 / (double)_fps * 1000) };
 	Uint32 lastTick;
 	Uint32 currentTick;
 	
 	// view related
-	const float moveSpeed = 0.1f;
-	const float rotationSpeed = 3.0f;
+	const float moveSpeed { 0.1f };
+	const float rotationSpeed { 3.0f };
 	
 	// input
-	const float widthNorm = 1.0f / _width;
-	const float heightNorm = 1.0f / _height;
+	const float widthNorm { 1.0f / _width };
+	const float heightNorm { 1.0f / _height };
 	bool
-		forwardDown = false,
-		backDown = false,
-		leftDown = false,
-		rightDown = false,
-		elevateDown = false,
-		descendDown = false;
+		forwardDown { false },
+		backDown { false },
+		leftDown { false },
+		rightDown { false },
+		elevateDown { false },
+		descendDown { false };
 	bool
-		freeMove = true,
-		upDownMove = true;
+		freeMove { true },
+		upDownMove { true };
 
 	// system
-	bool running = true;
+	bool running { true };
 	SDL_Event event;
 	
 	puts(AC_MAGENTA "[GAME LOOP START]" AC_RESET);
@@ -72,7 +72,7 @@ void game(float _width, float _height, float _fps) {
 		dbg::reset();
 		lastTick = SDL_GetTicks();
 		
-		Vector2 cameraRotation = V2_ZERO;
+		Vector2 cameraRotation V2_ZERO;
 		
 		while (SDL_PollEvent(&event)) {
 			switch (event.type) {
@@ -107,13 +107,13 @@ void game(float _width, float _height, float _fps) {
 					}
 				} break;
 				case SDL_MOUSEBUTTONDOWN: {
-					SDL_MouseButtonEvent* e = (SDL_MouseButtonEvent*)&event;
+					SDL_MouseButtonEvent* e { (SDL_MouseButtonEvent*)&event };
 					if (e->button == SDL_BUTTON_LEFT) SDL_SetRelativeMouseMode(SDL_TRUE);
 				} break;
 				// case SDL_MOUSEBUTTONUP: break;
 				case SDL_MOUSEMOTION: {
 					if (SDL_GetRelativeMouseMode()) {
-						SDL_MouseMotionEvent* e = (SDL_MouseMotionEvent*)&event;
+						SDL_MouseMotionEvent* e { (SDL_MouseMotionEvent*)&event };
 						
 						cameraRotation = V2_NEW(
 							-DEG_TO_RAD(e->yrel * widthNorm * 90.0f * rotationSpeed),
@@ -122,7 +122,7 @@ void game(float _width, float _height, float _fps) {
 					}
 				} break;
 				case SDL_WINDOWEVENT: {
-					const SDL_WindowEvent wev = event.window;
+					const SDL_WindowEvent wev { event.window };
 					switch (wev.event) {
 						case SDL_WINDOWEVENT_RESIZED:
 						case SDL_WINDOWEVENT_SIZE_CHANGED: break;
@@ -137,11 +137,11 @@ void game(float _width, float _height, float _fps) {
 		
 		// process input when the mouse is locked in the window
 		if (SDL_GetRelativeMouseMode()) {
-			Vector3 move = V3_ZERO;
+			Vector3 move V3_ZERO;
 			
 			if (forwardDown || backDown) {
 				if (forwardDown != backDown) {
-					Vector3 fwd = camera.getForward();
+					Vector3 fwd { camera.getForward() };
 					
 					if (freeMove) move = forwardDown ? fwd : (fwd * -1.0f);
 					else {
@@ -153,7 +153,7 @@ void game(float _width, float _height, float _fps) {
 			}
 			if (leftDown || rightDown) {
 				if (leftDown != rightDown) {
-					Vector3 right = camera.getRight();
+					Vector3 right { camera.getRight() };
 					
 					if (freeMove) move += rightDown ? right : (right * -1.0f);
 					else {
@@ -168,7 +168,7 @@ void game(float _width, float _height, float _fps) {
 				if (elevateDown || descendDown) {
 					if (elevateDown != descendDown) {
 						if (freeMove) {
-							Vector3 up = camera.getUp();
+							Vector3 up { camera.getUp() };
 							move += elevateDown ? up : (up * -1.0f);
 						}
 						else {
@@ -188,14 +188,14 @@ void game(float _width, float _height, float _fps) {
 
 		// calculate view and projection matrix
 		{
-			Matrix4x4 view = LOOK_AT(camera.position, camera.getLookAt());
+			Matrix4x4 view LOOK_AT(camera.position, camera.getLookAt());
 			
-			Matrix4x4 proj = PERSPECTIVE(DEG_TO_RAD(90.0f), _width / _height, 0.1f, 100.0f);
+			Matrix4x4 proj PERSPECTIVE(DEG_TO_RAD(90.0f), _width / _height, 0.1f, 100.0f);
 			bgfx::setViewTransform(0, &view, &proj);
 			bgfx::setViewRect(0, 0, 0, (int)_width, (int)_height);
 		}
 
-		bgfx::Encoder* encoder = bgfx::begin(true);
+		bgfx::Encoder* encoder { bgfx::begin(true) };
 		bgfx::touch(0);
 
 		// RENDER objects START
@@ -209,7 +209,7 @@ void game(float _width, float _height, float _fps) {
 		bgfx::frame(false);
 		
 		currentTick = SDL_GetTicks();
-		int sleep = milliPeriod - (currentTick - lastTick);
+		int sleep { milliPeriod - (int)(currentTick - lastTick) };
 		if (sleep > 0) SDL_Delay(sleep);
 		
 		// for testing shutdown

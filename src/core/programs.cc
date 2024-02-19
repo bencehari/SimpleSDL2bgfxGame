@@ -39,8 +39,8 @@ namespace ProgramManager {
 	}
 
 	bgfx::ProgramHandle create(const char* _vertexShader, const char* _fragmentShader, bool _destroyShaders) {
-		bgfx::ShaderHandle vertexShaderHnd = {0};
-		bgfx::ShaderHandle fragmentShaderHnd = {0};
+		bgfx::ShaderHandle vertexShaderHnd { 0 };
+		bgfx::ShaderHandle fragmentShaderHnd { 0 };
 		
 		if (!loadShader(_vertexShader, &vertexShaderHnd)) {
 			// TODO: load fallback shader

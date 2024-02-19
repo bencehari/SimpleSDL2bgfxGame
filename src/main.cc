@@ -31,7 +31,7 @@ int main(int _argc, char* _argv[]) {
 	
 	if (!initSystem(initFlags, WIDTH, HEIGHT)) {
 		printf("Initialization failed. Terminating...");
-		return 0;
+		return EXIT_FAILURE;
 	}
 	
 	game(WIDTH_F, HEIGHT_F, FPS);
@@ -39,5 +39,5 @@ int main(int _argc, char* _argv[]) {
 	cleanupSystem();
 	puts(AC_MAGENTA "DONE" AC_RESET);
 	
-	return 0;
+	return EXIT_SUCCESS;
 }

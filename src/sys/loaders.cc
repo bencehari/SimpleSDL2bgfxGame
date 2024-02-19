@@ -20,14 +20,14 @@ Model* loadExternalGeometry_OBJ(const char* _objPath, const bgfx::VertexLayout* 
 		return nullptr;
 	}
 	
-	Model* model = nullptr;
+	Model* model { nullptr };
 	
 	char c;
-	int vert = 0;
-	int tris = 0;
+	int vert { 0 };
+	int tris { 0 };
 	
 	bool detectOrder = _order == INDICES_ORDER_AUTO ? true : false;
-	Vector3 normal = V3_ZERO;
+	Vector3 normal V3_ZERO;
 	
 	while ((c = getc(file)) != EOF) {
 		if (c == 'v') {
@@ -47,7 +47,7 @@ Model* loadExternalGeometry_OBJ(const char* _objPath, const bgfx::VertexLayout* 
 		}
 		else if (c == 'f') {
 			if (getc(file) == ' ') {
-				int vCount = 1;
+				int vCount { 1 };
 				while ((c = getc(file)) != '\n' && c != EOF) {
 					if (c == ' ') vCount++;
 				}
@@ -60,11 +60,11 @@ Model* loadExternalGeometry_OBJ(const char* _objPath, const bgfx::VertexLayout* 
 	// printf("\"%s\"\nvertex count: %d\ntri count: %d\n", _objPath, vert, tris);
 	
 	{
-		Vertex_PosColor* vertices = (Vertex_PosColor*)malloc(sizeof(struct Vertex_PosColor) * vert);
-		uint16_t* indices = (uint16_t*)malloc(sizeof(uint16_t) * tris * 3);
+		Vertex_PosColor* vertices { (Vertex_PosColor*)malloc(sizeof(struct Vertex_PosColor) * vert) };
+		uint16_t* indices { (uint16_t*)malloc(sizeof(uint16_t) * tris * 3) };
 		
-		int vIndex = 0;
-		int iIndex = 0;
+		int vIndex { 0 };
+		int iIndex { 0 };
 		
 		rewind(file);
 		
@@ -94,10 +94,10 @@ Model* loadExternalGeometry_OBJ(const char* _objPath, const bgfx::VertexLayout* 
 			else if (c == 'f') {
 				if (getc(file) == ' ') {
 					int
-						v1 = -1, vt1 = -1, vn1 = -1,
-						v2 = -1, vt2 = -1, vn2 = -1,
-						v3 = -1, vt3 = -1, vn3 = -1,
-						v4 = -1, vt4 = -1, vn4 = -1;
+						v1 { -1 }, vt1 { -1 }, vn1 { -1 },
+						v2 { -1 }, vt2 { -1 }, vn2 { -1 },
+						v3 { -1 }, vt3 { -1 }, vn3 { -1 },
+						v4 { -1 }, vt4 { -1 }, vn4 { -1 };
 
 					int n = fscanf(file,
 						"%d/%d/%d %d/%d/%d %d/%d/%d %d/%d/%d",
@@ -110,12 +110,12 @@ Model* loadExternalGeometry_OBJ(const char* _objPath, const bgfx::VertexLayout* 
 					v4--; vt4--; vn4--;
 
 					if (_order == INDICES_ORDER_AUTO) {
-						Vector3 a = V3_NEW(vertices[v1].x, vertices[v1].y, vertices[v1].z);
-						Vector3 b = V3_NEW(vertices[v2].x, vertices[v2].y, vertices[v2].z);
-						Vector3 c = V3_NEW(vertices[v3].x, vertices[v3].y, vertices[v3].z);
+						Vector3 a { V3_NEW(vertices[v1].x, vertices[v1].y, vertices[v1].z) };
+						Vector3 b { V3_NEW(vertices[v2].x, vertices[v2].y, vertices[v2].z) };
+						Vector3 c { V3_NEW(vertices[v3].x, vertices[v3].y, vertices[v3].z) };
 						
 						// calculate normal clockwise
-						Vector3 normCalculated = V3_NORM(V3_CROSS(b - a, c - a));
+						Vector3 normCalculated { V3_NORM(V3_CROSS(b - a, c - a)) };
 						
 						// hopefully that will be enough.
 						// EDIT: changed to 0.95 from 0.99
@@ -188,7 +188,7 @@ close:
 }
 
 bool loadShader(const char* _filename, bgfx::ShaderHandle* _shaderHandle) {
-	const char* shaderPath;
+	const char* shaderPath { nullptr };
 	
 	switch (bgfx::getRendererType()) {
 		case bgfx::RendererType::Noop:
@@ -206,19 +206,19 @@ bool loadShader(const char* _filename, bgfx::ShaderHandle* _shaderHandle) {
 	
 	// printf(AC_YELLOW "ShaderName: '%s'.\nPath: '%s'\n" AC_RESET, _filename, shaderPath);
 	
-	size_t shaderPathLen = strlen(shaderPath);
-	size_t fileNameLen = strlen(_filename);
+	size_t shaderPathLen { strlen(shaderPath) };
+	size_t fileNameLen { strlen(_filename) };
 	
-	char* filePath = (char*)malloc(shaderPathLen + fileNameLen + 1);
+	char* filePath { (char*)malloc(shaderPathLen + fileNameLen + 1) };
 	memcpy(filePath, shaderPath, shaderPathLen);
 	memcpy(&filePath[shaderPathLen], _filename, fileNameLen);
 	filePath[shaderPathLen + fileNameLen] = '\0';
 	
 	// printf(AC_YELLOW "%s\n" AC_RESET, filePath);
 	
-	FILE* file = nullptr;
-	long fileSize = 0;
-	if (!getFileSize(filePath, fileSize, &file)) return false;
+	FILE* file { nullptr };
+	long fileSize { 0 };
+	if (!getFileSize(filePath, fileSize, file)) return false;
 	
 	// printf(AC_YELLOW "fileSize: %ld\n" AC_RESET, fileSize);
 	

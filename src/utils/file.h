@@ -13,6 +13,6 @@
  *
  * @return False on error, otherwise true.
 */
-extern bool getFileSize(const char* _filePath, long& _fileSize, FILE** _file);
+extern bool getFileSize(const char* _filePath, long& _fileSize, FILE*& _file);
 
 #endif // KE_FILE_H

@@ -24,15 +24,12 @@ bool initSystem(uint32_t _flags, int _width, int _height) {
 	puts(AC_GREEN "DONE" AC_RESET);
 	
 	printf("SDL_CreateWindow... ");
-	window = SDL_CreateWindow(
-		"SDL2/bgfx Test",
-		SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-		_width, _height, 0);
+	window = SDL_CreateWindow("SDL2/bgfx Test", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, _width, _height, 0);
 		
 	if (!window) {
 		printf("\n" AC_RED "Error creating window: %s" AC_RESET "\n", SDL_GetError());
 		SDL_Quit();
-		return 0;
+		return false;
 	}
 	puts(AC_GREEN "DONE" AC_RESET);
 	
