@@ -32,12 +32,12 @@ void game(float _width, float _height, float _fps) {
 	/*Object* cube =*/ ObjectManager::createTestCube(programHandle);
 	
 	// test
-	Model* suzanneModel { WavefrontObj::load("assets/models/suzanne.obj", &Vertex_PosColor::layout) };
+	Model* suzanneModel { WavefrontObj::loadColored("assets/models/suzanne.obj") };
 	Object* suzanne { Object::create(suzanneModel, programHandle) };
 	suzanne->transform.position = V3_NEW(5.0f, 0.0f, 0.0f);
 
 	// for now, it loads all object as one from .obj
-	Model* skeletonMageModel { WavefrontObj::load("assets/models/Skeleton_Mage.obj", &Vertex_PosColor::layout) };
+	Model* skeletonMageModel { WavefrontObj::loadColored("assets/models/Skeleton_Mage.obj") };
 	Object* skeletonMage { Object::create(skeletonMageModel, programHandle) };
 	skeletonMage->transform.position = V3_NEW(-5.0f, 0.0f, 0.0f);
 	

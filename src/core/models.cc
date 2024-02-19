@@ -8,7 +8,7 @@
 
 // Model class
 
-Model* Model::create(Vertex_PosColor _vertices[], int _verticesLen, uint16_t _indices[], int _indicesLen, bgfx::VertexLayout& _vertexLayout) {
+Model* Model::create(Vertex_Colored _vertices[], int _verticesLen, uint16_t _indices[], int _indicesLen, bgfx::VertexLayout& _vertexLayout) {
 	return ModelManager::create(_vertices, _verticesLen, _indices, _indicesLen, _vertexLayout);
 }
 
@@ -81,16 +81,16 @@ namespace ModelManager {
 		initialized = false;
 	}
 
-	Model* create(const Vertex_PosColor _vertices[], int _verticesLen, const uint16_t _indices[], int _indicesLen, const bgfx::VertexLayout& _vertexLayout) {
+	Model* create(const Vertex_Colored _vertices[], int _verticesLen, const uint16_t _indices[], int _indicesLen, const bgfx::VertexLayout& _vertexLayout) {
 		if (currentIndex >= maxModelCount) {
 			puts(AC_YELLOW "Max model count reached." AC_RESET);
 			return nullptr;
 		}
 
-		size_t verticesSize { sizeof(Vertex_PosColor) * _verticesLen };
+		size_t verticesSize { sizeof(Vertex_Colored) * _verticesLen };
 		size_t indicesSize { sizeof(uint16_t) * _indicesLen };
 
-		Vertex_PosColor* pvertices { (Vertex_PosColor*)malloc(verticesSize) };
+		Vertex_Colored* pvertices { (Vertex_Colored*)malloc(verticesSize) };
 		memcpy(pvertices, _vertices, verticesSize);
 		
 		uint16_t* pindices { (uint16_t*)malloc(indicesSize) };

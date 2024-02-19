@@ -13,7 +13,7 @@
 class Model {
 private:
 	unsigned int id;
-	Vertex_PosColor* vertices;
+	Vertex_Colored* vertices;
 	uint16_t* indices;
 	
 public:
@@ -28,7 +28,7 @@ public:
 	*/
 	Model(
 		int _id,
-		Vertex_PosColor _vertices[],
+		Vertex_Colored _vertices[],
 		int _verticesLen,
 		uint16_t _indices[],
 		int _indicesLen,
@@ -43,7 +43,7 @@ public:
 		vertexBufferHnd(_vertexBufferHnd),
 		indexBufferHnd(_indexBufferHnd) {}
 
-	static Model* create(Vertex_PosColor _vertices[], int _verticesLen, uint16_t _indices[], int _indicesLen, bgfx::VertexLayout& _vertexLayout);
+	static Model* create(Vertex_Colored _vertices[], int _verticesLen, uint16_t _indices[], int _indicesLen, bgfx::VertexLayout& _vertexLayout);
 
 	void cleanup(void);
 	
@@ -78,7 +78,7 @@ namespace ModelManager {
 	 *
 	 * @return Pointer to the created Model.
 	*/
-	extern Model* create(const Vertex_PosColor _vertices[], int _verticesLen, const uint16_t _indices[], int _indicesLen, const bgfx::VertexLayout& _vertexLayout);
+	extern Model* create(const Vertex_Colored _vertices[], int _verticesLen, const uint16_t _indices[], int _indicesLen, const bgfx::VertexLayout& _vertexLayout);
 }
 
 #endif // KE_MODELS_H

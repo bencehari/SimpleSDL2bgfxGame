@@ -58,32 +58,32 @@ namespace ObjectManager {
 			return nullptr;
 		}
 		
-		Vertex_PosColor vertices[] = {
-			Vertex_PosColor(-1.0f,  1.0f,  1.0f, 0xff000000),
-			Vertex_PosColor( 1.0f,  1.0f,  1.0f, 0xff0000ff),
-			Vertex_PosColor(-1.0f, -1.0f,  1.0f, 0xff00ff00),
-			Vertex_PosColor( 1.0f, -1.0f,  1.0f, 0xff00ffff),
-			Vertex_PosColor(-1.0f,  1.0f, -1.0f, 0xffff0000),
-			Vertex_PosColor( 1.0f,  1.0f, -1.0f, 0xffff00ff),
-			Vertex_PosColor(-1.0f, -1.0f, -1.0f, 0xffffff00),
-			Vertex_PosColor( 1.0f, -1.0f, -1.0f, 0xffffffff),
+		Vertex_Colored vertices[] = {
+			Vertex_Colored(-1.0f,  1.0f,  1.0f, 0xff000000),
+			Vertex_Colored( 1.0f,  1.0f,  1.0f, 0xff0000ff),
+			Vertex_Colored(-1.0f, -1.0f,  1.0f, 0xff00ff00),
+			Vertex_Colored( 1.0f, -1.0f,  1.0f, 0xff00ffff),
+			Vertex_Colored(-1.0f,  1.0f, -1.0f, 0xffff0000),
+			Vertex_Colored( 1.0f,  1.0f, -1.0f, 0xffff00ff),
+			Vertex_Colored(-1.0f, -1.0f, -1.0f, 0xffffff00),
+			Vertex_Colored( 1.0f, -1.0f, -1.0f, 0xffffffff),
 		};
 		uint16_t indices[] = {
-			0, 1, 2, // 0
+			0, 1, 2,
 			1, 3, 2,
-			4, 6, 5, // 2
+			4, 6, 5,
 			5, 6, 7,
-			0, 2, 4, // 4
+			0, 2, 4,
 			4, 2, 6,
-			1, 5, 3, // 6
+			1, 5, 3,
 			5, 7, 3,
-			0, 4, 1, // 8
+			0, 4, 1,
 			4, 5, 1,
-			2, 3, 6, // 10
+			2, 3, 6,
 			6, 3, 7,
 		};
 		
-		Model* pCubeModel { ModelManager::create(vertices, 8, indices, 36, Vertex_PosColor::layout) };
+		Model* pCubeModel { ModelManager::create(vertices, 8, indices, 36, Vertex_Colored::layout) };
 		
 		// pCubeModel.print(true, true);
 		

@@ -7,10 +7,11 @@
 #include "../math/math.h"
 #include "../core/vertex.h"
 
+#include "../utils/color.h"
 #include "../utils/consc.h"
 
 namespace WavefrontObj {
-	Model* load(const char* _objPath, const bgfx::VertexLayout* _vertexLayout, enum IndicesOrder _order) {
+	Model* loadColored(const char* _objPath, enum IndicesOrder _order) {
 		FILE* file = fopen(_objPath, "r");
 		if (file == nullptr) {
 			printf(AC_RED "file is NULL: %s\n" AC_RESET, _objPath);
@@ -65,7 +66,7 @@ namespace WavefrontObj {
 			}
 		}
 		
-		Vertex_PosColor* vertices { (Vertex_PosColor*)malloc(sizeof(struct Vertex_PosColor) * vert) };
+		Vertex_Colored* vertices { (Vertex_Colored*)malloc(sizeof(struct Vertex_Colored) * vert) };
 		uint16_t* indices { (uint16_t*)malloc(sizeof(uint16_t) * tris * 3) };
 		
 		int vIndex { 0 };
@@ -77,15 +78,18 @@ namespace WavefrontObj {
 			if (c == 'v') {
 				if (getc(file) == ' ') {
 					float x, y, z;
-					int n = fscanf(file, "%f %f %f", &x, &y, &z);
+					float r, g, b;
+					int n = fscanf(file, "%f %f %f %f %f %f", &x, &y, &z, &r, &g, &b);
 					
-					if (n != 3) {
-						printf(AC_RED "Failed to match vertex data." AC_RESET);
-						goto end;
+					if (n == 3) {
+						vertices[vIndex] = Vertex_Colored(x, y, z, 0xff7f00ff);
+					}
+					else if (n == 6) {
+						vertices[vIndex] = Vertex_Colored(x, y, z, rgbaToHex(r, g, b, 1.0f));
 					}
 					else {
-						// this doesn't make any sense, just coloring 'randomly' to be able to see the result
-						vertices[vIndex] = Vertex_PosColor(x, y, z, vIndex % 2 == 0 ? 0xffffffff : (vIndex % 3 == 0 ? 0xff0000ff : 0xff00ff00));
+						printf(AC_RED "Failed to match vertex data." AC_RESET);
+						goto end;
 					}
 					vIndex++;
 				}
@@ -173,7 +177,7 @@ namespace WavefrontObj {
 		puts(AC_YELLOW "INDICES" AC_RESET);
 		for (int i = 1, j = 2; j < tris * 3; i++, j += 3) printf("%d:\t%d %d %d\n", i, indices[j - 2], indices[j - 1], indices[j]);*/
 		
-		model = ModelManager::create(vertices, vert, indices, tris * 3, *_vertexLayout);
+		model = ModelManager::create(vertices, vert, indices, tris * 3, Vertex_Colored::layout);
 
 	end:
 		free(vertices);
