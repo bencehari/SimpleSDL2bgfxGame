@@ -8,6 +8,7 @@
 
 #include "math/math.h"
 #include "sys/loaders.h"
+#include "geometry/wavefront_obj.h"
 #include "core/programs.h"
 #include "core/vertex.h"
 #include "core/models.h"
@@ -31,12 +32,12 @@ void game(float _width, float _height, float _fps) {
 	/*Object* cube =*/ ObjectManager::createTestCube(programHandle);
 	
 	// test
-	Model* suzanneModel { loadExternalGeometry_OBJ("assets/models/suzanne.obj", &Vertex_PosColor::layout, INDICES_ORDER_AUTO) };
+	Model* suzanneModel { WavefrontObj::load("assets/models/suzanne.obj", &Vertex_PosColor::layout) };
 	Object* suzanne { Object::create(suzanneModel, programHandle) };
 	suzanne->transform.position = V3_NEW(5.0f, 0.0f, 0.0f);
 
 	// for now, it loads all object as one from .obj
-	Model* skeletonMageModel { loadExternalGeometry_OBJ("assets/models/Skeleton_Mage.obj", &Vertex_PosColor::layout, INDICES_ORDER_AUTO) };
+	Model* skeletonMageModel { WavefrontObj::load("assets/models/Skeleton_Mage.obj", &Vertex_PosColor::layout) };
 	Object* skeletonMage { Object::create(skeletonMageModel, programHandle) };
 	skeletonMage->transform.position = V3_NEW(-5.0f, 0.0f, 0.0f);
 	
