@@ -81,7 +81,7 @@ static bool preprocess(FILE*& _file, int& _vertexCount, int& _triCount, int& _no
 		}
 	}
 	
-	printf("v: %d, vn: %d, tri: %d\n", _vertexCount, normCount, _triCount);
+	// printf("v: %d, vn: %d, tri: %d\n", _vertexCount, _normCount, _triCount);
 	
 	return true;
 }
@@ -98,7 +98,7 @@ Model* wfobj_loadColored(const char* _objPath, IndicesOrder _order) {
 	
 	int norms { 0 }; // unused here
 
-	if (!preprocess(file, vert, tris, normCount, normal, _order == IndicesOrder::Auto)) return nullptr;
+	if (!preprocess(file, vert, tris, norms, normal, _order == IndicesOrder::Auto)) return nullptr;
 	
 	Model* model { nullptr };
 	
@@ -226,6 +226,47 @@ end:
 
 	return model;
 }
+
+// + TMP
+
+// quickly copied from bgfx_utils.h to make wfobj_loadTextured work
+// recursively started from https://github.com/bkaradzic/bgfx/blob/c75b9cb57d8943a12dbd5399b1ace5c27c6a6c67/examples/common/bgfx_utils.h#L56
+
+#define TRUNC_F(_f) (float(int((_f))))
+#define FRACT_F(_f) ((_f) - TRUNC_F((_f)))
+#define FLOOR_F(_f) ( (_f) < 0.0f ? -FRACT_F(-(_f)) - float(0.0f != FRACT_F(-(_f))) : (_f) - FRACT_F((_f)) )
+#define ROUND_F(_f) (FLOOR_F((_f) + 0.5f))
+#define MIN_F(_fa, _fb) ((_fa) < (_fb) ? (_fa) : (_fb))
+#define MAX_F(_fa, _fb) ((_fa) > (_fb) ? (_fa) : (_fb))
+#define CLAMP_F(_f, _fmin, _fmax) (MAX_F(MIN_F((_f), (_fmax)), (_fmin)))
+#define TO_UNORM(_fvalue, _fscale) (uint32_t(ROUND_F(CLAMP_F((_fvalue), 0.0f, 1.0f) * (_fscale))))
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-function"
+
+static void packRGBA8(void* _dst, const float* _src) {
+	uint8_t* dst = (uint8_t*)_dst;
+	dst[0] = uint8_t(TO_UNORM(_src[0], 255.0f));
+	dst[1] = uint8_t(TO_UNORM(_src[1], 255.0f));
+	dst[2] = uint8_t(TO_UNORM(_src[2], 255.0f));
+	dst[3] = uint8_t(TO_UNORM(_src[3], 255.0f));
+}
+
+static uint32_t encodeNormalRGBA8(float _x, float _y = 0.0f, float _z = 0.0f, float _w = 0.0f) {
+	const float src[] = {
+		_x * 0.5f + 0.5f,
+		_y * 0.5f + 0.5f,
+		_z * 0.5f + 0.5f,
+		_w * 0.5f + 0.5f
+	};
+	uint32_t dst;
+	packRGBA8(&dst, src);
+	return dst;
+}
+
+#pragma GCC diagnostic pop
+
+// -TMP
 
 Model* wfobj_loadTextured(const char* _objPath, IndicesOrder _order) {
 	FILE* file { nullptr };
