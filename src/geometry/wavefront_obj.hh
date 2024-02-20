@@ -15,7 +15,7 @@ enum IndicesOrder {
 };
 
 /**
- * @brief Creates a model from Wavefront OBJ data.
+ * @brief Creates a model (colored by vertex) from Wavefront OBJ data.
  *
  * Obj should contain vertex color data (defaults to #ff007f [pink]).
  * In Blender: add Color Attribute in Object Data Properties
@@ -27,6 +27,17 @@ enum IndicesOrder {
  *
  * @return Pointer to the created Model or nullptr on error.
 */
-extern Model* wfobj_loadColored(const char* _objPath, enum IndicesOrder _order = IndicesOrder::Auto);
+extern Model* wfobj_loadColored(const char* _objPath, IndicesOrder _order = IndicesOrder::Auto);
+
+/**
+ * @brief Creates a textured model from Wavefront OBJ data.
+ *
+ * @param _objPath Path to the .obj file.
+ * @param _vertexLayout bgfx::VertexLayout of the Model.
+ * @param _order Indices order for how to process the .obj data.
+ *
+ * @return Pointer to the created Model or nullptr on error.
+*/
+extern Model* wfobj_loadTextured(const char* _objPath, IndicesOrder _order = IndicesOrder::Auto);
 
 #endif // KE_WAVEFRONT_OBJ

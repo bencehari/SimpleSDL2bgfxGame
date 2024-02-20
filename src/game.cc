@@ -41,6 +41,9 @@ void game(float _width, float _height, float _fps) {
 	Object* skeletonMage { Object::create(skeletonMageModel, programHandle) };
 	skeletonMage->transform.position = V3_NEW(-5.0f, 0.0f, 0.0f);
 	
+	// doesn't create model, WiP and here only for testing
+	wfobj_loadTextured("assets/models/Skeleton_Mage.obj");
+	
 	// FPS
 	int milliPeriod { (int)(1.0 / (double)_fps * 1000) };
 	Uint32 lastTick;
