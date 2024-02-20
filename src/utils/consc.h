@@ -10,4 +10,8 @@
 #define AC_CYAN    "\x1b[36m"
 #define AC_RESET   "\x1b[0m"
 
+// usage example:
+// printf(AC_RED "ERROR!\n" AC_RESET);
+// printf(AC_GREEN "[DONE]" AC_RESET " %d model(s) loaded.\n", loadedModelCount);
+
 #endif // KE_CONSC_H
