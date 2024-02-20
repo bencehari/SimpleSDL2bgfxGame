@@ -219,8 +219,6 @@ extern "C"
 #define HMM_MOD(a, m) (((a) % (m)) >= 0 ? ((a) % (m)) : (((a) % (m)) + (m)))
 #define HMM_SQUARE(x) ((x) * (x))
 
-#define FUNC_MOD static inline
-
 typedef union HMM_Vec2 {
 	struct { float X, Y; };
 	struct { float U, V; };
@@ -360,7 +358,7 @@ typedef signed int HMM_Bool;
 
 // Angle unit conversion functions
 
-FUNC_MOD float HMM_ToRad(float Angle) {
+static inline float HMM_ToRad(float Angle) {
 #if defined(HANDMADE_MATH_USE_RADIANS)
 	float Result = Angle;
 #elif defined(HANDMADE_MATH_USE_DEGREES) 
@@ -372,7 +370,7 @@ FUNC_MOD float HMM_ToRad(float Angle) {
 	return Result;
 }
 
-FUNC_MOD float HMM_ToDeg(float Angle) {
+static inline float HMM_ToDeg(float Angle) {
 #if defined(HANDMADE_MATH_USE_RADIANS)
 	float Result = Angle * HMM_RadToDeg;
 #elif defined(HANDMADE_MATH_USE_DEGREES) 
@@ -384,7 +382,7 @@ FUNC_MOD float HMM_ToDeg(float Angle) {
 	return Result;
 }
 
-FUNC_MOD float HMM_ToTurn(float Angle) {
+static inline float HMM_ToTurn(float Angle) {
 #if defined(HANDMADE_MATH_USE_RADIANS)
 	float Result = Angle * HMM_RadToTurn;
 #elif defined(HANDMADE_MATH_USE_DEGREES) 
@@ -398,23 +396,23 @@ FUNC_MOD float HMM_ToTurn(float Angle) {
 
 // Floating-point math functions
 
-FUNC_MOD float HMM_SinF(float Angle) {
+static inline float HMM_SinF(float Angle) {
 	return HMM_SINF(HMM_ANGLE_USER_TO_INTERNAL(Angle));
 }
 
-FUNC_MOD float HMM_CosF(float Angle) {
+static inline float HMM_CosF(float Angle) {
 	return HMM_COSF(HMM_ANGLE_USER_TO_INTERNAL(Angle));
 }
 
-FUNC_MOD float HMM_TanF(float Angle) {
+static inline float HMM_TanF(float Angle) {
 	return HMM_TANF(HMM_ANGLE_USER_TO_INTERNAL(Angle));
 }
 
-FUNC_MOD float HMM_ACosF(float Arg) {
+static inline float HMM_ACosF(float Arg) {
 	return HMM_ANGLE_INTERNAL_TO_USER(HMM_ACOSF(Arg));
 }
 
-FUNC_MOD float HMM_SqrtF(float Float) {
+static inline float HMM_SqrtF(float Float) {
 	float Result;
 
 #ifdef HANDMADE_MATH__USE_SSE
@@ -428,17 +426,17 @@ FUNC_MOD float HMM_SqrtF(float Float) {
 	return Result;
 }
 
-FUNC_MOD float HMM_InvSqrtF(float Float) {
+static inline float HMM_InvSqrtF(float Float) {
 	return 1.0f / HMM_SqrtF(Float);
 }
 
 // Utility functions
 
-FUNC_MOD float HMM_Lerp(float A, float Time, float B) {
+static inline float HMM_Lerp(float A, float Time, float B) {
 	return (1.0f - Time) * A + Time * B;
 }
 
-FUNC_MOD float HMM_Clamp(float Min, float Value, float Max) {
+static inline float HMM_Clamp(float Min, float Value, float Max) {
 	float Result = Value;
 
 	if (Result < Min) Result = Min;
@@ -449,7 +447,7 @@ FUNC_MOD float HMM_Clamp(float Min, float Value, float Max) {
 
 // Vector initialization
 
-FUNC_MOD HMM_Vec2 HMM_V2(float X, float Y) {
+static inline HMM_Vec2 HMM_V2(float X, float Y) {
 	HMM_Vec2 Result;
 	Result.X = X;
 	Result.Y = Y;
@@ -457,7 +455,7 @@ FUNC_MOD HMM_Vec2 HMM_V2(float X, float Y) {
 	return Result;
 }
 
-FUNC_MOD HMM_Vec3 HMM_V3(float X, float Y, float Z) {
+static inline HMM_Vec3 HMM_V3(float X, float Y, float Z) {
 	HMM_Vec3 Result;
 	Result.X = X;
 	Result.Y = Y;
@@ -466,7 +464,7 @@ FUNC_MOD HMM_Vec3 HMM_V3(float X, float Y, float Z) {
 	return Result;
 }
 
-FUNC_MOD HMM_Vec4 HMM_V4(float X, float Y, float Z, float W) {
+static inline HMM_Vec4 HMM_V4(float X, float Y, float Z, float W) {
 	HMM_Vec4 Result;
 
 #ifdef HANDMADE_MATH__USE_SSE
@@ -481,7 +479,7 @@ FUNC_MOD HMM_Vec4 HMM_V4(float X, float Y, float Z, float W) {
 	return Result;
 }
 
-FUNC_MOD HMM_Vec4 HMM_V4V(HMM_Vec3 Vector, float W) {
+static inline HMM_Vec4 HMM_V4V(HMM_Vec3 Vector, float W) {
 	HMM_Vec4 Result;
 
 #ifdef HANDMADE_MATH__USE_SSE
@@ -496,7 +494,7 @@ FUNC_MOD HMM_Vec4 HMM_V4V(HMM_Vec3 Vector, float W) {
 
 // Binary vector operations
 
-FUNC_MOD HMM_Vec2 HMM_AddV2(HMM_Vec2 Left, HMM_Vec2 Right) {
+static inline HMM_Vec2 HMM_AddV2(HMM_Vec2 Left, HMM_Vec2 Right) {
 	HMM_Vec2 Result;
 	Result.X = Left.X + Right.X;
 	Result.Y = Left.Y + Right.Y;
@@ -504,7 +502,7 @@ FUNC_MOD HMM_Vec2 HMM_AddV2(HMM_Vec2 Left, HMM_Vec2 Right) {
 	return Result;
 }
 
-FUNC_MOD HMM_Vec3 HMM_AddV3(HMM_Vec3 Left, HMM_Vec3 Right) {
+static inline HMM_Vec3 HMM_AddV3(HMM_Vec3 Left, HMM_Vec3 Right) {
 	HMM_Vec3 Result;
 	Result.X = Left.X + Right.X;
 	Result.Y = Left.Y + Right.Y;
@@ -513,7 +511,7 @@ FUNC_MOD HMM_Vec3 HMM_AddV3(HMM_Vec3 Left, HMM_Vec3 Right) {
 	return Result;
 }
 
-FUNC_MOD HMM_Vec4 HMM_AddV4(HMM_Vec4 Left, HMM_Vec4 Right) {
+static inline HMM_Vec4 HMM_AddV4(HMM_Vec4 Left, HMM_Vec4 Right) {
 	HMM_Vec4 Result;
 
 #ifdef HANDMADE_MATH__USE_SSE
@@ -528,7 +526,7 @@ FUNC_MOD HMM_Vec4 HMM_AddV4(HMM_Vec4 Left, HMM_Vec4 Right) {
 	return Result;
 }
 
-FUNC_MOD HMM_Vec2 HMM_SubV2(HMM_Vec2 Left, HMM_Vec2 Right) {
+static inline HMM_Vec2 HMM_SubV2(HMM_Vec2 Left, HMM_Vec2 Right) {
 	HMM_Vec2 Result;
 	Result.X = Left.X - Right.X;
 	Result.Y = Left.Y - Right.Y;
@@ -536,7 +534,7 @@ FUNC_MOD HMM_Vec2 HMM_SubV2(HMM_Vec2 Left, HMM_Vec2 Right) {
 	return Result;
 }
 
-FUNC_MOD HMM_Vec3 HMM_SubV3(HMM_Vec3 Left, HMM_Vec3 Right) {
+static inline HMM_Vec3 HMM_SubV3(HMM_Vec3 Left, HMM_Vec3 Right) {
 	HMM_Vec3 Result;
 	Result.X = Left.X - Right.X;
 	Result.Y = Left.Y - Right.Y;
@@ -545,7 +543,7 @@ FUNC_MOD HMM_Vec3 HMM_SubV3(HMM_Vec3 Left, HMM_Vec3 Right) {
 	return Result;
 }
 
-FUNC_MOD HMM_Vec4 HMM_SubV4(HMM_Vec4 Left, HMM_Vec4 Right) {
+static inline HMM_Vec4 HMM_SubV4(HMM_Vec4 Left, HMM_Vec4 Right) {
 	HMM_Vec4 Result;
 
 #ifdef HANDMADE_MATH__USE_SSE
@@ -560,7 +558,7 @@ FUNC_MOD HMM_Vec4 HMM_SubV4(HMM_Vec4 Left, HMM_Vec4 Right) {
 	return Result;
 }
 
-FUNC_MOD HMM_Vec2 HMM_MulV2(HMM_Vec2 Left, HMM_Vec2 Right) {
+static inline HMM_Vec2 HMM_MulV2(HMM_Vec2 Left, HMM_Vec2 Right) {
 	HMM_Vec2 Result;
 	Result.X = Left.X * Right.X;
 	Result.Y = Left.Y * Right.Y;
@@ -568,7 +566,7 @@ FUNC_MOD HMM_Vec2 HMM_MulV2(HMM_Vec2 Left, HMM_Vec2 Right) {
 	return Result;
 }
 
-FUNC_MOD HMM_Vec2 HMM_MulV2F(HMM_Vec2 Left, float Right) {
+static inline HMM_Vec2 HMM_MulV2F(HMM_Vec2 Left, float Right) {
 	HMM_Vec2 Result;
 	Result.X = Left.X * Right;
 	Result.Y = Left.Y * Right;
@@ -576,7 +574,7 @@ FUNC_MOD HMM_Vec2 HMM_MulV2F(HMM_Vec2 Left, float Right) {
 	return Result;
 }
 
-FUNC_MOD HMM_Vec3 HMM_MulV3(HMM_Vec3 Left, HMM_Vec3 Right) {
+static inline HMM_Vec3 HMM_MulV3(HMM_Vec3 Left, HMM_Vec3 Right) {
 	HMM_Vec3 Result;
 	Result.X = Left.X * Right.X;
 	Result.Y = Left.Y * Right.Y;
@@ -585,7 +583,7 @@ FUNC_MOD HMM_Vec3 HMM_MulV3(HMM_Vec3 Left, HMM_Vec3 Right) {
 	return Result;
 }
 
-FUNC_MOD HMM_Vec3 HMM_MulV3F(HMM_Vec3 Left, float Right) {
+static inline HMM_Vec3 HMM_MulV3F(HMM_Vec3 Left, float Right) {
 	HMM_Vec3 Result;
 	Result.X = Left.X * Right;
 	Result.Y = Left.Y * Right;
@@ -594,7 +592,7 @@ FUNC_MOD HMM_Vec3 HMM_MulV3F(HMM_Vec3 Left, float Right) {
 	return Result;
 }
 
-FUNC_MOD HMM_Vec4 HMM_MulV4(HMM_Vec4 Left, HMM_Vec4 Right) {
+static inline HMM_Vec4 HMM_MulV4(HMM_Vec4 Left, HMM_Vec4 Right) {
 	HMM_Vec4 Result;
 
 #ifdef HANDMADE_MATH__USE_SSE
@@ -609,7 +607,7 @@ FUNC_MOD HMM_Vec4 HMM_MulV4(HMM_Vec4 Left, HMM_Vec4 Right) {
 	return Result;
 }
 
-FUNC_MOD HMM_Vec4 HMM_MulV4F(HMM_Vec4 Left, float Right) {
+static inline HMM_Vec4 HMM_MulV4F(HMM_Vec4 Left, float Right) {
 	HMM_Vec4 Result;
 
 #ifdef HANDMADE_MATH__USE_SSE
@@ -625,7 +623,7 @@ FUNC_MOD HMM_Vec4 HMM_MulV4F(HMM_Vec4 Left, float Right) {
 	return Result;
 }
 
-FUNC_MOD HMM_Vec2 HMM_DivV2(HMM_Vec2 Left, HMM_Vec2 Right) {
+static inline HMM_Vec2 HMM_DivV2(HMM_Vec2 Left, HMM_Vec2 Right) {
 	HMM_Vec2 Result;
 	Result.X = Left.X / Right.X;
 	Result.Y = Left.Y / Right.Y;
@@ -633,7 +631,7 @@ FUNC_MOD HMM_Vec2 HMM_DivV2(HMM_Vec2 Left, HMM_Vec2 Right) {
 	return Result;
 }
 
-FUNC_MOD HMM_Vec2 HMM_DivV2F(HMM_Vec2 Left, float Right) {
+static inline HMM_Vec2 HMM_DivV2F(HMM_Vec2 Left, float Right) {
 	HMM_Vec2 Result;
 	Result.X = Left.X / Right;
 	Result.Y = Left.Y / Right;
@@ -641,7 +639,7 @@ FUNC_MOD HMM_Vec2 HMM_DivV2F(HMM_Vec2 Left, float Right) {
 	return Result;
 }
 
-FUNC_MOD HMM_Vec3 HMM_DivV3(HMM_Vec3 Left, HMM_Vec3 Right) {
+static inline HMM_Vec3 HMM_DivV3(HMM_Vec3 Left, HMM_Vec3 Right) {
 	HMM_Vec3 Result;
 	Result.X = Left.X / Right.X;
 	Result.Y = Left.Y / Right.Y;
@@ -650,7 +648,7 @@ FUNC_MOD HMM_Vec3 HMM_DivV3(HMM_Vec3 Left, HMM_Vec3 Right) {
 	return Result;
 }
 
-FUNC_MOD HMM_Vec3 HMM_DivV3F(HMM_Vec3 Left, float Right) {
+static inline HMM_Vec3 HMM_DivV3F(HMM_Vec3 Left, float Right) {
 	HMM_Vec3 Result;
 	Result.X = Left.X / Right;
 	Result.Y = Left.Y / Right;
@@ -659,7 +657,7 @@ FUNC_MOD HMM_Vec3 HMM_DivV3F(HMM_Vec3 Left, float Right) {
 	return Result;
 }
 
-FUNC_MOD HMM_Vec4 HMM_DivV4(HMM_Vec4 Left, HMM_Vec4 Right) {
+static inline HMM_Vec4 HMM_DivV4(HMM_Vec4 Left, HMM_Vec4 Right) {
 	HMM_Vec4 Result;
 
 #ifdef HANDMADE_MATH__USE_SSE
@@ -674,7 +672,7 @@ FUNC_MOD HMM_Vec4 HMM_DivV4(HMM_Vec4 Left, HMM_Vec4 Right) {
 	return Result;
 }
 
-FUNC_MOD HMM_Vec4 HMM_DivV4F(HMM_Vec4 Left, float Right) {
+static inline HMM_Vec4 HMM_DivV4F(HMM_Vec4 Left, float Right) {
 	HMM_Vec4 Result;
 
 #ifdef HANDMADE_MATH__USE_SSE
@@ -690,27 +688,27 @@ FUNC_MOD HMM_Vec4 HMM_DivV4F(HMM_Vec4 Left, float Right) {
 	return Result;
 }
 
-FUNC_MOD HMM_Bool HMM_EqV2(HMM_Vec2 Left, HMM_Vec2 Right) {
+static inline HMM_Bool HMM_EqV2(HMM_Vec2 Left, HMM_Vec2 Right) {
 	return Left.X == Right.X && Left.Y == Right.Y;
 }
 
-FUNC_MOD HMM_Bool HMM_EqV3(HMM_Vec3 Left, HMM_Vec3 Right) {
+static inline HMM_Bool HMM_EqV3(HMM_Vec3 Left, HMM_Vec3 Right) {
 	return Left.X == Right.X && Left.Y == Right.Y && Left.Z == Right.Z;
 }
 
-FUNC_MOD HMM_Bool HMM_EqV4(HMM_Vec4 Left, HMM_Vec4 Right) {
+static inline HMM_Bool HMM_EqV4(HMM_Vec4 Left, HMM_Vec4 Right) {
 	return Left.X == Right.X && Left.Y == Right.Y && Left.Z == Right.Z && Left.W == Right.W;
 }
 
-FUNC_MOD float HMM_DotV2(HMM_Vec2 Left, HMM_Vec2 Right) {
+static inline float HMM_DotV2(HMM_Vec2 Left, HMM_Vec2 Right) {
 	return (Left.X * Right.X) + (Left.Y * Right.Y);
 }
 
-FUNC_MOD float HMM_DotV3(HMM_Vec3 Left, HMM_Vec3 Right) {
+static inline float HMM_DotV3(HMM_Vec3 Left, HMM_Vec3 Right) {
 	return (Left.X * Right.X) + (Left.Y * Right.Y) + (Left.Z * Right.Z);
 }
 
-FUNC_MOD float HMM_DotV4(HMM_Vec4 Left, HMM_Vec4 Right) {
+static inline float HMM_DotV4(HMM_Vec4 Left, HMM_Vec4 Right) {
 	float Result;
 
 	// NOTE(zak): IN the future if we wanna check what version SSE is support
@@ -730,7 +728,7 @@ FUNC_MOD float HMM_DotV4(HMM_Vec4 Left, HMM_Vec4 Right) {
 	return Result;
 }
 
-FUNC_MOD HMM_Vec3 HMM_Cross(HMM_Vec3 Left, HMM_Vec3 Right) {
+static inline HMM_Vec3 HMM_Cross(HMM_Vec3 Left, HMM_Vec3 Right) {
 	HMM_Vec3 Result;
 	Result.X = (Left.Y * Right.Z) - (Left.Z * Right.Y);
 	Result.Y = (Left.Z * Right.X) - (Left.X * Right.Z);
@@ -741,59 +739,59 @@ FUNC_MOD HMM_Vec3 HMM_Cross(HMM_Vec3 Left, HMM_Vec3 Right) {
 
 // Unary vector operations
 
-FUNC_MOD float HMM_LenSqrV2(HMM_Vec2 A) {
+static inline float HMM_LenSqrV2(HMM_Vec2 A) {
 	return HMM_DotV2(A, A);
 }
 
-FUNC_MOD float HMM_LenSqrV3(HMM_Vec3 A) {
+static inline float HMM_LenSqrV3(HMM_Vec3 A) {
 	return HMM_DotV3(A, A);
 }
 
-FUNC_MOD float HMM_LenSqrV4(HMM_Vec4 A) {
+static inline float HMM_LenSqrV4(HMM_Vec4 A) {
 	return HMM_DotV4(A, A);
 }
 
-FUNC_MOD float HMM_LenV2(HMM_Vec2 A) {
+static inline float HMM_LenV2(HMM_Vec2 A) {
 	return HMM_SqrtF(HMM_LenSqrV2(A));
 }
 
-FUNC_MOD float HMM_LenV3(HMM_Vec3 A) {
+static inline float HMM_LenV3(HMM_Vec3 A) {
 	return HMM_SqrtF(HMM_LenSqrV3(A));
 }
 
-FUNC_MOD float HMM_LenV4(HMM_Vec4 A) {
+static inline float HMM_LenV4(HMM_Vec4 A) {
 	return HMM_SqrtF(HMM_LenSqrV4(A));
 }
 
-FUNC_MOD HMM_Vec2 HMM_NormV2(HMM_Vec2 A) {
+static inline HMM_Vec2 HMM_NormV2(HMM_Vec2 A) {
 	return HMM_MulV2F(A, HMM_InvSqrtF(HMM_DotV2(A, A)));
 }
 
-FUNC_MOD HMM_Vec3 HMM_NormV3(HMM_Vec3 A) {
+static inline HMM_Vec3 HMM_NormV3(HMM_Vec3 A) {
 	return HMM_MulV3F(A, HMM_InvSqrtF(HMM_DotV3(A, A)));
 }
 
-FUNC_MOD HMM_Vec4 HMM_NormV4(HMM_Vec4 A) {
+static inline HMM_Vec4 HMM_NormV4(HMM_Vec4 A) {
 	return HMM_MulV4F(A, HMM_InvSqrtF(HMM_DotV4(A, A)));
 }
 
 // Utility vector functions
 
-FUNC_MOD HMM_Vec2 HMM_LerpV2(HMM_Vec2 A, float Time, HMM_Vec2 B) {
+static inline HMM_Vec2 HMM_LerpV2(HMM_Vec2 A, float Time, HMM_Vec2 B) {
 	return HMM_AddV2(HMM_MulV2F(A, 1.0f - Time), HMM_MulV2F(B, Time));
 }
 
-FUNC_MOD HMM_Vec3 HMM_LerpV3(HMM_Vec3 A, float Time, HMM_Vec3 B) {
+static inline HMM_Vec3 HMM_LerpV3(HMM_Vec3 A, float Time, HMM_Vec3 B) {
 	return HMM_AddV3(HMM_MulV3F(A, 1.0f - Time), HMM_MulV3F(B, Time));
 }
 
-FUNC_MOD HMM_Vec4 HMM_LerpV4(HMM_Vec4 A, float Time, HMM_Vec4 B) {
+static inline HMM_Vec4 HMM_LerpV4(HMM_Vec4 A, float Time, HMM_Vec4 B) {
 	return HMM_AddV4(HMM_MulV4F(A, 1.0f - Time), HMM_MulV4F(B, Time));
 }
 
 // SSE stuff
 
-FUNC_MOD HMM_Vec4 HMM_LinearCombineV4M4(HMM_Vec4 Left, HMM_Mat4 Right) {
+static inline HMM_Vec4 HMM_LinearCombineV4M4(HMM_Vec4 Left, HMM_Mat4 Right) {
 	HMM_Vec4 Result;
 
 #ifdef HANDMADE_MATH__USE_SSE
@@ -828,12 +826,12 @@ FUNC_MOD HMM_Vec4 HMM_LinearCombineV4M4(HMM_Vec4 Left, HMM_Mat4 Right) {
 
 // 2x2 Matrices
 
-FUNC_MOD HMM_Mat2 HMM_M2(void) {
+static inline HMM_Mat2 HMM_M2(void) {
 	HMM_Mat2 Result = {0};
 	return Result;
 }
 
-FUNC_MOD HMM_Mat2 HMM_M2D(float Diagonal) {
+static inline HMM_Mat2 HMM_M2D(float Diagonal) {
 	HMM_Mat2 Result = {0};
 	Result.Elements[0][0] = Diagonal;
 	Result.Elements[1][1] = Diagonal;
@@ -841,7 +839,7 @@ FUNC_MOD HMM_Mat2 HMM_M2D(float Diagonal) {
 	return Result;
 }
 
-FUNC_MOD HMM_Mat2 HMM_TransposeM2(HMM_Mat2 Matrix) {
+static inline HMM_Mat2 HMM_TransposeM2(HMM_Mat2 Matrix) {
 	HMM_Mat2 Result = Matrix;
 
 	Result.Elements[0][1] = Matrix.Elements[1][0];
@@ -850,7 +848,7 @@ FUNC_MOD HMM_Mat2 HMM_TransposeM2(HMM_Mat2 Matrix) {
 	return Result;
 }
 
-FUNC_MOD HMM_Mat2 HMM_AddM2(HMM_Mat2 Left, HMM_Mat2 Right) {
+static inline HMM_Mat2 HMM_AddM2(HMM_Mat2 Left, HMM_Mat2 Right) {
 	HMM_Mat2 Result;
 
 	Result.Elements[0][0] = Left.Elements[0][0] + Right.Elements[0][0];
@@ -861,7 +859,7 @@ FUNC_MOD HMM_Mat2 HMM_AddM2(HMM_Mat2 Left, HMM_Mat2 Right) {
 	return Result;    
 }
 
-FUNC_MOD HMM_Mat2 HMM_SubM2(HMM_Mat2 Left, HMM_Mat2 Right) {
+static inline HMM_Mat2 HMM_SubM2(HMM_Mat2 Left, HMM_Mat2 Right) {
 	HMM_Mat2 Result;
 
 	Result.Elements[0][0] = Left.Elements[0][0] - Right.Elements[0][0];
@@ -872,7 +870,7 @@ FUNC_MOD HMM_Mat2 HMM_SubM2(HMM_Mat2 Left, HMM_Mat2 Right) {
 	return Result;
 }
 
-FUNC_MOD HMM_Vec2 HMM_MulM2V2(HMM_Mat2 Matrix, HMM_Vec2 Vector) {
+static inline HMM_Vec2 HMM_MulM2V2(HMM_Mat2 Matrix, HMM_Vec2 Vector) {
 	HMM_Vec2 Result;
 
 	Result.X = Vector.Elements[0] * Matrix.Columns[0].X;
@@ -884,7 +882,7 @@ FUNC_MOD HMM_Vec2 HMM_MulM2V2(HMM_Mat2 Matrix, HMM_Vec2 Vector) {
 	return Result;    
 }
 
-FUNC_MOD HMM_Mat2 HMM_MulM2(HMM_Mat2 Left, HMM_Mat2 Right) {
+static inline HMM_Mat2 HMM_MulM2(HMM_Mat2 Left, HMM_Mat2 Right) {
 	HMM_Mat2 Result;
 	Result.Columns[0] = HMM_MulM2V2(Left, Right.Columns[0]);
 	Result.Columns[1] = HMM_MulM2V2(Left, Right.Columns[1]);
@@ -892,7 +890,7 @@ FUNC_MOD HMM_Mat2 HMM_MulM2(HMM_Mat2 Left, HMM_Mat2 Right) {
 	return Result;    
 }
 
-FUNC_MOD HMM_Mat2 HMM_MulM2F(HMM_Mat2 Matrix, float Scalar) {
+static inline HMM_Mat2 HMM_MulM2F(HMM_Mat2 Matrix, float Scalar) {
 	HMM_Mat2 Result;
 
 	Result.Elements[0][0] = Matrix.Elements[0][0] * Scalar;
@@ -903,7 +901,7 @@ FUNC_MOD HMM_Mat2 HMM_MulM2F(HMM_Mat2 Matrix, float Scalar) {
 	return Result;
 }
 
-FUNC_MOD HMM_Mat2 HMM_DivM2F(HMM_Mat2 Matrix, float Scalar) {
+static inline HMM_Mat2 HMM_DivM2F(HMM_Mat2 Matrix, float Scalar) {
 	HMM_Mat2 Result;
 
 	Result.Elements[0][0] = Matrix.Elements[0][0] / Scalar;
@@ -914,11 +912,11 @@ FUNC_MOD HMM_Mat2 HMM_DivM2F(HMM_Mat2 Matrix, float Scalar) {
 	return Result;
 }
 
-FUNC_MOD float HMM_DeterminantM2(HMM_Mat2 Matrix) {
+static inline float HMM_DeterminantM2(HMM_Mat2 Matrix) {
 	return Matrix.Elements[0][0] * Matrix.Elements[1][1] - Matrix.Elements[0][1] * Matrix.Elements[1][0];
 }
 
-FUNC_MOD HMM_Mat2 HMM_InvGeneralM2(HMM_Mat2 Matrix) {
+static inline HMM_Mat2 HMM_InvGeneralM2(HMM_Mat2 Matrix) {
 	HMM_Mat2 Result;
 	float InvDeterminant = 1.0f / HMM_DeterminantM2(Matrix);
 	Result.Elements[0][0] = InvDeterminant * +Matrix.Elements[1][1];
@@ -931,11 +929,11 @@ FUNC_MOD HMM_Mat2 HMM_InvGeneralM2(HMM_Mat2 Matrix) {
 
 // 3x3 Matrices
 
-FUNC_MOD HMM_Mat3 HMM_M3(void) {
+static inline HMM_Mat3 HMM_M3(void) {
 	return (HMM_Mat3) {0};
 }
 
-FUNC_MOD HMM_Mat3 HMM_M3D(float Diagonal) {
+static inline HMM_Mat3 HMM_M3D(float Diagonal) {
 	HMM_Mat3 Result = {0};
 	
 	Result.Elements[0][0] = Diagonal;
@@ -945,7 +943,7 @@ FUNC_MOD HMM_Mat3 HMM_M3D(float Diagonal) {
 	return Result;
 }
 
-FUNC_MOD HMM_Mat3 HMM_TransposeM3(HMM_Mat3 Matrix) {
+static inline HMM_Mat3 HMM_TransposeM3(HMM_Mat3 Matrix) {
 	HMM_Mat3 Result = Matrix;
 
 	Result.Elements[0][1] = Matrix.Elements[1][0];
@@ -958,7 +956,7 @@ FUNC_MOD HMM_Mat3 HMM_TransposeM3(HMM_Mat3 Matrix) {
 	return Result;
 }
 
-FUNC_MOD HMM_Mat3 HMM_AddM3(HMM_Mat3 Left, HMM_Mat3 Right) {
+static inline HMM_Mat3 HMM_AddM3(HMM_Mat3 Left, HMM_Mat3 Right) {
 	HMM_Mat3 Result;
 	
 	Result.Elements[0][0] = Left.Elements[0][0] + Right.Elements[0][0];
@@ -974,7 +972,7 @@ FUNC_MOD HMM_Mat3 HMM_AddM3(HMM_Mat3 Left, HMM_Mat3 Right) {
 	return Result;    
 }
 
-FUNC_MOD HMM_Mat3 HMM_SubM3(HMM_Mat3 Left, HMM_Mat3 Right) {
+static inline HMM_Mat3 HMM_SubM3(HMM_Mat3 Left, HMM_Mat3 Right) {
 	HMM_Mat3 Result;
 
 	Result.Elements[0][0] = Left.Elements[0][0] - Right.Elements[0][0];
@@ -990,7 +988,7 @@ FUNC_MOD HMM_Mat3 HMM_SubM3(HMM_Mat3 Left, HMM_Mat3 Right) {
 	return Result;
 }
 
-FUNC_MOD HMM_Vec3 HMM_MulM3V3(HMM_Mat3 Matrix, HMM_Vec3 Vector) {
+static inline HMM_Vec3 HMM_MulM3V3(HMM_Mat3 Matrix, HMM_Vec3 Vector) {
 	HMM_Vec3 Result;
 
 	Result.X = Vector.Elements[0] * Matrix.Columns[0].X;
@@ -1008,7 +1006,7 @@ FUNC_MOD HMM_Vec3 HMM_MulM3V3(HMM_Mat3 Matrix, HMM_Vec3 Vector) {
 	return Result;    
 }
 
-FUNC_MOD HMM_Mat3 HMM_MulM3(HMM_Mat3 Left, HMM_Mat3 Right) {
+static inline HMM_Mat3 HMM_MulM3(HMM_Mat3 Left, HMM_Mat3 Right) {
 	HMM_Mat3 Result;
 	Result.Columns[0] = HMM_MulM3V3(Left, Right.Columns[0]);
 	Result.Columns[1] = HMM_MulM3V3(Left, Right.Columns[1]);
@@ -1017,7 +1015,7 @@ FUNC_MOD HMM_Mat3 HMM_MulM3(HMM_Mat3 Left, HMM_Mat3 Right) {
 	return Result;    
 }
 
-FUNC_MOD HMM_Mat3 HMM_MulM3F(HMM_Mat3 Matrix, float Scalar) {
+static inline HMM_Mat3 HMM_MulM3F(HMM_Mat3 Matrix, float Scalar) {
 	HMM_Mat3 Result;
 
 	Result.Elements[0][0] = Matrix.Elements[0][0] * Scalar;
@@ -1033,7 +1031,7 @@ FUNC_MOD HMM_Mat3 HMM_MulM3F(HMM_Mat3 Matrix, float Scalar) {
 	return Result;            
 }
 
-FUNC_MOD HMM_Mat3 HMM_DivM3F(HMM_Mat3 Matrix, float Scalar) {
+static inline HMM_Mat3 HMM_DivM3F(HMM_Mat3 Matrix, float Scalar) {
 	HMM_Mat3 Result;
 	
 	Result.Elements[0][0] = Matrix.Elements[0][0] / Scalar;
@@ -1049,7 +1047,7 @@ FUNC_MOD HMM_Mat3 HMM_DivM3F(HMM_Mat3 Matrix, float Scalar) {
 	return Result;                    
 }
 
-FUNC_MOD float HMM_DeterminantM3(HMM_Mat3 Matrix) {
+static inline float HMM_DeterminantM3(HMM_Mat3 Matrix) {
 	HMM_Mat3 Cross;
 
 	Cross.Columns[0] = HMM_Cross(Matrix.Columns[1], Matrix.Columns[2]);
@@ -1059,7 +1057,7 @@ FUNC_MOD float HMM_DeterminantM3(HMM_Mat3 Matrix) {
 	return HMM_DotV3(Cross.Columns[2], Matrix.Columns[2]);
 }
 
-FUNC_MOD HMM_Mat3 HMM_InvGeneralM3(HMM_Mat3 Matrix) {
+static inline HMM_Mat3 HMM_InvGeneralM3(HMM_Mat3 Matrix) {
 	HMM_Mat3 Cross;
 
 	Cross.Columns[0] = HMM_Cross(Matrix.Columns[1], Matrix.Columns[2]);
@@ -1078,11 +1076,11 @@ FUNC_MOD HMM_Mat3 HMM_InvGeneralM3(HMM_Mat3 Matrix) {
 
 // 4x4 Matrices
 
-FUNC_MOD HMM_Mat4 HMM_M4(void) {
+static inline HMM_Mat4 HMM_M4(void) {
 	return (HMM_Mat4) {0};
 }
 
-FUNC_MOD HMM_Mat4 HMM_M4D(float Diagonal) {
+static inline HMM_Mat4 HMM_M4D(float Diagonal) {
 	HMM_Mat4 Result = {0};
 
 	Result.Elements[0][0] = Diagonal;
@@ -1093,7 +1091,7 @@ FUNC_MOD HMM_Mat4 HMM_M4D(float Diagonal) {
 	return Result;
 }
 
-FUNC_MOD HMM_Mat4 HMM_TransposeM4(HMM_Mat4 Matrix) {
+static inline HMM_Mat4 HMM_TransposeM4(HMM_Mat4 Matrix) {
 	HMM_Mat4 Result = Matrix;
 
 #ifdef HANDMADE_MATH__USE_SSE
@@ -1116,7 +1114,7 @@ FUNC_MOD HMM_Mat4 HMM_TransposeM4(HMM_Mat4 Matrix) {
 	return Result;
 }
 
-FUNC_MOD HMM_Mat4 HMM_AddM4(HMM_Mat4 Left, HMM_Mat4 Right) {
+static inline HMM_Mat4 HMM_AddM4(HMM_Mat4 Left, HMM_Mat4 Right) {
 	HMM_Mat4 Result;
 
 #ifdef HANDMADE_MATH__USE_SSE
@@ -1146,7 +1144,7 @@ FUNC_MOD HMM_Mat4 HMM_AddM4(HMM_Mat4 Left, HMM_Mat4 Right) {
 	return Result;
 }
 
-FUNC_MOD HMM_Mat4 HMM_SubM4(HMM_Mat4 Left, HMM_Mat4 Right) {
+static inline HMM_Mat4 HMM_SubM4(HMM_Mat4 Left, HMM_Mat4 Right) {
 	HMM_Mat4 Result;
 
 #ifdef HANDMADE_MATH__USE_SSE
@@ -1176,7 +1174,7 @@ FUNC_MOD HMM_Mat4 HMM_SubM4(HMM_Mat4 Left, HMM_Mat4 Right) {
 	return Result;
 }
 
-FUNC_MOD HMM_Mat4 HMM_MulM4(HMM_Mat4 Left, HMM_Mat4 Right) {
+static inline HMM_Mat4 HMM_MulM4(HMM_Mat4 Left, HMM_Mat4 Right) {
 	HMM_Mat4 Result;
 
 	Result.Columns[0] = HMM_LinearCombineV4M4(Right.Columns[0], Left);
@@ -1187,7 +1185,7 @@ FUNC_MOD HMM_Mat4 HMM_MulM4(HMM_Mat4 Left, HMM_Mat4 Right) {
 	return Result;
 }
 
-FUNC_MOD HMM_Mat4 HMM_MulM4F(HMM_Mat4 Matrix, float Scalar) {
+static inline HMM_Mat4 HMM_MulM4F(HMM_Mat4 Matrix, float Scalar) {
 	HMM_Mat4 Result;
 
 #ifdef HANDMADE_MATH__USE_SSE
@@ -1218,11 +1216,11 @@ FUNC_MOD HMM_Mat4 HMM_MulM4F(HMM_Mat4 Matrix, float Scalar) {
 	return Result;
 }
 
-FUNC_MOD HMM_Vec4 HMM_MulM4V4(HMM_Mat4 Matrix, HMM_Vec4 Vector) {
+static inline HMM_Vec4 HMM_MulM4V4(HMM_Mat4 Matrix, HMM_Vec4 Vector) {
 	return HMM_LinearCombineV4M4(Vector, Matrix);
 }
 
-FUNC_MOD HMM_Mat4 HMM_DivM4F(HMM_Mat4 Matrix, float Scalar) {
+static inline HMM_Mat4 HMM_DivM4F(HMM_Mat4 Matrix, float Scalar) {
 	HMM_Mat4 Result;
 
 #ifdef HANDMADE_MATH__USE_SSE
@@ -1253,7 +1251,7 @@ FUNC_MOD HMM_Mat4 HMM_DivM4F(HMM_Mat4 Matrix, float Scalar) {
 	return Result;
 }
 
-FUNC_MOD float HMM_DeterminantM4(HMM_Mat4 Matrix) {
+static inline float HMM_DeterminantM4(HMM_Mat4 Matrix) {
 	HMM_Vec3 C01 = HMM_Cross(Matrix.Columns[0].XYZ, Matrix.Columns[1].XYZ);
 	HMM_Vec3 C23 = HMM_Cross(Matrix.Columns[2].XYZ, Matrix.Columns[3].XYZ);
 	HMM_Vec3 B10 = HMM_SubV3(HMM_MulV3F(Matrix.Columns[0].XYZ, Matrix.Columns[1].W), HMM_MulV3F(Matrix.Columns[1].XYZ, Matrix.Columns[0].W));
@@ -1264,7 +1262,7 @@ FUNC_MOD float HMM_DeterminantM4(HMM_Mat4 Matrix) {
 
 // Returns a general-purpose inverse of an HMM_Mat4. Note that special-purpose inverses of many transformations
 // are available and will be more efficient.
-FUNC_MOD HMM_Mat4 HMM_InvGeneralM4(HMM_Mat4 Matrix) {
+static inline HMM_Mat4 HMM_InvGeneralM4(HMM_Mat4 Matrix) {
 	HMM_Vec3 C01 = HMM_Cross(Matrix.Columns[0].XYZ, Matrix.Columns[1].XYZ);
 	HMM_Vec3 C23 = HMM_Cross(Matrix.Columns[2].XYZ, Matrix.Columns[3].XYZ);
 	HMM_Vec3 B10 = HMM_SubV3(HMM_MulV3F(Matrix.Columns[0].XYZ, Matrix.Columns[1].W), HMM_MulV3F(Matrix.Columns[1].XYZ, Matrix.Columns[0].W));
@@ -1290,7 +1288,7 @@ FUNC_MOD HMM_Mat4 HMM_InvGeneralM4(HMM_Mat4 Matrix) {
 // Produces a right-handed orthographic projection matrix with Z ranging from -1 to 1 (the GL convention).
 // Left, Right, Bottom, and Top specify the coordinates of their respective clipping planes.
 // Near and Far specify the distances to the near and far clipping planes.
-FUNC_MOD HMM_Mat4 HMM_Orthographic_RH_NO(float Left, float Right, float Bottom, float Top, float Near, float Far) {
+static inline HMM_Mat4 HMM_Orthographic_RH_NO(float Left, float Right, float Bottom, float Top, float Near, float Far) {
 	HMM_Mat4 Result = {0};
 
 	Result.Elements[0][0] = 2.0f / (Right - Left);
@@ -1308,7 +1306,7 @@ FUNC_MOD HMM_Mat4 HMM_Orthographic_RH_NO(float Left, float Right, float Bottom, 
 // Produces a right-handed orthographic projection matrix with Z ranging from 0 to 1 (the DirectX convention).
 // Left, Right, Bottom, and Top specify the coordinates of their respective clipping planes.
 // Near and Far specify the distances to the near and far clipping planes.
-FUNC_MOD HMM_Mat4 HMM_Orthographic_RH_ZO(float Left, float Right, float Bottom, float Top, float Near, float Far) {
+static inline HMM_Mat4 HMM_Orthographic_RH_ZO(float Left, float Right, float Bottom, float Top, float Near, float Far) {
 	HMM_Mat4 Result = {0};
 
 	Result.Elements[0][0] = 2.0f / (Right - Left);
@@ -1326,7 +1324,7 @@ FUNC_MOD HMM_Mat4 HMM_Orthographic_RH_ZO(float Left, float Right, float Bottom, 
 // Produces a left-handed orthographic projection matrix with Z ranging from -1 to 1 (the GL convention).
 // Left, Right, Bottom, and Top specify the coordinates of their respective clipping planes.
 // Near and Far specify the distances to the near and far clipping planes.
-FUNC_MOD HMM_Mat4 HMM_Orthographic_LH_NO(float Left, float Right, float Bottom, float Top, float Near, float Far) {
+static inline HMM_Mat4 HMM_Orthographic_LH_NO(float Left, float Right, float Bottom, float Top, float Near, float Far) {
 	HMM_Mat4 Result = HMM_Orthographic_RH_NO(Left, Right, Bottom, Top, Near, Far);
 	Result.Elements[2][2] = -Result.Elements[2][2];
 	
@@ -1336,7 +1334,7 @@ FUNC_MOD HMM_Mat4 HMM_Orthographic_LH_NO(float Left, float Right, float Bottom, 
 // Produces a left-handed orthographic projection matrix with Z ranging from 0 to 1 (the DirectX convention).
 // Left, Right, Bottom, and Top specify the coordinates of their respective clipping planes.
 // Near and Far specify the distances to the near and far clipping planes.
-FUNC_MOD HMM_Mat4 HMM_Orthographic_LH_ZO(float Left, float Right, float Bottom, float Top, float Near, float Far) {
+static inline HMM_Mat4 HMM_Orthographic_LH_ZO(float Left, float Right, float Bottom, float Top, float Near, float Far) {
 	HMM_Mat4 Result = HMM_Orthographic_RH_ZO(Left, Right, Bottom, Top, Near, Far);
 	Result.Elements[2][2] = -Result.Elements[2][2];
 	
@@ -1345,7 +1343,7 @@ FUNC_MOD HMM_Mat4 HMM_Orthographic_LH_ZO(float Left, float Right, float Bottom, 
 
 // Returns an inverse for the given orthographic projection matrix. Works for all orthographic
 // projection matrices, regardless of handedness or NDC convention.
-FUNC_MOD HMM_Mat4 HMM_InvOrthographic(HMM_Mat4 OrthoMatrix) {
+static inline HMM_Mat4 HMM_InvOrthographic(HMM_Mat4 OrthoMatrix) {
 	HMM_Mat4 Result = {0};
 	Result.Elements[0][0] = 1.0f / OrthoMatrix.Elements[0][0];
 	Result.Elements[1][1] = 1.0f / OrthoMatrix.Elements[1][1];
@@ -1359,7 +1357,7 @@ FUNC_MOD HMM_Mat4 HMM_InvOrthographic(HMM_Mat4 OrthoMatrix) {
 	return Result;
 }
 
-FUNC_MOD HMM_Mat4 HMM_Perspective_RH_NO(float FOV, float AspectRatio, float Near, float Far) {
+static inline HMM_Mat4 HMM_Perspective_RH_NO(float FOV, float AspectRatio, float Near, float Far) {
 	HMM_Mat4 Result = {0};
 
 	// See https://www.khronos.org/registry/OpenGL-Refpages/gl2.1/xhtml/gluPerspective.xml
@@ -1376,7 +1374,7 @@ FUNC_MOD HMM_Mat4 HMM_Perspective_RH_NO(float FOV, float AspectRatio, float Near
 	return Result;
 }
 
-FUNC_MOD HMM_Mat4 HMM_Perspective_RH_ZO(float FOV, float AspectRatio, float Near, float Far) {
+static inline HMM_Mat4 HMM_Perspective_RH_ZO(float FOV, float AspectRatio, float Near, float Far) {
 	HMM_Mat4 Result = {0};
 
 	// See https://www.khronos.org/registry/OpenGL-Refpages/gl2.1/xhtml/gluPerspective.xml
@@ -1393,7 +1391,7 @@ FUNC_MOD HMM_Mat4 HMM_Perspective_RH_ZO(float FOV, float AspectRatio, float Near
 	return Result;
 }
 
-FUNC_MOD HMM_Mat4 HMM_Perspective_LH_NO(float FOV, float AspectRatio, float Near, float Far) { 
+static inline HMM_Mat4 HMM_Perspective_LH_NO(float FOV, float AspectRatio, float Near, float Far) { 
 	HMM_Mat4 Result = HMM_Perspective_RH_NO(FOV, AspectRatio, Near, Far);
 	Result.Elements[2][2] = -Result.Elements[2][2];
 	Result.Elements[2][3] = -Result.Elements[2][3];
@@ -1401,7 +1399,7 @@ FUNC_MOD HMM_Mat4 HMM_Perspective_LH_NO(float FOV, float AspectRatio, float Near
 	return Result;
 }
 
-FUNC_MOD HMM_Mat4 HMM_Perspective_LH_ZO(float FOV, float AspectRatio, float Near, float Far) { 
+static inline HMM_Mat4 HMM_Perspective_LH_ZO(float FOV, float AspectRatio, float Near, float Far) { 
 	HMM_Mat4 Result = HMM_Perspective_RH_ZO(FOV, AspectRatio, Near, Far);
 	Result.Elements[2][2] = -Result.Elements[2][2];
 	Result.Elements[2][3] = -Result.Elements[2][3];
@@ -1409,7 +1407,7 @@ FUNC_MOD HMM_Mat4 HMM_Perspective_LH_ZO(float FOV, float AspectRatio, float Near
 	return Result;
 }
 
-FUNC_MOD HMM_Mat4 HMM_InvPerspective_RH(HMM_Mat4 PerspectiveMatrix) {
+static inline HMM_Mat4 HMM_InvPerspective_RH(HMM_Mat4 PerspectiveMatrix) {
 	HMM_Mat4 Result = {0};
 	
 	Result.Elements[0][0] = 1.0f / PerspectiveMatrix.Elements[0][0];
@@ -1423,7 +1421,7 @@ FUNC_MOD HMM_Mat4 HMM_InvPerspective_RH(HMM_Mat4 PerspectiveMatrix) {
 	return Result;
 }
 
-FUNC_MOD HMM_Mat4 HMM_InvPerspective_LH(HMM_Mat4 PerspectiveMatrix) {
+static inline HMM_Mat4 HMM_InvPerspective_LH(HMM_Mat4 PerspectiveMatrix) {
 	HMM_Mat4 Result = {0};
 
 	Result.Elements[0][0] = 1.0f / PerspectiveMatrix.Elements[0][0];
@@ -1437,7 +1435,7 @@ FUNC_MOD HMM_Mat4 HMM_InvPerspective_LH(HMM_Mat4 PerspectiveMatrix) {
 	return Result;
 }
 
-FUNC_MOD HMM_Mat4 HMM_Translate(HMM_Vec3 Translation) {
+static inline HMM_Mat4 HMM_Translate(HMM_Vec3 Translation) {
 	HMM_Mat4 Result = HMM_M4D(1.0f);
 
 	Result.Elements[3][0] = Translation.X;
@@ -1447,7 +1445,7 @@ FUNC_MOD HMM_Mat4 HMM_Translate(HMM_Vec3 Translation) {
 	return Result;
 }
 
-FUNC_MOD HMM_Mat4 HMM_InvTranslate(HMM_Mat4 TranslationMatrix) {
+static inline HMM_Mat4 HMM_InvTranslate(HMM_Mat4 TranslationMatrix) {
 	HMM_Mat4 Result = TranslationMatrix;
 
 	Result.Elements[3][0] = -Result.Elements[3][0];
@@ -1457,7 +1455,7 @@ FUNC_MOD HMM_Mat4 HMM_InvTranslate(HMM_Mat4 TranslationMatrix) {
 	return Result;
 }
 
-FUNC_MOD HMM_Mat4 HMM_Rotate_RH(float Angle, HMM_Vec3 Axis) {
+static inline HMM_Mat4 HMM_Rotate_RH(float Angle, HMM_Vec3 Axis) {
 	HMM_Mat4 Result = HMM_M4D(1.0f);
 
 	Axis = HMM_NormV3(Axis);
@@ -1481,16 +1479,16 @@ FUNC_MOD HMM_Mat4 HMM_Rotate_RH(float Angle, HMM_Vec3 Axis) {
 	return Result;
 }
 
-FUNC_MOD HMM_Mat4 HMM_Rotate_LH(float Angle, HMM_Vec3 Axis) {
+static inline HMM_Mat4 HMM_Rotate_LH(float Angle, HMM_Vec3 Axis) {
 	// NOTE(lcf): Matrix will be inverse/transpose of RH.
 	return HMM_Rotate_RH(-Angle, Axis);
 }
 
-FUNC_MOD HMM_Mat4 HMM_InvRotate(HMM_Mat4 RotationMatrix) {
+static inline HMM_Mat4 HMM_InvRotate(HMM_Mat4 RotationMatrix) {
 	return HMM_TransposeM4(RotationMatrix);
 }
 
-FUNC_MOD HMM_Mat4 HMM_Scale(HMM_Vec3 Scale) {
+static inline HMM_Mat4 HMM_Scale(HMM_Vec3 Scale) {
 	HMM_Mat4 Result = HMM_M4D(1.0f);
 
 	Result.Elements[0][0] = Scale.X;
@@ -1500,7 +1498,7 @@ FUNC_MOD HMM_Mat4 HMM_Scale(HMM_Vec3 Scale) {
 	return Result;
 }
 
-FUNC_MOD HMM_Mat4 HMM_InvScale(HMM_Mat4 ScaleMatrix) {
+static inline HMM_Mat4 HMM_InvScale(HMM_Mat4 ScaleMatrix) {
 	HMM_Mat4 Result = ScaleMatrix;
 
 	Result.Elements[0][0] = 1.0f / Result.Elements[0][0];
@@ -1510,7 +1508,7 @@ FUNC_MOD HMM_Mat4 HMM_InvScale(HMM_Mat4 ScaleMatrix) {
 	return Result;
 }
 
-FUNC_MOD HMM_Mat4 _HMM_LookAt(HMM_Vec3 F,  HMM_Vec3 S, HMM_Vec3 U,  HMM_Vec3 Eye) {
+static inline HMM_Mat4 _HMM_LookAt(HMM_Vec3 F,  HMM_Vec3 S, HMM_Vec3 U,  HMM_Vec3 Eye) {
 	HMM_Mat4 Result;
 
 	Result.Elements[0][0] = S.X;
@@ -1536,7 +1534,7 @@ FUNC_MOD HMM_Mat4 _HMM_LookAt(HMM_Vec3 F,  HMM_Vec3 S, HMM_Vec3 U,  HMM_Vec3 Eye
 	return Result;
 }
 
-FUNC_MOD HMM_Mat4 HMM_LookAt_RH(HMM_Vec3 Eye, HMM_Vec3 Center, HMM_Vec3 Up) {
+static inline HMM_Mat4 HMM_LookAt_RH(HMM_Vec3 Eye, HMM_Vec3 Center, HMM_Vec3 Up) {
 	HMM_Vec3 F = HMM_NormV3(HMM_SubV3(Center, Eye));
 	HMM_Vec3 S = HMM_NormV3(HMM_Cross(F, Up));
 	HMM_Vec3 U = HMM_Cross(S, F);
@@ -1544,7 +1542,7 @@ FUNC_MOD HMM_Mat4 HMM_LookAt_RH(HMM_Vec3 Eye, HMM_Vec3 Center, HMM_Vec3 Up) {
 	return _HMM_LookAt(F, S, U, Eye);
 }
 
-FUNC_MOD HMM_Mat4 HMM_LookAt_LH(HMM_Vec3 Eye, HMM_Vec3 Center, HMM_Vec3 Up) {
+static inline HMM_Mat4 HMM_LookAt_LH(HMM_Vec3 Eye, HMM_Vec3 Center, HMM_Vec3 Up) {
 	HMM_Vec3 F = HMM_NormV3(HMM_SubV3(Eye, Center));
 	HMM_Vec3 S = HMM_NormV3(HMM_Cross(F, Up));
 	HMM_Vec3 U = HMM_Cross(S, F);
@@ -1552,7 +1550,7 @@ FUNC_MOD HMM_Mat4 HMM_LookAt_LH(HMM_Vec3 Eye, HMM_Vec3 Center, HMM_Vec3 Up) {
 	return _HMM_LookAt(F, S, U, Eye);
 }
 
-FUNC_MOD HMM_Mat4 HMM_InvLookAt(HMM_Mat4 Matrix) {
+static inline HMM_Mat4 HMM_InvLookAt(HMM_Mat4 Matrix) {
 	HMM_Mat4 Result;
 
 	HMM_Mat3 Rotation = {0};
@@ -1575,7 +1573,7 @@ FUNC_MOD HMM_Mat4 HMM_InvLookAt(HMM_Mat4 Matrix) {
 
 // Quaternion operations
 
-FUNC_MOD HMM_Quat HMM_Q(float X, float Y, float Z, float W) {
+static inline HMM_Quat HMM_Q(float X, float Y, float Z, float W) {
 	HMM_Quat Result;
 
 #ifdef HANDMADE_MATH__USE_SSE
@@ -1590,7 +1588,7 @@ FUNC_MOD HMM_Quat HMM_Q(float X, float Y, float Z, float W) {
 	return Result;
 }
 
-FUNC_MOD HMM_Quat HMM_QV4(HMM_Vec4 Vector) {
+static inline HMM_Quat HMM_QV4(HMM_Vec4 Vector) {
 	HMM_Quat Result;
 
 #ifdef HANDMADE_MATH__USE_SSE
@@ -1605,7 +1603,7 @@ FUNC_MOD HMM_Quat HMM_QV4(HMM_Vec4 Vector) {
 	return Result;
 }
 
-FUNC_MOD HMM_Quat HMM_AddQ(HMM_Quat Left, HMM_Quat Right) {
+static inline HMM_Quat HMM_AddQ(HMM_Quat Left, HMM_Quat Right) {
 	HMM_Quat Result;
 
 #ifdef HANDMADE_MATH__USE_SSE
@@ -1621,7 +1619,7 @@ FUNC_MOD HMM_Quat HMM_AddQ(HMM_Quat Left, HMM_Quat Right) {
 	return Result;
 }
 
-FUNC_MOD HMM_Quat HMM_SubQ(HMM_Quat Left, HMM_Quat Right) {
+static inline HMM_Quat HMM_SubQ(HMM_Quat Left, HMM_Quat Right) {
 	HMM_Quat Result;
 
 #ifdef HANDMADE_MATH__USE_SSE
@@ -1636,7 +1634,7 @@ FUNC_MOD HMM_Quat HMM_SubQ(HMM_Quat Left, HMM_Quat Right) {
 	return Result;
 }
 
-FUNC_MOD HMM_Quat HMM_MulQ(HMM_Quat Left, HMM_Quat Right) {
+static inline HMM_Quat HMM_MulQ(HMM_Quat Left, HMM_Quat Right) {
 	HMM_Quat Result;
 
 #ifdef HANDMADE_MATH__USE_SSE
@@ -1680,7 +1678,7 @@ FUNC_MOD HMM_Quat HMM_MulQ(HMM_Quat Left, HMM_Quat Right) {
 	return Result;
 }
 
-FUNC_MOD HMM_Quat HMM_MulQF(HMM_Quat Left, float Multiplicative) {
+static inline HMM_Quat HMM_MulQF(HMM_Quat Left, float Multiplicative) {
 	HMM_Quat Result;
 
 #ifdef HANDMADE_MATH__USE_SSE
@@ -1696,7 +1694,7 @@ FUNC_MOD HMM_Quat HMM_MulQF(HMM_Quat Left, float Multiplicative) {
 	return Result;
 }
 
-FUNC_MOD HMM_Quat HMM_DivQF(HMM_Quat Left, float Divnd) {
+static inline HMM_Quat HMM_DivQF(HMM_Quat Left, float Divnd) {
 	HMM_Quat Result;
 
 #ifdef HANDMADE_MATH__USE_SSE
@@ -1712,7 +1710,7 @@ FUNC_MOD HMM_Quat HMM_DivQF(HMM_Quat Left, float Divnd) {
 	return Result;
 }
 
-FUNC_MOD float HMM_DotQ(HMM_Quat Left, HMM_Quat Right) {
+static inline float HMM_DotQ(HMM_Quat Left, HMM_Quat Right) {
 	float Result;
 
 #ifdef HANDMADE_MATH__USE_SSE
@@ -1729,7 +1727,7 @@ FUNC_MOD float HMM_DotQ(HMM_Quat Left, HMM_Quat Right) {
 	return Result;
 }
 
-FUNC_MOD HMM_Quat HMM_InvQ(HMM_Quat Left) {
+static inline HMM_Quat HMM_InvQ(HMM_Quat Left) {
 	HMM_Quat Result;
 
 	Result.X = -Left.X;
@@ -1740,7 +1738,7 @@ FUNC_MOD HMM_Quat HMM_InvQ(HMM_Quat Left) {
 	return HMM_DivQF(Result, (HMM_DotQ(Left, Left)));
 }
 
-FUNC_MOD HMM_Quat HMM_NormQ(HMM_Quat Quat) {
+static inline HMM_Quat HMM_NormQ(HMM_Quat Quat) {
 	// NOTE(lcf): Take advantage of SSE implementation in HMM_NormV4
 	HMM_Vec4 Vec = {{{ .X = Quat.X, .Y = Quat.Y, .Z = Quat.Z }, .W = Quat.W }};
 	Vec = HMM_NormV4(Vec);
@@ -1749,7 +1747,7 @@ FUNC_MOD HMM_Quat HMM_NormQ(HMM_Quat Quat) {
 	return Result;
 }
 
-FUNC_MOD HMM_Quat _HMM_MixQ(HMM_Quat Left, float MixLeft, HMM_Quat Right, float MixRight) {
+static inline HMM_Quat _HMM_MixQ(HMM_Quat Left, float MixLeft, HMM_Quat Right, float MixRight) {
 	HMM_Quat Result;
 
 #ifdef HANDMADE_MATH__USE_SSE
@@ -1768,14 +1766,14 @@ FUNC_MOD HMM_Quat _HMM_MixQ(HMM_Quat Left, float MixLeft, HMM_Quat Right, float 
 	return Result;
 }
 
-FUNC_MOD HMM_Quat HMM_NLerp(HMM_Quat Left, float Time, HMM_Quat Right) {
+static inline HMM_Quat HMM_NLerp(HMM_Quat Left, float Time, HMM_Quat Right) {
 	HMM_Quat Result = _HMM_MixQ(Left, 1.0f-Time, Right, Time);
 	Result = HMM_NormQ(Result);
 
 	return Result;
 }
 
-FUNC_MOD HMM_Quat HMM_SLerp(HMM_Quat Left, float Time, HMM_Quat Right) {
+static inline HMM_Quat HMM_SLerp(HMM_Quat Left, float Time, HMM_Quat Right) {
 	HMM_Quat Result;
 
 	float Cos_Theta = HMM_DotQ(Left, Right);
@@ -1802,7 +1800,7 @@ FUNC_MOD HMM_Quat HMM_SLerp(HMM_Quat Left, float Time, HMM_Quat Right) {
 	return Result;
 }
 
-FUNC_MOD HMM_Mat4 HMM_QToM4(HMM_Quat Left) {
+static inline HMM_Mat4 HMM_QToM4(HMM_Quat Left) {
 	HMM_Mat4 Result;
 
 	HMM_Quat NormalizedQ = HMM_NormQ(Left);
@@ -1858,7 +1856,7 @@ FUNC_MOD HMM_Mat4 HMM_QToM4(HMM_Quat Left) {
 //
 // Don't be confused! Or if you must be confused, at least trust this
 // comment. :)
-FUNC_MOD HMM_Quat HMM_M4ToQ_RH(HMM_Mat4 M) {
+static inline HMM_Quat HMM_M4ToQ_RH(HMM_Mat4 M) {
 	float T;
 	HMM_Quat Q;
 
@@ -1905,7 +1903,7 @@ FUNC_MOD HMM_Quat HMM_M4ToQ_RH(HMM_Mat4 M) {
 	return Q;
 }
 
-FUNC_MOD HMM_Quat HMM_M4ToQ_LH(HMM_Mat4 M) {
+static inline HMM_Quat HMM_M4ToQ_LH(HMM_Mat4 M) {
 	float T;
 	HMM_Quat Q;
 
@@ -1952,7 +1950,7 @@ FUNC_MOD HMM_Quat HMM_M4ToQ_LH(HMM_Mat4 M) {
 	return Q;
 }
 
-FUNC_MOD HMM_Quat HMM_QFromAxisAngle_RH(HMM_Vec3 Axis, float AngleOfRotation) {
+static inline HMM_Quat HMM_QFromAxisAngle_RH(HMM_Vec3 Axis, float AngleOfRotation) {
 	HMM_Quat Result;
 
 	HMM_Vec3 AxisNormalized = HMM_NormV3(Axis);
@@ -1964,7 +1962,7 @@ FUNC_MOD HMM_Quat HMM_QFromAxisAngle_RH(HMM_Vec3 Axis, float AngleOfRotation) {
 	return Result;
 }
 
-FUNC_MOD HMM_Quat HMM_QFromAxisAngle_LH(HMM_Vec3 Axis, float AngleOfRotation) {
+static inline HMM_Quat HMM_QFromAxisAngle_LH(HMM_Vec3 Axis, float AngleOfRotation) {
 	return HMM_QFromAxisAngle_RH(Axis, -AngleOfRotation);
 }
 
@@ -1976,631 +1974,631 @@ FUNC_MOD HMM_Quat HMM_QFromAxisAngle_LH(HMM_Vec3 Axis, float AngleOfRotation) {
 
 #ifdef __cplusplus
 
-FUNC_MOD float HMM_Len(HMM_Vec2 A) {
+static inline float HMM_Len(HMM_Vec2 A) {
 	return HMM_LenV2(A);
 }
 
-FUNC_MOD float HMM_Len(HMM_Vec3 A) {
+static inline float HMM_Len(HMM_Vec3 A) {
 	return HMM_LenV3(A);
 }
 
-FUNC_MOD float HMM_Len(HMM_Vec4 A) {
+static inline float HMM_Len(HMM_Vec4 A) {
 	return HMM_LenV4(A);
 }
 
-FUNC_MOD float HMM_LenSqr(HMM_Vec2 A) {
+static inline float HMM_LenSqr(HMM_Vec2 A) {
 	return HMM_LenSqrV2(A);
 }
 
-FUNC_MOD float HMM_LenSqr(HMM_Vec3 A) {
+static inline float HMM_LenSqr(HMM_Vec3 A) {
 	return HMM_LenSqrV3(A);
 }
 
-FUNC_MOD float HMM_LenSqr(HMM_Vec4 A) {
+static inline float HMM_LenSqr(HMM_Vec4 A) {
 	return HMM_LenSqrV4(A);
 }
 
-FUNC_MOD HMM_Vec2 HMM_Norm(HMM_Vec2 A) {
+static inline HMM_Vec2 HMM_Norm(HMM_Vec2 A) {
 	return HMM_NormV2(A);
 }
 
-FUNC_MOD HMM_Vec3 HMM_Norm(HMM_Vec3 A) {
+static inline HMM_Vec3 HMM_Norm(HMM_Vec3 A) {
 	return HMM_NormV3(A);
 }
 
-FUNC_MOD HMM_Vec4 HMM_Norm(HMM_Vec4 A) {
+static inline HMM_Vec4 HMM_Norm(HMM_Vec4 A) {
 	return HMM_NormV4(A);
 }
 
-FUNC_MOD HMM_Quat HMM_Norm(HMM_Quat A) {
+static inline HMM_Quat HMM_Norm(HMM_Quat A) {
 	return HMM_NormQ(A);
 }
 
-FUNC_MOD float HMM_Dot(HMM_Vec2 Left, HMM_Vec2 VecTwo) {
+static inline float HMM_Dot(HMM_Vec2 Left, HMM_Vec2 VecTwo) {
 	return HMM_DotV2(Left, VecTwo);
 }
 
-FUNC_MOD float HMM_Dot(HMM_Vec3 Left, HMM_Vec3 VecTwo) {
+static inline float HMM_Dot(HMM_Vec3 Left, HMM_Vec3 VecTwo) {
 	return HMM_DotV3(Left, VecTwo);
 }
 
-FUNC_MOD float HMM_Dot(HMM_Vec4 Left, HMM_Vec4 VecTwo) {
+static inline float HMM_Dot(HMM_Vec4 Left, HMM_Vec4 VecTwo) {
 	return HMM_DotV4(Left, VecTwo);
 }
  
-FUNC_MOD HMM_Vec2 HMM_Lerp(HMM_Vec2 Left, float Time, HMM_Vec2 Right) {
+static inline HMM_Vec2 HMM_Lerp(HMM_Vec2 Left, float Time, HMM_Vec2 Right) {
 	return HMM_LerpV2(Left, Time, Right);
 }
 
-FUNC_MOD HMM_Vec3 HMM_Lerp(HMM_Vec3 Left, float Time, HMM_Vec3 Right) {
+static inline HMM_Vec3 HMM_Lerp(HMM_Vec3 Left, float Time, HMM_Vec3 Right) {
 	return HMM_LerpV3(Left, Time, Right);
 }
 
-FUNC_MOD HMM_Vec4 HMM_Lerp(HMM_Vec4 Left, float Time, HMM_Vec4 Right) {
+static inline HMM_Vec4 HMM_Lerp(HMM_Vec4 Left, float Time, HMM_Vec4 Right) {
 	return HMM_LerpV4(Left, Time, Right);
 }
 
-FUNC_MOD HMM_Mat2 HMM_Transpose(HMM_Mat2 Matrix) {
+static inline HMM_Mat2 HMM_Transpose(HMM_Mat2 Matrix) {
 	return HMM_TransposeM2(Matrix);
 }
 
-FUNC_MOD HMM_Mat3 HMM_Transpose(HMM_Mat3 Matrix) {
+static inline HMM_Mat3 HMM_Transpose(HMM_Mat3 Matrix) {
 	return HMM_TransposeM3(Matrix);
 }
 
-FUNC_MOD HMM_Mat4 HMM_Transpose(HMM_Mat4 Matrix) {
+static inline HMM_Mat4 HMM_Transpose(HMM_Mat4 Matrix) {
 	return HMM_TransposeM4(Matrix);
 }
 
-FUNC_MOD float HMM_Determinant(HMM_Mat2 Matrix) {
+static inline float HMM_Determinant(HMM_Mat2 Matrix) {
 	return HMM_DeterminantM2(Matrix);
 }
 
-FUNC_MOD float HMM_Determinant(HMM_Mat3 Matrix) {
+static inline float HMM_Determinant(HMM_Mat3 Matrix) {
 	return HMM_DeterminantM3(Matrix);
 }
 
-FUNC_MOD float HMM_Determinant(HMM_Mat4 Matrix) {
+static inline float HMM_Determinant(HMM_Mat4 Matrix) {
 	return HMM_DeterminantM4(Matrix);
 }
 
-FUNC_MOD HMM_Mat2 HMM_InvGeneral(HMM_Mat2 Matrix) {
+static inline HMM_Mat2 HMM_InvGeneral(HMM_Mat2 Matrix) {
 	return HMM_InvGeneralM2(Matrix);
 }
 
-FUNC_MOD HMM_Mat3 HMM_InvGeneral(HMM_Mat3 Matrix) {
+static inline HMM_Mat3 HMM_InvGeneral(HMM_Mat3 Matrix) {
 	return HMM_InvGeneralM3(Matrix);
 }
 
-FUNC_MOD HMM_Mat4 HMM_InvGeneral(HMM_Mat4 Matrix) {
+static inline HMM_Mat4 HMM_InvGeneral(HMM_Mat4 Matrix) {
 	return HMM_InvGeneralM4(Matrix);
 }
 
-FUNC_MOD float HMM_Dot(HMM_Quat QuatOne, HMM_Quat QuatTwo) {
+static inline float HMM_Dot(HMM_Quat QuatOne, HMM_Quat QuatTwo) {
 	return HMM_DotQ(QuatOne, QuatTwo);
 }
 
-FUNC_MOD HMM_Vec2 HMM_Add(HMM_Vec2 Left, HMM_Vec2 Right) {
+static inline HMM_Vec2 HMM_Add(HMM_Vec2 Left, HMM_Vec2 Right) {
 	return HMM_AddV2(Left, Right);
 }
 
-FUNC_MOD HMM_Vec3 HMM_Add(HMM_Vec3 Left, HMM_Vec3 Right) {
+static inline HMM_Vec3 HMM_Add(HMM_Vec3 Left, HMM_Vec3 Right) {
 	return HMM_AddV3(Left, Right);
 }
 
-FUNC_MOD HMM_Vec4 HMM_Add(HMM_Vec4 Left, HMM_Vec4 Right) {
+static inline HMM_Vec4 HMM_Add(HMM_Vec4 Left, HMM_Vec4 Right) {
 	return HMM_AddV4(Left, Right);
 }
 
-FUNC_MOD HMM_Mat2 HMM_Add(HMM_Mat2 Left, HMM_Mat2 Right) {
+static inline HMM_Mat2 HMM_Add(HMM_Mat2 Left, HMM_Mat2 Right) {
 	return HMM_AddM2(Left, Right);
 }
 
-FUNC_MOD HMM_Mat3 HMM_Add(HMM_Mat3 Left, HMM_Mat3 Right) {
+static inline HMM_Mat3 HMM_Add(HMM_Mat3 Left, HMM_Mat3 Right) {
 	return HMM_AddM3(Left, Right);
 }
 
-FUNC_MOD HMM_Mat4 HMM_Add(HMM_Mat4 Left, HMM_Mat4 Right) {
+static inline HMM_Mat4 HMM_Add(HMM_Mat4 Left, HMM_Mat4 Right) {
 	return HMM_AddM4(Left, Right);
 }
 
-FUNC_MOD HMM_Quat HMM_Add(HMM_Quat Left, HMM_Quat Right) {
+static inline HMM_Quat HMM_Add(HMM_Quat Left, HMM_Quat Right) {
 	return HMM_AddQ(Left, Right);
 }
 
-FUNC_MOD HMM_Vec2 HMM_Sub(HMM_Vec2 Left, HMM_Vec2 Right) {
+static inline HMM_Vec2 HMM_Sub(HMM_Vec2 Left, HMM_Vec2 Right) {
 	return HMM_SubV2(Left, Right);
 }
 
-FUNC_MOD HMM_Vec3 HMM_Sub(HMM_Vec3 Left, HMM_Vec3 Right) {
+static inline HMM_Vec3 HMM_Sub(HMM_Vec3 Left, HMM_Vec3 Right) {
 	return HMM_SubV3(Left, Right);
 }
 
-FUNC_MOD HMM_Vec4 HMM_Sub(HMM_Vec4 Left, HMM_Vec4 Right) {
+static inline HMM_Vec4 HMM_Sub(HMM_Vec4 Left, HMM_Vec4 Right) {
 	return HMM_SubV4(Left, Right);
 }
 
-FUNC_MOD HMM_Mat2 HMM_Sub(HMM_Mat2 Left, HMM_Mat2 Right) {
+static inline HMM_Mat2 HMM_Sub(HMM_Mat2 Left, HMM_Mat2 Right) {
 	return HMM_SubM2(Left, Right);
 }
 
-FUNC_MOD HMM_Mat3 HMM_Sub(HMM_Mat3 Left, HMM_Mat3 Right) {
+static inline HMM_Mat3 HMM_Sub(HMM_Mat3 Left, HMM_Mat3 Right) {
 	return HMM_SubM3(Left, Right);
 }
 
-FUNC_MOD HMM_Mat4 HMM_Sub(HMM_Mat4 Left, HMM_Mat4 Right) {
+static inline HMM_Mat4 HMM_Sub(HMM_Mat4 Left, HMM_Mat4 Right) {
 	return HMM_SubM4(Left, Right);
 }
 
-FUNC_MOD HMM_Quat HMM_Sub(HMM_Quat Left, HMM_Quat Right) {
+static inline HMM_Quat HMM_Sub(HMM_Quat Left, HMM_Quat Right) {
 	return HMM_SubQ(Left, Right);
 }
 
-FUNC_MOD HMM_Vec2 HMM_Mul(HMM_Vec2 Left, HMM_Vec2 Right) {
+static inline HMM_Vec2 HMM_Mul(HMM_Vec2 Left, HMM_Vec2 Right) {
 	return HMM_MulV2(Left, Right);
 }
 
-FUNC_MOD HMM_Vec2 HMM_Mul(HMM_Vec2 Left, float Right) {
+static inline HMM_Vec2 HMM_Mul(HMM_Vec2 Left, float Right) {
 	return HMM_MulV2F(Left, Right);
 }
 
-FUNC_MOD HMM_Vec3 HMM_Mul(HMM_Vec3 Left, HMM_Vec3 Right) {
+static inline HMM_Vec3 HMM_Mul(HMM_Vec3 Left, HMM_Vec3 Right) {
 	return HMM_MulV3(Left, Right);
 }
 
-FUNC_MOD HMM_Vec3 HMM_Mul(HMM_Vec3 Left, float Right) {
+static inline HMM_Vec3 HMM_Mul(HMM_Vec3 Left, float Right) {
 	return HMM_MulV3F(Left, Right);
 }
 
-FUNC_MOD HMM_Vec4 HMM_Mul(HMM_Vec4 Left, HMM_Vec4 Right) {
+static inline HMM_Vec4 HMM_Mul(HMM_Vec4 Left, HMM_Vec4 Right) {
 	return HMM_MulV4(Left, Right);
 }
 
-FUNC_MOD HMM_Vec4 HMM_Mul(HMM_Vec4 Left, float Right) {
+static inline HMM_Vec4 HMM_Mul(HMM_Vec4 Left, float Right) {
 	return HMM_MulV4F(Left, Right);
 }
 
-FUNC_MOD HMM_Mat2 HMM_Mul(HMM_Mat2 Left, HMM_Mat2 Right) {
+static inline HMM_Mat2 HMM_Mul(HMM_Mat2 Left, HMM_Mat2 Right) {
 	return HMM_MulM2(Left, Right);
 }
 
-FUNC_MOD HMM_Mat3 HMM_Mul(HMM_Mat3 Left, HMM_Mat3 Right) {
+static inline HMM_Mat3 HMM_Mul(HMM_Mat3 Left, HMM_Mat3 Right) {
 	return HMM_MulM3(Left, Right);
 }
 
-FUNC_MOD HMM_Mat4 HMM_Mul(HMM_Mat4 Left, HMM_Mat4 Right) {
+static inline HMM_Mat4 HMM_Mul(HMM_Mat4 Left, HMM_Mat4 Right) {
 	return HMM_MulM4(Left, Right);
 }
 
-FUNC_MOD HMM_Mat2 HMM_Mul(HMM_Mat2 Left, float Right) {
+static inline HMM_Mat2 HMM_Mul(HMM_Mat2 Left, float Right) {
 	return HMM_MulM2F(Left, Right);
 }
 
-FUNC_MOD HMM_Mat3 HMM_Mul(HMM_Mat3 Left, float Right) {
+static inline HMM_Mat3 HMM_Mul(HMM_Mat3 Left, float Right) {
 	return HMM_MulM3F(Left, Right);
 }
 
-FUNC_MOD HMM_Mat4 HMM_Mul(HMM_Mat4 Left, float Right) {
+static inline HMM_Mat4 HMM_Mul(HMM_Mat4 Left, float Right) {
 	return HMM_MulM4F(Left, Right);
 }
 
-FUNC_MOD HMM_Vec2 HMM_Mul(HMM_Mat2 Matrix, HMM_Vec2 Vector) {
+static inline HMM_Vec2 HMM_Mul(HMM_Mat2 Matrix, HMM_Vec2 Vector) {
 	return HMM_MulM2V2(Matrix, Vector);
 }
 
-FUNC_MOD HMM_Vec3 HMM_Mul(HMM_Mat3 Matrix, HMM_Vec3 Vector) {
+static inline HMM_Vec3 HMM_Mul(HMM_Mat3 Matrix, HMM_Vec3 Vector) {
 	return HMM_MulM3V3(Matrix, Vector);
 }
 
-FUNC_MOD HMM_Vec4 HMM_Mul(HMM_Mat4 Matrix, HMM_Vec4 Vector) {
+static inline HMM_Vec4 HMM_Mul(HMM_Mat4 Matrix, HMM_Vec4 Vector) {
 	return HMM_MulM4V4(Matrix, Vector);
 }
 
-FUNC_MOD HMM_Quat HMM_Mul(HMM_Quat Left, HMM_Quat Right) {
+static inline HMM_Quat HMM_Mul(HMM_Quat Left, HMM_Quat Right) {
 	return HMM_MulQ(Left, Right);
 }
 
-FUNC_MOD HMM_Quat HMM_Mul(HMM_Quat Left, float Right) {
+static inline HMM_Quat HMM_Mul(HMM_Quat Left, float Right) {
 	return HMM_MulQF(Left, Right);
 }
 
-FUNC_MOD HMM_Vec2 HMM_Div(HMM_Vec2 Left, HMM_Vec2 Right) {
+static inline HMM_Vec2 HMM_Div(HMM_Vec2 Left, HMM_Vec2 Right) {
 	return HMM_DivV2(Left, Right);
 }
 
-FUNC_MOD HMM_Vec2 HMM_Div(HMM_Vec2 Left, float Right) {
+static inline HMM_Vec2 HMM_Div(HMM_Vec2 Left, float Right) {
 	return HMM_DivV2F(Left, Right);
 }
 
-FUNC_MOD HMM_Vec3 HMM_Div(HMM_Vec3 Left, HMM_Vec3 Right) {
+static inline HMM_Vec3 HMM_Div(HMM_Vec3 Left, HMM_Vec3 Right) {
 	return HMM_DivV3(Left, Right);
 }
 
-FUNC_MOD HMM_Vec3 HMM_Div(HMM_Vec3 Left, float Right) {
+static inline HMM_Vec3 HMM_Div(HMM_Vec3 Left, float Right) {
 	return HMM_DivV3F(Left, Right);
 }
 
-FUNC_MOD HMM_Vec4 HMM_Div(HMM_Vec4 Left, HMM_Vec4 Right) {
+static inline HMM_Vec4 HMM_Div(HMM_Vec4 Left, HMM_Vec4 Right) {
 	return HMM_DivV4(Left, Right);
 }
 
-FUNC_MOD HMM_Vec4 HMM_Div(HMM_Vec4 Left, float Right) {
+static inline HMM_Vec4 HMM_Div(HMM_Vec4 Left, float Right) {
 	return HMM_DivV4F(Left, Right);
 }
 
-FUNC_MOD HMM_Mat2 HMM_Div(HMM_Mat2 Left, float Right) {
+static inline HMM_Mat2 HMM_Div(HMM_Mat2 Left, float Right) {
 	return HMM_DivM2F(Left, Right);
 }
 
-FUNC_MOD HMM_Mat3 HMM_Div(HMM_Mat3 Left, float Right) {
+static inline HMM_Mat3 HMM_Div(HMM_Mat3 Left, float Right) {
 	return HMM_DivM3F(Left, Right);
 }
 
-FUNC_MOD HMM_Mat4 HMM_Div(HMM_Mat4 Left, float Right) {
+static inline HMM_Mat4 HMM_Div(HMM_Mat4 Left, float Right) {
 	return HMM_DivM4F(Left, Right);
 }
 
-FUNC_MOD HMM_Quat HMM_Div(HMM_Quat Left, float Right) {
+static inline HMM_Quat HMM_Div(HMM_Quat Left, float Right) {
 	return HMM_DivQF(Left, Right);
 }
 
-FUNC_MOD HMM_Bool HMM_Eq(HMM_Vec2 Left, HMM_Vec2 Right) {
+static inline HMM_Bool HMM_Eq(HMM_Vec2 Left, HMM_Vec2 Right) {
 	return HMM_EqV2(Left, Right);
 }
 
-FUNC_MOD HMM_Bool HMM_Eq(HMM_Vec3 Left, HMM_Vec3 Right) {
+static inline HMM_Bool HMM_Eq(HMM_Vec3 Left, HMM_Vec3 Right) {
 	return HMM_EqV3(Left, Right);
 }
 
-FUNC_MOD HMM_Bool HMM_Eq(HMM_Vec4 Left, HMM_Vec4 Right) {
+static inline HMM_Bool HMM_Eq(HMM_Vec4 Left, HMM_Vec4 Right) {
 	return HMM_EqV4(Left, Right);
 }
 
-FUNC_MOD HMM_Vec2 operator+(HMM_Vec2 Left, HMM_Vec2 Right) {
+static inline HMM_Vec2 operator+(HMM_Vec2 Left, HMM_Vec2 Right) {
 	return HMM_AddV2(Left, Right);
 }
 
-FUNC_MOD HMM_Vec3 operator+(HMM_Vec3 Left, HMM_Vec3 Right) {
+static inline HMM_Vec3 operator+(HMM_Vec3 Left, HMM_Vec3 Right) {
 	return HMM_AddV3(Left, Right);
 }
 
-FUNC_MOD HMM_Vec4 operator+(HMM_Vec4 Left, HMM_Vec4 Right) {
+static inline HMM_Vec4 operator+(HMM_Vec4 Left, HMM_Vec4 Right) {
 	return HMM_AddV4(Left, Right);
 }
 
-FUNC_MOD HMM_Mat2 operator+(HMM_Mat2 Left, HMM_Mat2 Right) {
+static inline HMM_Mat2 operator+(HMM_Mat2 Left, HMM_Mat2 Right) {
 	return HMM_AddM2(Left, Right);
 }
 
-FUNC_MOD HMM_Mat3 operator+(HMM_Mat3 Left, HMM_Mat3 Right) {
+static inline HMM_Mat3 operator+(HMM_Mat3 Left, HMM_Mat3 Right) {
 	return HMM_AddM3(Left, Right);
 }
 
-FUNC_MOD HMM_Mat4 operator+(HMM_Mat4 Left, HMM_Mat4 Right) {
+static inline HMM_Mat4 operator+(HMM_Mat4 Left, HMM_Mat4 Right) {
 	return HMM_AddM4(Left, Right);
 }
 
-FUNC_MOD HMM_Quat operator+(HMM_Quat Left, HMM_Quat Right) {
+static inline HMM_Quat operator+(HMM_Quat Left, HMM_Quat Right) {
 	return HMM_AddQ(Left, Right);
 }
 
-FUNC_MOD HMM_Vec2 operator-(HMM_Vec2 Left, HMM_Vec2 Right) {
+static inline HMM_Vec2 operator-(HMM_Vec2 Left, HMM_Vec2 Right) {
 	return HMM_SubV2(Left, Right);
 }
 
-FUNC_MOD HMM_Vec3 operator-(HMM_Vec3 Left, HMM_Vec3 Right) {
+static inline HMM_Vec3 operator-(HMM_Vec3 Left, HMM_Vec3 Right) {
 	return HMM_SubV3(Left, Right);
 }
 
-FUNC_MOD HMM_Vec4 operator-(HMM_Vec4 Left, HMM_Vec4 Right) {
+static inline HMM_Vec4 operator-(HMM_Vec4 Left, HMM_Vec4 Right) {
 	return HMM_SubV4(Left, Right);
 }
 
-FUNC_MOD HMM_Mat2 operator-(HMM_Mat2 Left, HMM_Mat2 Right) {
+static inline HMM_Mat2 operator-(HMM_Mat2 Left, HMM_Mat2 Right) {
 	return HMM_SubM2(Left, Right);
 }
 
-FUNC_MOD HMM_Mat3 operator-(HMM_Mat3 Left, HMM_Mat3 Right) {
+static inline HMM_Mat3 operator-(HMM_Mat3 Left, HMM_Mat3 Right) {
 	return HMM_SubM3(Left, Right);
 }
 
-FUNC_MOD HMM_Mat4 operator-(HMM_Mat4 Left, HMM_Mat4 Right) {
+static inline HMM_Mat4 operator-(HMM_Mat4 Left, HMM_Mat4 Right) {
 	return HMM_SubM4(Left, Right);
 }
 
-FUNC_MOD HMM_Quat operator-(HMM_Quat Left, HMM_Quat Right) {
+static inline HMM_Quat operator-(HMM_Quat Left, HMM_Quat Right) {
 	return HMM_SubQ(Left, Right);
 }
 
-FUNC_MOD HMM_Vec2 operator*(HMM_Vec2 Left, HMM_Vec2 Right) {
+static inline HMM_Vec2 operator*(HMM_Vec2 Left, HMM_Vec2 Right) {
 	return HMM_MulV2(Left, Right);
 }
 
-FUNC_MOD HMM_Vec3 operator*(HMM_Vec3 Left, HMM_Vec3 Right) {
+static inline HMM_Vec3 operator*(HMM_Vec3 Left, HMM_Vec3 Right) {
 	return HMM_MulV3(Left, Right);
 }
 
-FUNC_MOD HMM_Vec4 operator*(HMM_Vec4 Left, HMM_Vec4 Right) {
+static inline HMM_Vec4 operator*(HMM_Vec4 Left, HMM_Vec4 Right) {
 	return HMM_MulV4(Left, Right);
 }
 
-FUNC_MOD HMM_Mat2 operator*(HMM_Mat2 Left, HMM_Mat2 Right) {
+static inline HMM_Mat2 operator*(HMM_Mat2 Left, HMM_Mat2 Right) {
 	return HMM_MulM2(Left, Right);
 }
 
-FUNC_MOD HMM_Mat3 operator*(HMM_Mat3 Left, HMM_Mat3 Right) {
+static inline HMM_Mat3 operator*(HMM_Mat3 Left, HMM_Mat3 Right) {
 	return HMM_MulM3(Left, Right);
 }
 
-FUNC_MOD HMM_Mat4 operator*(HMM_Mat4 Left, HMM_Mat4 Right) {
+static inline HMM_Mat4 operator*(HMM_Mat4 Left, HMM_Mat4 Right) {
 	return HMM_MulM4(Left, Right);
 }
 
-FUNC_MOD HMM_Quat operator*(HMM_Quat Left, HMM_Quat Right) {
+static inline HMM_Quat operator*(HMM_Quat Left, HMM_Quat Right) {
 	return HMM_MulQ(Left, Right);
 }
 
-FUNC_MOD HMM_Vec2 operator*(HMM_Vec2 Left, float Right) {
+static inline HMM_Vec2 operator*(HMM_Vec2 Left, float Right) {
 	return HMM_MulV2F(Left, Right);
 }
 
-FUNC_MOD HMM_Vec3 operator*(HMM_Vec3 Left, float Right) {
+static inline HMM_Vec3 operator*(HMM_Vec3 Left, float Right) {
 	return HMM_MulV3F(Left, Right);
 }
 
-FUNC_MOD HMM_Vec4 operator*(HMM_Vec4 Left, float Right) {
+static inline HMM_Vec4 operator*(HMM_Vec4 Left, float Right) {
 	return HMM_MulV4F(Left, Right);
 }
 
-FUNC_MOD HMM_Mat2 operator*(HMM_Mat2 Left, float Right) {
+static inline HMM_Mat2 operator*(HMM_Mat2 Left, float Right) {
 	return HMM_MulM2F(Left, Right);
 }
 
-FUNC_MOD HMM_Mat3 operator*(HMM_Mat3 Left, float Right) {
+static inline HMM_Mat3 operator*(HMM_Mat3 Left, float Right) {
 	return HMM_MulM3F(Left, Right);
 }
 
-FUNC_MOD HMM_Mat4 operator*(HMM_Mat4 Left, float Right) {
+static inline HMM_Mat4 operator*(HMM_Mat4 Left, float Right) {
 	return HMM_MulM4F(Left, Right);
 }
 
-FUNC_MOD HMM_Quat operator*(HMM_Quat Left, float Right) {
+static inline HMM_Quat operator*(HMM_Quat Left, float Right) {
 	return HMM_MulQF(Left, Right);
 }
 
-FUNC_MOD HMM_Vec2 operator*(float Left, HMM_Vec2 Right) {
+static inline HMM_Vec2 operator*(float Left, HMM_Vec2 Right) {
 	return HMM_MulV2F(Right, Left);
 }
 
-FUNC_MOD HMM_Vec3 operator*(float Left, HMM_Vec3 Right) {
+static inline HMM_Vec3 operator*(float Left, HMM_Vec3 Right) {
 	return HMM_MulV3F(Right, Left);
 }
 
-FUNC_MOD HMM_Vec4 operator*(float Left, HMM_Vec4 Right) {
+static inline HMM_Vec4 operator*(float Left, HMM_Vec4 Right) {
 	return HMM_MulV4F(Right, Left);
 }
 
-FUNC_MOD HMM_Mat2 operator*(float Left, HMM_Mat2 Right) {
+static inline HMM_Mat2 operator*(float Left, HMM_Mat2 Right) {
 	return HMM_MulM2F(Right, Left);
 }
 
-FUNC_MOD HMM_Mat3 operator*(float Left, HMM_Mat3 Right) {
+static inline HMM_Mat3 operator*(float Left, HMM_Mat3 Right) {
 	return HMM_MulM3F(Right, Left);
 }
 
-FUNC_MOD HMM_Mat4 operator*(float Left, HMM_Mat4 Right) {
+static inline HMM_Mat4 operator*(float Left, HMM_Mat4 Right) {
 	return HMM_MulM4F(Right, Left);
 }
 
-FUNC_MOD HMM_Quat operator*(float Left, HMM_Quat Right) {
+static inline HMM_Quat operator*(float Left, HMM_Quat Right) {
 	return HMM_MulQF(Right, Left);
 }
 
-FUNC_MOD HMM_Vec2 operator*(HMM_Mat2 Matrix, HMM_Vec2 Vector) {
+static inline HMM_Vec2 operator*(HMM_Mat2 Matrix, HMM_Vec2 Vector) {
 	return HMM_MulM2V2(Matrix, Vector);
 }
 
-FUNC_MOD HMM_Vec3 operator*(HMM_Mat3 Matrix, HMM_Vec3 Vector) {
+static inline HMM_Vec3 operator*(HMM_Mat3 Matrix, HMM_Vec3 Vector) {
 	return HMM_MulM3V3(Matrix, Vector);
 }
 
-FUNC_MOD HMM_Vec4 operator*(HMM_Mat4 Matrix, HMM_Vec4 Vector) {
+static inline HMM_Vec4 operator*(HMM_Mat4 Matrix, HMM_Vec4 Vector) {
 	return HMM_MulM4V4(Matrix, Vector);
 }
 
-FUNC_MOD HMM_Vec2 operator/(HMM_Vec2 Left, HMM_Vec2 Right) {
+static inline HMM_Vec2 operator/(HMM_Vec2 Left, HMM_Vec2 Right) {
 	return HMM_DivV2(Left, Right);
 }
 
-FUNC_MOD HMM_Vec3 operator/(HMM_Vec3 Left, HMM_Vec3 Right) {
+static inline HMM_Vec3 operator/(HMM_Vec3 Left, HMM_Vec3 Right) {
 	return HMM_DivV3(Left, Right);
 }
 
-FUNC_MOD HMM_Vec4 operator/(HMM_Vec4 Left, HMM_Vec4 Right) {
+static inline HMM_Vec4 operator/(HMM_Vec4 Left, HMM_Vec4 Right) {
 	return HMM_DivV4(Left, Right);
 }
 
-FUNC_MOD HMM_Vec2 operator/(HMM_Vec2 Left, float Right) {
+static inline HMM_Vec2 operator/(HMM_Vec2 Left, float Right) {
 	return HMM_DivV2F(Left, Right);
 }
 
-FUNC_MOD HMM_Vec3 operator/(HMM_Vec3 Left, float Right) {
+static inline HMM_Vec3 operator/(HMM_Vec3 Left, float Right) {
 	return HMM_DivV3F(Left, Right);
 }
 
-FUNC_MOD HMM_Vec4 operator/(HMM_Vec4 Left, float Right) {
+static inline HMM_Vec4 operator/(HMM_Vec4 Left, float Right) {
 	return HMM_DivV4F(Left, Right);
 }
 
-FUNC_MOD HMM_Mat4 operator/(HMM_Mat4 Left, float Right) {
+static inline HMM_Mat4 operator/(HMM_Mat4 Left, float Right) {
 	return HMM_DivM4F(Left, Right);
 }
 
-FUNC_MOD HMM_Mat3 operator/(HMM_Mat3 Left, float Right) {
+static inline HMM_Mat3 operator/(HMM_Mat3 Left, float Right) {
 	return HMM_DivM3F(Left, Right);
 }
 
-FUNC_MOD HMM_Mat2 operator/(HMM_Mat2 Left, float Right) {
+static inline HMM_Mat2 operator/(HMM_Mat2 Left, float Right) {
 	return HMM_DivM2F(Left, Right);
 }
 
-FUNC_MOD HMM_Quat operator/(HMM_Quat Left, float Right) {
+static inline HMM_Quat operator/(HMM_Quat Left, float Right) {
 	return HMM_DivQF(Left, Right);
 }
 
-FUNC_MOD HMM_Vec2 &operator+=(HMM_Vec2 &Left, HMM_Vec2 Right) {
+static inline HMM_Vec2 &operator+=(HMM_Vec2 &Left, HMM_Vec2 Right) {
 	return Left = Left + Right;
 }
 
-FUNC_MOD HMM_Vec3 &operator+=(HMM_Vec3 &Left, HMM_Vec3 Right) {
+static inline HMM_Vec3 &operator+=(HMM_Vec3 &Left, HMM_Vec3 Right) {
 	return Left = Left + Right;
 }
 
-FUNC_MOD HMM_Vec4 &operator+=(HMM_Vec4 &Left, HMM_Vec4 Right) {
+static inline HMM_Vec4 &operator+=(HMM_Vec4 &Left, HMM_Vec4 Right) {
 	return Left = Left + Right;
 }
 
-FUNC_MOD HMM_Mat2 &operator+=(HMM_Mat2 &Left, HMM_Mat2 Right) {
+static inline HMM_Mat2 &operator+=(HMM_Mat2 &Left, HMM_Mat2 Right) {
 	return Left = Left + Right;
 }
 
-FUNC_MOD HMM_Mat3 &operator+=(HMM_Mat3 &Left, HMM_Mat3 Right) {
+static inline HMM_Mat3 &operator+=(HMM_Mat3 &Left, HMM_Mat3 Right) {
 	return Left = Left + Right;
 }
 
-FUNC_MOD HMM_Mat4 &operator+=(HMM_Mat4 &Left, HMM_Mat4 Right) {
+static inline HMM_Mat4 &operator+=(HMM_Mat4 &Left, HMM_Mat4 Right) {
 	return Left = Left + Right;
 }
 
-FUNC_MOD HMM_Quat &operator+=(HMM_Quat &Left, HMM_Quat Right) {
+static inline HMM_Quat &operator+=(HMM_Quat &Left, HMM_Quat Right) {
 	return Left = Left + Right;
 }
 
-FUNC_MOD HMM_Vec2 &operator-=(HMM_Vec2 &Left, HMM_Vec2 Right) {
+static inline HMM_Vec2 &operator-=(HMM_Vec2 &Left, HMM_Vec2 Right) {
 	return Left = Left - Right;
 }
 
-FUNC_MOD HMM_Vec3 &operator-=(HMM_Vec3 &Left, HMM_Vec3 Right) {
+static inline HMM_Vec3 &operator-=(HMM_Vec3 &Left, HMM_Vec3 Right) {
 	return Left = Left - Right;
 }
 
-FUNC_MOD HMM_Vec4 &operator-=(HMM_Vec4 &Left, HMM_Vec4 Right) {
+static inline HMM_Vec4 &operator-=(HMM_Vec4 &Left, HMM_Vec4 Right) {
 	return Left = Left - Right;
 }
 
-FUNC_MOD HMM_Mat2 &operator-=(HMM_Mat2 &Left, HMM_Mat2 Right) {
+static inline HMM_Mat2 &operator-=(HMM_Mat2 &Left, HMM_Mat2 Right) {
 	return Left = Left - Right;
 }
 
-FUNC_MOD HMM_Mat3 &operator-=(HMM_Mat3 &Left, HMM_Mat3 Right) {
+static inline HMM_Mat3 &operator-=(HMM_Mat3 &Left, HMM_Mat3 Right) {
 	return Left = Left - Right;
 }
 
-FUNC_MOD HMM_Mat4 &operator-=(HMM_Mat4 &Left, HMM_Mat4 Right) {
+static inline HMM_Mat4 &operator-=(HMM_Mat4 &Left, HMM_Mat4 Right) {
 	return Left = Left - Right;
 }
 
-FUNC_MOD HMM_Quat &operator-=(HMM_Quat &Left, HMM_Quat Right) {
+static inline HMM_Quat &operator-=(HMM_Quat &Left, HMM_Quat Right) {
 	return Left = Left - Right;
 }
 
-FUNC_MOD HMM_Vec2 &operator*=(HMM_Vec2 &Left, HMM_Vec2 Right) {
+static inline HMM_Vec2 &operator*=(HMM_Vec2 &Left, HMM_Vec2 Right) {
 	return Left = Left * Right;
 }
 
-FUNC_MOD HMM_Vec3 &operator*=(HMM_Vec3 &Left, HMM_Vec3 Right) {
+static inline HMM_Vec3 &operator*=(HMM_Vec3 &Left, HMM_Vec3 Right) {
 	return Left = Left * Right;
 }
 
-FUNC_MOD HMM_Vec4 &operator*=(HMM_Vec4 &Left, HMM_Vec4 Right) {
+static inline HMM_Vec4 &operator*=(HMM_Vec4 &Left, HMM_Vec4 Right) {
 	return Left = Left * Right;
 }
 
-FUNC_MOD HMM_Vec2 &operator*=(HMM_Vec2 &Left, float Right) {
+static inline HMM_Vec2 &operator*=(HMM_Vec2 &Left, float Right) {
 	return Left = Left * Right;
 }
 
-FUNC_MOD HMM_Vec3 &operator*=(HMM_Vec3 &Left, float Right) {
+static inline HMM_Vec3 &operator*=(HMM_Vec3 &Left, float Right) {
 	return Left = Left * Right;
 }
 
-FUNC_MOD HMM_Vec4 &operator*=(HMM_Vec4 &Left, float Right) {
+static inline HMM_Vec4 &operator*=(HMM_Vec4 &Left, float Right) {
 	return Left = Left * Right;
 }
 
-FUNC_MOD HMM_Mat2 &operator*=(HMM_Mat2 &Left, float Right) {
+static inline HMM_Mat2 &operator*=(HMM_Mat2 &Left, float Right) {
 	return Left = Left * Right;
 }
 
-FUNC_MOD HMM_Mat3 &operator*=(HMM_Mat3 &Left, float Right) {
+static inline HMM_Mat3 &operator*=(HMM_Mat3 &Left, float Right) {
 	return Left = Left * Right;
 }
 
-FUNC_MOD HMM_Mat4 &operator*=(HMM_Mat4 &Left, float Right) {
+static inline HMM_Mat4 &operator*=(HMM_Mat4 &Left, float Right) {
 	return Left = Left * Right;
 }
 
-FUNC_MOD HMM_Quat &operator*=(HMM_Quat &Left, float Right) {
+static inline HMM_Quat &operator*=(HMM_Quat &Left, float Right) {
 	return Left = Left * Right;
 }
 
-FUNC_MOD HMM_Vec2 &operator/=(HMM_Vec2 &Left, HMM_Vec2 Right) {
+static inline HMM_Vec2 &operator/=(HMM_Vec2 &Left, HMM_Vec2 Right) {
 	return Left = Left / Right;
 }
 
-FUNC_MOD HMM_Vec3 &operator/=(HMM_Vec3 &Left, HMM_Vec3 Right) {
+static inline HMM_Vec3 &operator/=(HMM_Vec3 &Left, HMM_Vec3 Right) {
 	return Left = Left / Right;
 }
 
-FUNC_MOD HMM_Vec4 &operator/=(HMM_Vec4 &Left, HMM_Vec4 Right) {
+static inline HMM_Vec4 &operator/=(HMM_Vec4 &Left, HMM_Vec4 Right) {
 	return Left = Left / Right;
 }
 
-FUNC_MOD HMM_Vec2 &operator/=(HMM_Vec2 &Left, float Right) {
+static inline HMM_Vec2 &operator/=(HMM_Vec2 &Left, float Right) {
 	return Left = Left / Right;
 }
 
-FUNC_MOD HMM_Vec3 &operator/=(HMM_Vec3 &Left, float Right) {
+static inline HMM_Vec3 &operator/=(HMM_Vec3 &Left, float Right) {
 	return Left = Left / Right;
 }
 
-FUNC_MOD HMM_Vec4 &operator/=(HMM_Vec4 &Left, float Right) {
+static inline HMM_Vec4 &operator/=(HMM_Vec4 &Left, float Right) {
 	return Left = Left / Right;
 }
 
-FUNC_MOD HMM_Mat4 &operator/=(HMM_Mat4 &Left, float Right) {
+static inline HMM_Mat4 &operator/=(HMM_Mat4 &Left, float Right) {
 	return Left = Left / Right;
 }
 
-FUNC_MOD HMM_Quat &operator/=(HMM_Quat &Left, float Right) {
+static inline HMM_Quat &operator/=(HMM_Quat &Left, float Right) {
 	return Left = Left / Right;
 }
 
-FUNC_MOD HMM_Bool operator==(HMM_Vec2 Left, HMM_Vec2 Right) {
+static inline HMM_Bool operator==(HMM_Vec2 Left, HMM_Vec2 Right) {
 	return HMM_EqV2(Left, Right);
 }
 
-FUNC_MOD HMM_Bool operator==(HMM_Vec3 Left, HMM_Vec3 Right) {
+static inline HMM_Bool operator==(HMM_Vec3 Left, HMM_Vec3 Right) {
 	return HMM_EqV3(Left, Right);
 }
 
-FUNC_MOD HMM_Bool operator==(HMM_Vec4 Left, HMM_Vec4 Right) {
+static inline HMM_Bool operator==(HMM_Vec4 Left, HMM_Vec4 Right) {
 	return HMM_EqV4(Left, Right);
 }
 
-FUNC_MOD HMM_Bool operator!=(HMM_Vec2 Left, HMM_Vec2 Right) {
+static inline HMM_Bool operator!=(HMM_Vec2 Left, HMM_Vec2 Right) {
 	return !HMM_EqV2(Left, Right);
 }
 
-FUNC_MOD HMM_Bool operator!=(HMM_Vec3 Left, HMM_Vec3 Right) {
+static inline HMM_Bool operator!=(HMM_Vec3 Left, HMM_Vec3 Right) {
 	return !HMM_EqV3(Left, Right);
 }
 
-FUNC_MOD HMM_Bool operator!=(HMM_Vec4 Left, HMM_Vec4 Right) {
+static inline HMM_Bool operator!=(HMM_Vec4 Left, HMM_Vec4 Right) {
 	return !HMM_EqV4(Left, Right);
 }
 
-FUNC_MOD HMM_Vec2 operator-(HMM_Vec2 In) {
+static inline HMM_Vec2 operator-(HMM_Vec2 In) {
 	HMM_Vec2 Result;
 
 	Result.X = -In.X;
@@ -2609,7 +2607,7 @@ FUNC_MOD HMM_Vec2 operator-(HMM_Vec2 In) {
 	return Result;
 }
 
-FUNC_MOD HMM_Vec3 operator-(HMM_Vec3 In) {
+static inline HMM_Vec3 operator-(HMM_Vec3 In) {
 	HMM_Vec3 Result;
 
 	Result.X = -In.X;
@@ -2619,7 +2617,7 @@ FUNC_MOD HMM_Vec3 operator-(HMM_Vec3 In) {
 	return Result;
 }
 
-FUNC_MOD HMM_Vec4 operator-(HMM_Vec4 In) {
+static inline HMM_Vec4 operator-(HMM_Vec4 In) {
 	HMM_Vec4 Result;
 
 #if HANDMADE_MATH__USE_SSE

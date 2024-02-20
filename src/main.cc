@@ -2,8 +2,8 @@
 
 #include <SDL2/SDL.h>
 
-#include "sys/init.h"
-#include "game.h"
+#include "sys/init.hh"
+#include "game.hh"
 
 #include "utils/consc.h"
 

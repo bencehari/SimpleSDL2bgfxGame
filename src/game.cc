@@ -1,4 +1,4 @@
-#include "game.h"
+#include "game.hh"
 
 #include <stdio.h>
 #include <stdbool.h>
@@ -7,16 +7,16 @@
 #include <bgfx/bgfx.h>
 
 #include "math/math.h"
-#include "sys/loaders.h"
-#include "geometry/wavefront_obj.h"
-#include "core/programs.h"
-#include "core/vertex.h"
-#include "core/models.h"
-#include "core/transform.h"
-#include "core/object.h"
+#include "sys/loaders.hh"
+#include "geometry/wavefront_obj.hh"
+#include "core/programs.hh"
+#include "core/vertex.hh"
+#include "core/models.hh"
+#include "core/transform.hh"
+#include "core/object.hh"
 
 #include "utils/consc.h"
-#include "utils/debug.h"
+#include "utils/debug.hh"
 
 void game(float _width, float _height, float _fps) {
 	VertexManager::init();
@@ -32,12 +32,12 @@ void game(float _width, float _height, float _fps) {
 	/*Object* cube =*/ ObjectManager::createTestCube(programHandle);
 	
 	// test
-	Model* suzanneModel { WavefrontObj::loadColored("assets/models/suzanne.obj") };
+	Model* suzanneModel { wfobj_loadColored("assets/models/suzanne.obj") };
 	Object* suzanne { Object::create(suzanneModel, programHandle) };
 	suzanne->transform.position = V3_NEW(5.0f, 0.0f, 0.0f);
 
 	// for now, it loads all object as one from .obj
-	Model* skeletonMageModel { WavefrontObj::loadColored("assets/models/Skeleton_Mage.obj") };
+	Model* skeletonMageModel { wfobj_loadColored("assets/models/Skeleton_Mage.obj") };
 	Object* skeletonMage { Object::create(skeletonMageModel, programHandle) };
 	skeletonMage->transform.position = V3_NEW(-5.0f, 0.0f, 0.0f);
 	

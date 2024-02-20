@@ -1,5 +1,5 @@
-#ifndef KE_TRANSFORM_H
-#define KE_TRANSFORM_H
+#ifndef KE_TRANSFORM_HH
+#define KE_TRANSFORM_HH
 
 #include "../math/math.h"
 
@@ -68,4 +68,4 @@ struct Transform {
 */
 #define TRANSFORM_NEW Transform(V3_ZERO, Q_IDENTITY, V3_ONE)
 
-#endif // KE_TRANSFORM_H
+#endif // KE_TRANSFORM_HH

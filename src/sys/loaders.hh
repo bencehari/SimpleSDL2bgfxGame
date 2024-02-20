@@ -1,5 +1,5 @@
-#ifndef LOADERS_H
-#define LOADERS_H
+#ifndef LOADERS_HH
+#define LOADERS_HH
 
 #include <bgfx/bgfx.h>
 
@@ -16,4 +16,4 @@
 */
 extern bool loadShader(const char* _filename, bgfx::ShaderHandle* _shaderHandle);
 
-#endif // LOADERS_H
+#endif // LOADERS_HH

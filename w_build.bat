@@ -40,7 +40,7 @@ IF %debug_mode%==0 (
 
 :: add *.c files from src folder
 SET source_files=
-FOR /f "usebackq delims=" %%a IN (`DIR /s /b ".\src\*.cc"`) DO SET source_files=!source_files! %%a
+FOR /f "usebackq delims=" %%a IN (`DIR /s /b ".\src\*.cc" ".\src\*.c"`) DO SET source_files=!source_files! %%a
 
 CLS
 

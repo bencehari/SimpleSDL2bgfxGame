@@ -1,13 +1,13 @@
-#ifndef KE_OBJECT_H
-#define KE_OBJECT_H
+#ifndef KE_OBJECT_HH
+#define KE_OBJECT_HH
 
 #include <stdbool.h>
 
 #include <bgfx/bgfx.h>
 
 #include "../math/math.h"
-#include "transform.h"
-#include "models.h"
+#include "transform.hh"
+#include "models.hh"
 
 /**
  * @brief Object class represent a visible entity.
@@ -95,4 +95,4 @@ namespace ObjectManager {
 	extern void render(void);
 }
 
-#endif // KE_OBJECT_H
+#endif // KE_OBJECT_HH

@@ -1,5 +1,5 @@
-#ifndef KE_INIT_H
-#define KE_INIT_H
+#ifndef KE_INIT_HH
+#define KE_INIT_HH
 
 #include <stdlib.h>
 #include <stdint.h>
@@ -21,4 +21,4 @@ extern bool initSystem(uint32_t _flags, int _width, int _height);
 */
 extern void cleanupSystem(void);
 
-#endif // KE_INIT_H
+#endif // KE_INIT_HH

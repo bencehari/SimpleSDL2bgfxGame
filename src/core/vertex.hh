@@ -1,5 +1,5 @@
-#ifndef KE_VERTEX_H
-#define KE_VERTEX_H
+#ifndef KE_VERTEX_HH
+#define KE_VERTEX_HH
 
 #include <stdint.h>
 
@@ -46,4 +46,4 @@ namespace VertexManager {
 	extern void init(void);
 }
 
-#endif // KE_VERTEX_H
+#endif // KE_VERTEX_HH

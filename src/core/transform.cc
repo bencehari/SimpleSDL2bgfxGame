@@ -1,4 +1,4 @@
-#include "transform.h"
+#include "transform.hh"
 
 void Transform::fpsRotate(const Vector2 _input) {
 	rotation = Q_AA(AXIS_Y, _input.Y) * rotation;

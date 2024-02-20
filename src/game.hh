@@ -1,5 +1,5 @@
-#ifndef KE_GAME_H
-#define KE_GAME_H
+#ifndef KE_GAME_HH
+#define KE_GAME_HH
 
 /**
  * @brief The game logic.
@@ -10,4 +10,4 @@
 */
 extern void game(float _width, float _height, float _fps);
 
-#endif // KE_GAME_H
+#endif // KE_GAME_HH

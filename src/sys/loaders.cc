@@ -1,4 +1,4 @@
-#include "loaders.h"
+#include "loaders.hh"
 
 #include <string.h>
 
@@ -37,7 +37,7 @@ bool loadShader(const char* _filename, bgfx::ShaderHandle* _shaderHandle) {
 	
 	FILE* file { nullptr };
 	long fileSize { 0 };
-	if (!getFileSize(filePath, fileSize, file)) return false;
+	if (!getFileSize(filePath, &fileSize, &file)) return false;
 	
 	// printf(AC_YELLOW "fileSize: %ld\n" AC_RESET, fileSize);
 	

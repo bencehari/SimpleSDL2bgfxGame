@@ -1,4 +1,4 @@
-#include "init.h"
+#include "init.hh"
 
 #include <stdio.h>
 

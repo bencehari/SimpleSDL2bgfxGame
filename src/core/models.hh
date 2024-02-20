@@ -1,11 +1,11 @@
-#ifndef KE_MODELS_H
-#define KE_MODELS_H
+#ifndef KE_MODELS_HH
+#define KE_MODELS_HH
 
 #include <stdbool.h>
 
 #include <bgfx/bgfx.h>
 
-#include "vertex.h"
+#include "vertex.hh"
 
 /**
  * @brief Model class contains all information fro bgfx to render a geometry.
@@ -81,4 +81,4 @@ namespace ModelManager {
 	extern Model* create(const Vertex_Colored _vertices[], int _verticesLen, const uint16_t _indices[], int _indicesLen, const bgfx::VertexLayout& _vertexLayout);
 }
 
-#endif // KE_MODELS_H
+#endif // KE_MODELS_HH

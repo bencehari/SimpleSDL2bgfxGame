@@ -1,4 +1,4 @@
-#include "vertex.h"
+#include "vertex.hh"
 
 bgfx::VertexLayout Vertex_Colored::layout;
 bgfx::VertexLayout Vertex_Textured::layout;

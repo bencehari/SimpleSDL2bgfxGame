@@ -1,10 +1,10 @@
-#include "programs.h"
+#include "programs.hh"
 
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 
-#include "../sys/loaders.h"
+#include "../sys/loaders.hh"
 #include "../utils/consc.h"
 
 namespace ProgramManager {

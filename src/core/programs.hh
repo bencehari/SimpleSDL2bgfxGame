@@ -1,5 +1,5 @@
-#ifndef KE_PROGRAMS_H
-#define KE_PROGRAMS_H
+#ifndef KE_PROGRAMS_HH
+#define KE_PROGRAMS_HH
 
 #include <stdbool.h>
 
@@ -34,4 +34,4 @@ namespace ProgramManager {
 	extern bgfx::ProgramHandle create(const char* _vertexShader, const char* _fragmentShader, bool _destroyShaders);
 }
 
-#endif // KE_PROGRAMS_H
+#endif // KE_PROGRAMS_HH
