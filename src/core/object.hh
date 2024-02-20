@@ -28,10 +28,7 @@ public:
 	 *
 	 * Create Object by Object::create(..) static function (or ObjectManager::create(..)).
 	*/
-	Object(Model* _model, bgfx::ProgramHandle _program, Transform _transform) :
-		model(_model),
-		program(_program),
-		transform(_transform) {}
+	Object(Model* _model, bgfx::ProgramHandle _program, Transform _transform);
 
 	/**
 	 * @brief Creates a new Object.

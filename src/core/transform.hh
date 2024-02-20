@@ -11,10 +11,7 @@ struct Transform {
 	Quaternion rotation;
 	Vector3 scale;
 	
-	Transform(Vector3 _position, Quaternion _rotation, Vector3 _scale) :
-		position(_position),
-		rotation(_rotation),
-		scale(_scale) {}
+	Transform(Vector3 _position, Quaternion _rotation, Vector3 _scale);
 
 	/**
 	 * @brief Rotates the transform based on input.

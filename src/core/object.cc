@@ -2,6 +2,11 @@
 
 #include <stdio.h>
 
+Object::Object(Model* _model, bgfx::ProgramHandle _program, Transform _transform) :
+		model(_model),
+		program(_program),
+		transform(_transform) {}
+
 Object* Object::create(Model* _model, bgfx::ProgramHandle _program, Transform _transform) {
 	return ObjectManager::create(_model, _program, _transform);
 }

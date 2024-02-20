@@ -1,5 +1,10 @@
 #include "transform.hh"
 
+Transform::Transform(Vector3 _position, Quaternion _rotation, Vector3 _scale) :
+		position(_position),
+		rotation(_rotation),
+		scale(_scale) {}
+
 void Transform::fpsRotate(const Vector2 _input) {
 	rotation = Q_AA(AXIS_Y, _input.Y) * rotation;
 	Vector3 localRight { rotate(V3_RIGHT, rotation) };

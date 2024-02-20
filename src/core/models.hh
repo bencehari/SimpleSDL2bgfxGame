@@ -33,15 +33,7 @@ public:
 		uint16_t _indices[],
 		int _indicesLen,
 		bgfx::VertexBufferHandle _vertexBufferHnd,
-		bgfx::IndexBufferHandle _indexBufferHnd
-	) :
-		id(_id),
-		vertices(_vertices),
-		indices(_indices),
-		verticesLen(_verticesLen),
-		indicesLen(_indicesLen),
-		vertexBufferHnd(_vertexBufferHnd),
-		indexBufferHnd(_indexBufferHnd) {}
+		bgfx::IndexBufferHandle _indexBufferHnd);
 
 	static Model* create(Vertex_Colored _vertices[], int _verticesLen, uint16_t _indices[], int _indicesLen, bgfx::VertexLayout& _vertexLayout);
 

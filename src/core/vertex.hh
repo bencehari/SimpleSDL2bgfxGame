@@ -16,7 +16,7 @@ struct Vertex_Colored {
 	float x, y, z;				//!< position coordinates
 	uint32_t abgr;				//!< vertex color
 
-	Vertex_Colored(float _x, float _y, float _z, uint32_t _abgr) : x(_x), y(_y), z(_z), abgr(_abgr) {}
+	Vertex_Colored(float _x, float _y, float _z, uint32_t _abgr);
 	
 	static bgfx::VertexLayout layout;
 	static void init(void);
@@ -30,10 +30,7 @@ struct Vertex_Textured {
 	uint32_t normal, tangent;	//!< normal and tangent
 	int16_t u, v;				//!< UV coordinates
 	
-	Vertex_Textured(float _x, float _y, float _z, uint32_t _normal, uint32_t _tangent, int16_t _u, int16_t _v) :
-		x(_x), y(_y), z(_z),
-		normal(_normal), tangent(_tangent),
-		u(_u), v(_v) {}
+	Vertex_Textured(float _x, float _y, float _z, uint32_t _normal, uint32_t _tangent, int16_t _u, int16_t _v);
 
 	static bgfx::VertexLayout layout;
 	static void init(void);

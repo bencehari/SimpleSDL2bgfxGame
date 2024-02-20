@@ -34,6 +34,10 @@ static bool preprocess(FILE*& _file, int& _vertexCount, int& _triCount, int& _no
 	char c;
 	bool shouldDetectOrder = _detectOrder;
 	
+	// TODO: handle face layouts, e.g.:
+	// "f v1 v2 v3", "f v1/vt1 v2/vt2 v3/vt3",
+	// "f v1/vt1/vn1 v2/vt2/vn2 v3/vt3/vn3", "f v1//vn1 v2//vn2 v3//vn3"
+	
 	while ((c = getc(_file)) != EOF) {
 		if (c == 'v') {
 			// vertex
@@ -145,6 +149,8 @@ Model* wfobj_loadColored(const char* _objPath, IndicesOrder _order) {
 					"%d/%d/%d %d/%d/%d %d/%d/%d %d/%d/%d",
 					&v1, &vt1, &vn1, &v2, &vt2, &vn2, &v3, &vt3, &vn3, &v4, &vt4, &vn4);
 				
+				// TODO: handle negative vertex index
+				
 				// we store indexes 0 based
 				v1--; vt1--; vn1--;
 				v2--; vt2--; vn2--;
@@ -152,12 +158,12 @@ Model* wfobj_loadColored(const char* _objPath, IndicesOrder _order) {
 				v4--; vt4--; vn4--;
 
 				if (_order == IndicesOrder::Auto) {
-					Vector3 a { V3_NEW(vertices[v1].x, vertices[v1].y, vertices[v1].z) };
-					Vector3 b { V3_NEW(vertices[v2].x, vertices[v2].y, vertices[v2].z) };
-					Vector3 c { V3_NEW(vertices[v3].x, vertices[v3].y, vertices[v3].z) };
+					Vector3 a V3_NEW(vertices[v1].x, vertices[v1].y, vertices[v1].z);
+					Vector3 b V3_NEW(vertices[v2].x, vertices[v2].y, vertices[v2].z);
+					Vector3 c V3_NEW(vertices[v3].x, vertices[v3].y, vertices[v3].z);
 					
 					// calculate normal clockwise
-					Vector3 normCalculated { V3_NORM(V3_CROSS(b - a, c - a)) };
+					Vector3 normCalculated V3_NORM(V3_CROSS(b - a, c - a));
 					
 					// hopefully that will be enough.
 					// EDIT: changed to 0.95 from 0.99
@@ -338,6 +344,8 @@ Model* wfobj_loadTextured(const char* _objPath, IndicesOrder _order) {
 				int n = fscanf(file,
 					"%d/%d/%d %d/%d/%d %d/%d/%d %d/%d/%d",
 					&v1, &vt1, &vn1, &v2, &vt2, &vn2, &v3, &vt3, &vn3, &v4, &vt4, &vn4);
+				
+				// TODO: handle negative vertex index (this TODO is in wfobj_loadColored also)
 				
 				// we store indexes 0 based
 				v1--; vt1--; vn1--;
