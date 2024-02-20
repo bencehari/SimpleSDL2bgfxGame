@@ -10,20 +10,22 @@ union Color {
 	unsigned hex;
 };
 
+unsigned int rgbToHex(const float r, const float g, const float b) {
+	Color c { (unsigned char)(255 * r), (unsigned char)(255 * g), (unsigned char)(255 * b), 255 };
+	return c.hex;
+}
+
 unsigned int rgbaToHex(const float r, const float g, const float b, const float a) {
-	Color c;
-	c.rgba.r = 255 * r;
-	c.rgba.g = 255 * g;
-	c.rgba.b = 255 * b;
-	c.rgba.a = 255 * a;
+	Color c { (unsigned char)(255 * r), (unsigned char)(255 * g), (unsigned char)(255 * b), (unsigned char)(255 * a) };
+	return c.hex;
+}
+
+unsigned int rgbToHex(const unsigned char r, const unsigned char g, const unsigned char b) {
+	Color c { r, g, b, 255 };
 	return c.hex;
 }
 
 unsigned int rgbaToHex(const unsigned char r, const unsigned char g, const unsigned char b, const unsigned char a) {
-	Color c;
-	c.rgba.r = r;
-	c.rgba.g = g;
-	c.rgba.b = b;
-	c.rgba.a = a;
+	Color c { r, g, b, a };
 	return c.hex;
 }

@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <string.h>
 
 #include "../math/math.h"
 #include "../core/vertex.h"
@@ -26,6 +27,18 @@ namespace WavefrontObj {
 
 		bool detectOrder { _order == IndicesOrder::Auto ? true : false };
 		Vector3 normal V3_ZERO;
+		
+		bool flipX { false };
+		{
+			char buf[10];
+			char* line = fgets(buf, 10, file);
+			if (line == nullptr) {
+				fclose(file);
+				return nullptr;
+			}
+
+			if (strcmp(line, "# Blender") == 0) flipX = true;
+		}
 
 		while ((c = getc(file)) != EOF) {
 			if (c == 'v') {
@@ -82,10 +95,10 @@ namespace WavefrontObj {
 					int n = fscanf(file, "%f %f %f %f %f %f", &x, &y, &z, &r, &g, &b);
 					
 					if (n == 3) {
-						vertices[vIndex] = Vertex_Colored(x, y, z, 0xff7f00ff);
+						vertices[vIndex] = Vertex_Colored(!flipX ? x : -x, y, z, 0xff7f00ff);
 					}
 					else if (n == 6) {
-						vertices[vIndex] = Vertex_Colored(x, y, z, rgbaToHex(r, g, b, 1.0f));
+						vertices[vIndex] = Vertex_Colored(!flipX ? x : -x, y, z, rgbToHex(r, g, b));
 					}
 					else {
 						printf(AC_RED "Failed to match vertex data." AC_RESET);
