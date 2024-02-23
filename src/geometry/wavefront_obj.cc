@@ -32,17 +32,14 @@ static bool readFileAndHeader(const char* _path, FILE*& _file, bool& _flipX) {
 	
 	char buf[10];
 	char* line = fgets(buf, 10, _file);
-	if (line == nullptr) {
-		fclose(_file);
-		return false;
-	}
+	if (line == nullptr) return false;
 
 	if (strcmp(line, "# Blender") == 0) _flipX = true;
 	
 	return true;
 }
 
-static bool preprocess(FILE*& _file, ObjData& _data, Vector3& _normal) {
+static bool preprocess(FILE*& _file, ObjData& _data, Vector3& _firstTriNormal) {
 	char c;
 	bool shouldDetectOrder = _data.order == IndicesOrder::Auto;
 	
@@ -60,7 +57,7 @@ static bool preprocess(FILE*& _file, ObjData& _data, Vector3& _normal) {
 			// vertex normal
 			else if (c == 'n') {
 				if (shouldDetectOrder) {
-					int n = fscanf(_file, "%f %f %f", &_normal.X, &_normal.Y, &_normal.Z);
+					int n = fscanf(_file, "%f %f %f", &_firstTriNormal.X, &_firstTriNormal.Y, &_firstTriNormal.Z);
 
 					if (n != 3) {
 						printf(AC_RED "Failed to match vertex normal data." AC_RESET);
@@ -89,10 +86,8 @@ static bool preprocess(FILE*& _file, ObjData& _data, Vector3& _normal) {
 	}
 	
 	if (_data.order == IndicesOrder::Auto) {
-		if (_normal == V3_ZERO) {
+		if (_firstTriNormal == V3_ZERO) {
 			printf(AC_RED "Failed to retrive vertex normal." AC_RESET);
-
-			fclose(_file);
 			return false;
 		}
 	}
@@ -106,12 +101,18 @@ Model* wfobj_load(const char* _objPath, IndicesOrder _order) {
 	FILE* file { nullptr };
 	bool flipX { false };
 	
-	if (!readFileAndHeader(_objPath, file, flipX)) return nullptr;
+	if (!readFileAndHeader(_objPath, file, flipX)) {
+		if (file != nullptr) fclose(file);
+		return nullptr;
+	}
 
 	ObjData data { 0, 0, 0, 0, _order };
-	Vector3 normal V3_ZERO;
+	Vector3 firstTriNormal V3_ZERO;
 
-	if (!preprocess(file, data, normal)) return nullptr;
+	if (!preprocess(file, data, firstTriNormal)) {
+		fclose(file);
+		return nullptr;
+	}
 	
 	Model* model { nullptr };
 	
@@ -149,24 +150,29 @@ Model* wfobj_load(const char* _objPath, IndicesOrder _order) {
 			// face
 			if (getc(file) == ' ') {
 				int
-					v1 { -1 }, vt1 { -1 }, vn1 { -1 },
-					v2 { -1 }, vt2 { -1 }, vn2 { -1 },
-					v3 { -1 }, vt3 { -1 }, vn3 { -1 },
-					v4 { -1 }, vt4 { -1 }, vn4 { -1 };
+					v1 { 0 }, vt1 { 0 }, vn1 { 0 },
+					v2 { 0 }, vt2 { 0 }, vn2 { 0 },
+					v3 { 0 }, vt3 { 0 }, vn3 { 0 },
+					v4 { 0 }, vt4 { 0 }, vn4 { 0 };
 
 				int n = fscanf(file,
 					"%d/%d/%d %d/%d/%d %d/%d/%d %d/%d/%d",
 					&v1, &vt1, &vn1, &v2, &vt2, &vn2, &v3, &vt3, &vn3, &v4, &vt4, &vn4);
 				
-				// TODO: handle negative vertex index
-				
-				// we store indexes 0 based
-				v1--; vt1--; vn1--;
-				v2--; vt2--; vn2--;
-				v3--; vt3--; vn3--;
-				v4--; vt4--; vn4--;
+				v1 += v1 < 0 ? data.positionCount : -1;
+				vt1 += vt1 < 0 ? data.texcoordCount : -1;
+				vn1 += vn1 < 0 ? data.normalCount : -1;
+				v2 += v2 < 0 ? data.positionCount : -1;
+				vt2 += vt2 < 0 ? data.texcoordCount : -1;
+				vn2 += vn2 < 0 ? data.normalCount : -1;
+				v3 += v3 < 0 ? data.positionCount : -1;
+				vt3 += vt3 < 0 ? data.texcoordCount : -1;
+				vn3 += vn3 < 0 ? data.normalCount : -1;
+				v4 += v4 < 0 ? data.positionCount : -1;
+				vt4 += vt4 < 0 ? data.texcoordCount : -1;
+				vn4 += vn4 < 0 ? data.normalCount : -1;
 
-				if (_order == IndicesOrder::Auto) {
+				if (data.order == IndicesOrder::Auto) {
 					Vector3 a V3_NEW(vertices[v1].x, vertices[v1].y, vertices[v1].z);
 					Vector3 b V3_NEW(vertices[v2].x, vertices[v2].y, vertices[v2].z);
 					Vector3 c V3_NEW(vertices[v3].x, vertices[v3].y, vertices[v3].z);
@@ -174,19 +180,12 @@ Model* wfobj_load(const char* _objPath, IndicesOrder _order) {
 					// calculate normal clockwise
 					Vector3 normCalculated V3_NORM(V3_CROSS(b - a, c - a));
 					
-					// hopefully that will be enough.
-					// EDIT: changed to 0.95 from 0.99
 					// theoretically dot > 0.0f would be enough, but it is strange that even 0.975 happened, maybe should investigate this
-					data.order = _order = V3_DOT(normal, normCalculated) >= 0.95f ? IndicesOrder::CW : IndicesOrder::CCW;
-					
-					/*printf(AC_YELLOW "determine indices order for \"%s\"\n" AC_RESET
-						"           normal: %f %f %f\nnormal calculated: %f %f %f\nDOT: %f\n",
-						_objPath, normal.X, normal.Y, normal.Z, normCalculated.X, normCalculated.Y, normCalculated.Z, V3_DOT(normal, normCalculated));*/
+					data.order = V3_DOT(firstTriNormal, normCalculated) >= 0.95f ? IndicesOrder::CW : IndicesOrder::CCW;
 				}
 
 				if (n == 12) {
-					// Blender arranges indices clockwise, while bgfx processes counterclockwise
-					switch (_order) {
+					switch (data.order) {
 						case IndicesOrder::CW:
 							indices[iIndex++] = v3;
 							indices[iIndex++] = v2;
@@ -210,7 +209,7 @@ Model* wfobj_load(const char* _objPath, IndicesOrder _order) {
 					
 				}
 				else if (n == 9) {
-					switch (_order) {
+					switch (data.order) {
 						case IndicesOrder::CW:
 							indices[iIndex++] = v3;
 							indices[iIndex++] = v2;
@@ -231,11 +230,6 @@ Model* wfobj_load(const char* _objPath, IndicesOrder _order) {
 			}
 		}
 	}
-	
-	/*puts(AC_YELLOW "VERTICES" AC_RESET);
-	for (int i = 0; i < vert; i++) printf("%d:\t%f %f %f\n", i + 1, vertices[i].x, vertices[i].y, vertices[i].z);
-	puts(AC_YELLOW "INDICES" AC_RESET);
-	for (int i = 1, j = 2; j < tris * 3; i++, j += 3) printf("%d:\t%d %d %d\n", i, indices[j - 2], indices[j - 1], indices[j]);*/
 	
 	model = ModelManager::create(vertices, data.positionCount, indices, data.triCount * 3, Vertex_Colored::layout);
 
