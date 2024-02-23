@@ -117,7 +117,19 @@ Model* wfobj_load(const char* _objPath, IndicesOrder _order) {
 	Model* model { nullptr };
 	
 	Vertex_Colored* vertices { (Vertex_Colored*)malloc(sizeof(Vertex_Colored) * data.positionCount) };
+	if (vertices == NULL) {
+		puts(AC_RED "Failed to allocate memory." AC_RESET);
+		fclose(file);
+		return nullptr;
+	}
+	
 	uint16_t* indices { (uint16_t*)malloc(sizeof(uint16_t) * data.triCount * 3) };
+	if (indices == NULL) {
+		puts(AC_RED "Failed to allocate memory." AC_RESET);
+		free(vertices);
+		fclose(file);
+		return nullptr;
+	}
 	
 	int vIndex { 0 };
 	int iIndex { 0 };
@@ -179,8 +191,7 @@ Model* wfobj_load(const char* _objPath, IndicesOrder _order) {
 					
 					// calculate normal clockwise
 					Vector3 normCalculated V3_NORM(V3_CROSS(b - a, c - a));
-					
-					// theoretically dot > 0.0f would be enough, but it is strange that even 0.975 happened, maybe should investigate this
+					// validate if calculated clockwise normal points the same direction as the provided normal
 					data.order = V3_DOT(firstTriNormal, normCalculated) >= 0.95f ? IndicesOrder::CW : IndicesOrder::CCW;
 				}
 

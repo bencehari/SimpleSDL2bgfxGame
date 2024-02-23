@@ -14,6 +14,7 @@ namespace ProgramManager {
 	static int currentIndex;
 	static bgfx::ProgramHandle* programs;
 
+	// TODO: handle errors!
 	void init(int _maxProgramCount) {
 		if (initialized) {
 			puts("Already initialized.");
@@ -22,6 +23,10 @@ namespace ProgramManager {
 		
 		programCount = _maxProgramCount;
 		programs = (bgfx::ProgramHandle*)malloc(sizeof(bgfx::ProgramHandle) * _maxProgramCount);
+		if (programs == NULL) {
+			puts(AC_RED "Failed to allocate memory." AC_RESET);
+			return;
+		}
 		
 		initialized = true;
 	}

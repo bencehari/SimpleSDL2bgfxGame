@@ -4,7 +4,7 @@
 
 #include "../utils/file.h" // <stdio.h>
 
-// #include "../utils/consc.h"
+#include "../utils/consc.h"
 
 bool loadShader(const char* _filename, bgfx::ShaderHandle* _shaderHandle) {
 	const char* shaderPath { nullptr };
@@ -29,6 +29,11 @@ bool loadShader(const char* _filename, bgfx::ShaderHandle* _shaderHandle) {
 	size_t fileNameLen { strlen(_filename) };
 	
 	char* filePath { (char*)malloc(shaderPathLen + fileNameLen + 1) };
+	if (filePath == NULL) {
+		puts(AC_RED "Failed to allocate memory." AC_RESET);
+		return false;
+	}
+	
 	memcpy(filePath, shaderPath, shaderPathLen);
 	memcpy(&filePath[shaderPathLen], _filename, fileNameLen);
 	filePath[shaderPathLen + fileNameLen] = '\0';

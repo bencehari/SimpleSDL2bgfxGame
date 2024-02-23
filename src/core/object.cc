@@ -2,6 +2,8 @@
 
 #include <stdio.h>
 
+#include "../utils/consc.h"
+
 Object::Object(Model* _model, bgfx::ProgramHandle _program, Transform _transform) :
 		model(_model),
 		program(_program),
@@ -30,6 +32,7 @@ namespace ObjectManager {
 	static int currentIndex;
 	static Object* objects;
 
+	// TODO: handle error!
 	void init(int _maxObjectCount) {
 		if (initialized) {
 			puts("Already initialized.");
@@ -38,6 +41,10 @@ namespace ObjectManager {
 		
 		maxObjectCount = _maxObjectCount;
 		objects = (Object*)malloc(sizeof(Object) * _maxObjectCount);
+		if (objects == NULL) {
+			printf(AC_RED "Failed to allocate memory." AC_RESET);
+			return;
+		}
 		
 		initialized = true;
 	}
