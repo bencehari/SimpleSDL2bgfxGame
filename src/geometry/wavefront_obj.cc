@@ -17,11 +17,40 @@ struct ObjData {
 	int normalCount;
 	int triCount;
 	IndicesOrder order;
+	bool flipX;
 	
 	void print() {
-		printf("v: %d, vt: %d, vn: %d, tris: %d\n", positionCount, texcoordCount, normalCount, triCount);
+		printf("v: %d, vt: %d, vn: %d, tris: %d, flipX: %s\n", positionCount, texcoordCount, normalCount, triCount, flipX ? "true" : "false");
 	}
 };
+
+static bool readFileAndHeader(const char* _path, FILE*& _file, bool& _flipX);
+static bool preprocess(FILE*& _file, ObjData& _data, Vector3& _firstTriNormal);
+static Model* process(FILE*& _file, ObjData& _data, const Vector3& _firstTriNormal);
+
+Model* wfobj_load(const char* _objPath, IndicesOrder _order) {
+	FILE* file { nullptr };
+	
+	ObjData data { 0, 0, 0, 0, _order, false };
+	
+	if (!readFileAndHeader(_objPath, file, data.flipX)) {
+		if (file != nullptr) fclose(file);
+		return nullptr;
+	}
+
+	Vector3 firstTriNormal V3_ZERO;
+
+	if (!preprocess(file, data, firstTriNormal)) {
+		fclose(file);
+		return nullptr;
+	}
+	
+	Model* model = process(file, data, firstTriNormal);
+
+	fclose(file);
+
+	return model;
+}
 
 static bool readFileAndHeader(const char* _path, FILE*& _file, bool& _flipX) {
 	_file = fopen(_path, "r");
@@ -97,59 +126,41 @@ static bool preprocess(FILE*& _file, ObjData& _data, Vector3& _firstTriNormal) {
 	return true;
 }
 
-Model* wfobj_load(const char* _objPath, IndicesOrder _order) {
-	FILE* file { nullptr };
-	bool flipX { false };
-	
-	if (!readFileAndHeader(_objPath, file, flipX)) {
-		if (file != nullptr) fclose(file);
-		return nullptr;
-	}
-
-	ObjData data { 0, 0, 0, 0, _order };
-	Vector3 firstTriNormal V3_ZERO;
-
-	if (!preprocess(file, data, firstTriNormal)) {
-		fclose(file);
-		return nullptr;
-	}
-	
+static Model* process(FILE*& _file, ObjData& _data, const Vector3& _firstTriNormal) {
 	Model* model { nullptr };
 	
-	Vertex_Colored* vertices { (Vertex_Colored*)malloc(sizeof(Vertex_Colored) * data.positionCount) };
+	Vertex_Colored* vertices { (Vertex_Colored*)malloc(sizeof(Vertex_Colored) * _data.positionCount) };
 	if (vertices == NULL) {
 		puts(AC_RED "Failed to allocate memory." AC_RESET);
-		fclose(file);
 		return nullptr;
 	}
 	
-	uint16_t* indices { (uint16_t*)malloc(sizeof(uint16_t) * data.triCount * 3) };
+	uint16_t* indices { (uint16_t*)malloc(sizeof(uint16_t) * _data.triCount * 3) };
 	if (indices == NULL) {
 		puts(AC_RED "Failed to allocate memory." AC_RESET);
 		free(vertices);
-		fclose(file);
 		return nullptr;
 	}
 	
 	int vIndex { 0 };
 	int iIndex { 0 };
 	
-	rewind(file);
+	rewind(_file);
 
 	char c;
-	while ((c = getc(file)) != EOF) {
+	while ((c = getc(_file)) != EOF) {
 		if (c == 'v') {
 			// vertex
-			if (getc(file) == ' ') {
+			if (getc(_file) == ' ') {
 				float x, y, z;
 				float r, g, b;
-				int n = fscanf(file, "%f %f %f %f %f %f", &x, &y, &z, &r, &g, &b);
+				int n = fscanf(_file, "%f %f %f %f %f %f", &x, &y, &z, &r, &g, &b);
 				
 				if (n == 3) {
-					vertices[vIndex] = Vertex_Colored(!flipX ? x : -x, y, z, 0xff7f00ff);
+					vertices[vIndex] = Vertex_Colored(!_data.flipX ? x : -x, y, z, 0xff7f00ff);
 				}
 				else if (n == 6) {
-					vertices[vIndex] = Vertex_Colored(!flipX ? x : -x, y, z, rgbToHex(r, g, b));
+					vertices[vIndex] = Vertex_Colored(!_data.flipX ? x : -x, y, z, rgbToHex(r, g, b));
 				}
 				else {
 					printf(AC_RED "Failed to match vertex data." AC_RESET);
@@ -160,31 +171,31 @@ Model* wfobj_load(const char* _objPath, IndicesOrder _order) {
 		}
 		else if (c == 'f') {
 			// face
-			if (getc(file) == ' ') {
+			if (getc(_file) == ' ') {
 				int
 					v1 { 0 }, vt1 { 0 }, vn1 { 0 },
 					v2 { 0 }, vt2 { 0 }, vn2 { 0 },
 					v3 { 0 }, vt3 { 0 }, vn3 { 0 },
 					v4 { 0 }, vt4 { 0 }, vn4 { 0 };
 
-				int n = fscanf(file,
+				int n = fscanf(_file,
 					"%d/%d/%d %d/%d/%d %d/%d/%d %d/%d/%d",
 					&v1, &vt1, &vn1, &v2, &vt2, &vn2, &v3, &vt3, &vn3, &v4, &vt4, &vn4);
 				
-				v1 += v1 < 0 ? data.positionCount : -1;
-				vt1 += vt1 < 0 ? data.texcoordCount : -1;
-				vn1 += vn1 < 0 ? data.normalCount : -1;
-				v2 += v2 < 0 ? data.positionCount : -1;
-				vt2 += vt2 < 0 ? data.texcoordCount : -1;
-				vn2 += vn2 < 0 ? data.normalCount : -1;
-				v3 += v3 < 0 ? data.positionCount : -1;
-				vt3 += vt3 < 0 ? data.texcoordCount : -1;
-				vn3 += vn3 < 0 ? data.normalCount : -1;
-				v4 += v4 < 0 ? data.positionCount : -1;
-				vt4 += vt4 < 0 ? data.texcoordCount : -1;
-				vn4 += vn4 < 0 ? data.normalCount : -1;
+				v1 += v1 < 0 ? _data.positionCount : -1;
+				vt1 += vt1 < 0 ? _data.texcoordCount : -1;
+				vn1 += vn1 < 0 ? _data.normalCount : -1;
+				v2 += v2 < 0 ? _data.positionCount : -1;
+				vt2 += vt2 < 0 ? _data.texcoordCount : -1;
+				vn2 += vn2 < 0 ? _data.normalCount : -1;
+				v3 += v3 < 0 ? _data.positionCount : -1;
+				vt3 += vt3 < 0 ? _data.texcoordCount : -1;
+				vn3 += vn3 < 0 ? _data.normalCount : -1;
+				v4 += v4 < 0 ? _data.positionCount : -1;
+				vt4 += vt4 < 0 ? _data.texcoordCount : -1;
+				vn4 += vn4 < 0 ? _data.normalCount : -1;
 
-				if (data.order == IndicesOrder::Auto) {
+				if (_data.order == IndicesOrder::Auto) {
 					Vector3 a V3_NEW(vertices[v1].x, vertices[v1].y, vertices[v1].z);
 					Vector3 b V3_NEW(vertices[v2].x, vertices[v2].y, vertices[v2].z);
 					Vector3 c V3_NEW(vertices[v3].x, vertices[v3].y, vertices[v3].z);
@@ -192,11 +203,11 @@ Model* wfobj_load(const char* _objPath, IndicesOrder _order) {
 					// calculate normal clockwise
 					Vector3 normCalculated V3_NORM(V3_CROSS(b - a, c - a));
 					// validate if calculated clockwise normal points the same direction as the provided normal
-					data.order = V3_DOT(firstTriNormal, normCalculated) >= 0.95f ? IndicesOrder::CW : IndicesOrder::CCW;
+					_data.order = V3_DOT(_firstTriNormal, normCalculated) >= 0.95f ? IndicesOrder::CW : IndicesOrder::CCW;
 				}
 
 				if (n == 12) {
-					switch (data.order) {
+					switch (_data.order) {
 						case IndicesOrder::CW:
 							indices[iIndex++] = v3;
 							indices[iIndex++] = v2;
@@ -220,7 +231,7 @@ Model* wfobj_load(const char* _objPath, IndicesOrder _order) {
 					
 				}
 				else if (n == 9) {
-					switch (data.order) {
+					switch (_data.order) {
 						case IndicesOrder::CW:
 							indices[iIndex++] = v3;
 							indices[iIndex++] = v2;
@@ -242,14 +253,12 @@ Model* wfobj_load(const char* _objPath, IndicesOrder _order) {
 		}
 	}
 	
-	model = ModelManager::create(vertices, data.positionCount, indices, data.triCount * 3, Vertex_Colored::layout);
+	model = ModelManager::create(vertices, _data.positionCount, indices, _data.triCount * 3, Vertex_Colored::layout);
 
 end:
 	free(vertices);
 	free(indices);
-
-	fclose(file);
-
+	
 	return model;
 }
 
