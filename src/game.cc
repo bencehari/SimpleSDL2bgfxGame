@@ -32,17 +32,14 @@ void game(float _width, float _height, float _fps) {
 	/*Object* cube =*/ ObjectManager::createTestCube(programHandle);
 	
 	// test
-	Model* suzanneModel { wfobj_loadColored("assets/models/suzanne.obj") };
+	Model* suzanneModel { wfobj_load("assets/models/suzanne.obj") };
 	Object* suzanne { Object::create(suzanneModel, programHandle) };
 	suzanne->transform.position = V3_NEW(5.0f, 0.0f, 0.0f);
 
 	// for now, it loads all object as one from .obj
-	Model* skeletonMageModel { wfobj_loadColored("assets/models/Skeleton_Mage.obj") };
+	Model* skeletonMageModel { wfobj_load("assets/models/Skeleton_Mage.obj") };
 	Object* skeletonMage { Object::create(skeletonMageModel, programHandle) };
 	skeletonMage->transform.position = V3_NEW(-5.0f, 0.0f, 0.0f);
-	
-	// doesn't create model, WiP and here only for testing
-	wfobj_loadTextured("assets/models/Skeleton_Mage.obj");
 	
 	// FPS
 	int milliPeriod { (int)(1.0 / (double)_fps * 1000) };
