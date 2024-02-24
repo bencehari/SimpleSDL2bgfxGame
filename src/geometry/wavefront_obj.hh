@@ -15,14 +15,9 @@ enum IndicesOrder {
 };
 
 /**
- * @brief Creates a model (colored by vertex) from Wavefront OBJ data.
- *
- * Obj should contain vertex color data (defaults to #ff007f [pink]).
- * In Blender: add Color Attribute in Object Data Properties
- * and export with Color checked in Geometry.
+ * @brief Creates a model from Wavefront OBJ data.
  *
  * @param _objPath Path to the .obj file.
- * @param _vertexLayout bgfx::VertexLayout of the Model.
  * @param _order Indices order for how to process the .obj data.
  *
  * @return Pointer to the created Model or nullptr on error.

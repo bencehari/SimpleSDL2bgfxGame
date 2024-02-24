@@ -11,6 +11,9 @@
 #include "../utils/color.h"
 #include "../utils/consc.h"
 
+// TODO: handle groups
+
+// TODO: order and flipX should be extracted from ObjData
 struct ObjData {
 	int positionCount;
 	int texcoordCount;
@@ -24,8 +27,39 @@ struct ObjData {
 	}
 };
 
+/**
+ * @brief Opens file and reads header info.
+ *
+ * @param _path Path to the file.
+ * @param _file nullptr on fail, otherwise FILE* pointer.
+ * @param _flipX true if the .obj produced by Blender.
+ *
+ * @return false on error, otherwise true.
+*/
 static bool readFileAndHeader(const char* _path, FILE*& _file, bool& _flipX);
+
+/**
+ * @brief Scans file for obj data.
+ *
+ * Count all vertices, texcoords, normals, faces and save them in the ObjData struct.
+ *
+ * @param _file FILE* to the source file.
+ * @param _data ObjData& to fill.
+ * @param _firstTriNormal A Vector3& for auto detect indices order.
+ *
+ * @return false on error, otherwise true.
+*/
 static bool preprocess(FILE*& _file, ObjData& _data, Vector3& _firstTriNormal);
+
+/**
+ * @brief Creates model from obj.
+ *
+ * @param _file FILE* to the source file.
+ * @param _data ObjData& (must init with preprocess).
+ * @param _firstTriNormal Vector3& for auto detect indices order (must init with preprocess).
+ *
+ * @return nullptr on error, otherwise the Model*.
+*/
 static Model* process(FILE*& _file, ObjData& _data, const Vector3& _firstTriNormal);
 
 Model* wfobj_load(const char* _objPath, IndicesOrder _order) {
@@ -53,6 +87,12 @@ Model* wfobj_load(const char* _objPath, IndicesOrder _order) {
 }
 
 static bool readFileAndHeader(const char* _path, FILE*& _file, bool& _flipX) {
+	size_t len = strlen(_path);
+	if (strcmp(_path + len - 4, ".obj") != 0) {
+		printf(AC_RED "%s is not Wavefront OBJ.\n" AC_RESET, _path);
+		return false;
+	}
+	
 	_file = fopen(_path, "r");
 	if (_file == nullptr) {
 		printf(AC_RED "file is NULL: %s\n" AC_RESET, _path);
