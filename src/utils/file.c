@@ -1,4 +1,7 @@
 #include "file.h"
+
+#include <string.h>
+
 #include "consc.h"
 
 bool getFileSize(const char* _filePath, long* _fileSize, FILE** _file) {
@@ -13,4 +16,14 @@ bool getFileSize(const char* _filePath, long* _fileSize, FILE** _file) {
 	fseek(*_file, 0, SEEK_SET);
 	
 	return true;
+}
+
+int getFileName(const char* _path) {
+	if (_path == NULL) return -1;
+	
+	int len = (int)strlen(_path);
+	for (; len >= 0; len--) {
+		if (_path[len] == '/') break;
+	}
+	return ++len;
 }

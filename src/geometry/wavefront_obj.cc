@@ -5,11 +5,14 @@
 #include <stdbool.h>
 #include <string.h>
 
+#include "../sys/err.h"
+
 #include "../math/math.h"
 #include "../core/vertex.hh"
 
 #include "../utils/color.h"
 #include "../utils/consc.h"
+#include "../utils/file.h"
 
 // TODO: handle groups
 
@@ -34,9 +37,9 @@ struct ObjData {
  * @param _file nullptr on fail, otherwise FILE* pointer.
  * @param _flipX true if the .obj produced by Blender.
  *
- * @return false on error, otherwise true.
+ * @return ErrorCode.
 */
-static bool readFileAndHeader(const char* _path, FILE*& _file, bool& _flipX);
+static ErrorCode readFileAndHeader(const char* _path, FILE*& _file, bool& _flipX);
 
 /**
  * @brief Scans file for obj data.
@@ -47,9 +50,9 @@ static bool readFileAndHeader(const char* _path, FILE*& _file, bool& _flipX);
  * @param _data ObjData& to fill.
  * @param _firstTriNormal A Vector3& for auto detect indices order.
  *
- * @return false on error, otherwise true.
+ * @return ErrorCode.
 */
-static bool preprocess(FILE*& _file, ObjData& _data, Vector3& _firstTriNormal);
+static ErrorCode preprocess(FILE*& _file, ObjData& _data, Vector3& _firstTriNormal);
 
 /**
  * @brief Creates model from obj.
@@ -67,14 +70,14 @@ Model* wfobj_load(const char* _objPath, IndicesOrder _order) {
 	
 	ObjData data { 0, 0, 0, 0, _order, false };
 	
-	if (!readFileAndHeader(_objPath, file, data.flipX)) {
+	if (readFileAndHeader(_objPath, file, data.flipX) != ErrorCode::NONE) {
 		if (file != nullptr) fclose(file);
 		return nullptr;
 	}
 
 	Vector3 firstTriNormal V3_ZERO;
 
-	if (!preprocess(file, data, firstTriNormal)) {
+	if (preprocess(file, data, firstTriNormal) != ErrorCode::NONE) {
 		fclose(file);
 		return nullptr;
 	}
@@ -86,29 +89,29 @@ Model* wfobj_load(const char* _objPath, IndicesOrder _order) {
 	return model;
 }
 
-static bool readFileAndHeader(const char* _path, FILE*& _file, bool& _flipX) {
+static ErrorCode readFileAndHeader(const char* _path, FILE*& _file, bool& _flipX) {
 	size_t len = strlen(_path);
 	if (strcmp(_path + len - 4, ".obj") != 0) {
-		printf(AC_RED "%s is not Wavefront OBJ.\n" AC_RESET, _path);
-		return false;
+		return err_create(EXT_MISMATCH, "%s is not Wavefront OBJ.\n", getFileName(_path));
 	}
 	
 	_file = fopen(_path, "r");
 	if (_file == nullptr) {
-		printf(AC_RED "file is NULL: %s\n" AC_RESET, _path);
-		return false;
+		return err_create(OPEN_FILE, "file is NULL: %s\n", getFileName(_path));
 	}
 	
 	char buf[10];
 	char* line = fgets(buf, 10, _file);
-	if (line == nullptr) return false;
+	if (line == nullptr) {
+		return err_create(NO_CONTENT, NULL);
+	}
 
 	if (strcmp(line, "# Blender") == 0) _flipX = true;
 	
-	return true;
+	return ErrorCode::NONE;
 }
 
-static bool preprocess(FILE*& _file, ObjData& _data, Vector3& _firstTriNormal) {
+static ErrorCode preprocess(FILE*& _file, ObjData& _data, Vector3& _firstTriNormal) {
 	char c;
 	bool shouldDetectOrder = _data.order == IndicesOrder::Auto;
 	
@@ -129,10 +132,8 @@ static bool preprocess(FILE*& _file, ObjData& _data, Vector3& _firstTriNormal) {
 					int n = fscanf(_file, "%f %f %f", &_firstTriNormal.X, &_firstTriNormal.Y, &_firstTriNormal.Z);
 
 					if (n != 3) {
-						printf(AC_RED "Failed to match vertex normal data." AC_RESET);
-
 						fclose(_file);
-						return false;
+						return err_create(PARSE_FAILED, "Failed to match vertex normal data.");
 					}
 					shouldDetectOrder = false;
 				}
@@ -156,14 +157,13 @@ static bool preprocess(FILE*& _file, ObjData& _data, Vector3& _firstTriNormal) {
 	
 	if (_data.order == IndicesOrder::Auto) {
 		if (_firstTriNormal == V3_ZERO) {
-			printf(AC_RED "Failed to retrive vertex normal." AC_RESET);
-			return false;
+			return err_create(PARSE_FAILED, "Failed to retrive vertex normal.");
 		}
 	}
 	
 	// _data.print();
 	
-	return true;
+	return ErrorCode::NONE;
 }
 
 static Model* process(FILE*& _file, ObjData& _data, const Vector3& _firstTriNormal) {

@@ -15,4 +15,17 @@
 */
 extern bool getFileSize(const char* _filePath, long* _fileSize, FILE** _file);
 
+/**
+ * @brief Gets file name from path.
+ *
+ * Returns index of the char after the last '/'.
+ * If the input is NULL, returns -1!
+ * Does not working with '\'!!!
+ *
+ * @param _path Path char*.
+ *
+ * @return Start index of filename.
+*/
+extern int getFileName(const char* _path);
+
 #endif // KE_FILE_H
