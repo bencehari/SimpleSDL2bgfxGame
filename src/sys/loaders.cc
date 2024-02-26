@@ -6,7 +6,7 @@
 
 #include "../utils/consc.h"
 
-bool loadShader(const char* _filename, bgfx::ShaderHandle* _shaderHandle) {
+ErrorCode loadShader(const char* _filename, bgfx::ShaderHandle* _shaderHandle) {
 	const char* shaderPath { nullptr };
 	
 	switch (bgfx::getRendererType()) {
@@ -29,10 +29,7 @@ bool loadShader(const char* _filename, bgfx::ShaderHandle* _shaderHandle) {
 	size_t fileNameLen { strlen(_filename) };
 	
 	char* filePath { (char*)malloc(shaderPathLen + fileNameLen + 1) };
-	if (filePath == NULL) {
-		puts(AC_RED "Failed to allocate memory." AC_RESET);
-		return false;
-	}
+	if (filePath == NULL) return err_create(MEM_ALLOC, "loaders.cc:loadShader");
 	
 	memcpy(filePath, shaderPath, shaderPathLen);
 	memcpy(&filePath[shaderPathLen], _filename, fileNameLen);
@@ -42,7 +39,7 @@ bool loadShader(const char* _filename, bgfx::ShaderHandle* _shaderHandle) {
 	
 	FILE* file { nullptr };
 	long fileSize { 0 };
-	if (!getFileSize(filePath, &fileSize, &file)) return false;
+	if (!getFileSize(filePath, &fileSize, &file)) return err_create(OPEN_FILE, "loaders.cc:loadShader");
 	
 	// printf(AC_YELLOW "fileSize: %ld\n" AC_RESET, fileSize);
 	
@@ -55,5 +52,5 @@ bool loadShader(const char* _filename, bgfx::ShaderHandle* _shaderHandle) {
 	
 	*_shaderHandle = h;
 	
-	return true;
+	return NONE;
 }

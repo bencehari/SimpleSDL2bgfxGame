@@ -3,6 +3,8 @@
 
 #include <bgfx/bgfx.h>
 
+#include "err.h"
+
 /**
  * @brief Loads shader.
  *
@@ -12,8 +14,8 @@
  * @param _filename Path to the shader file.
  * @param _shaderHandle bgfx::ShaderHandle pointer to the created shader.
  *
- * @return False on error, otherwise true.
+ * @return ErrorCode.
 */
-extern bool loadShader(const char* _filename, bgfx::ShaderHandle* _shaderHandle);
+extern ErrorCode loadShader(const char* _filename, bgfx::ShaderHandle* _shaderHandle);
 
 #endif // LOADERS_HH

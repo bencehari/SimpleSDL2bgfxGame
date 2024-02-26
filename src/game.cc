@@ -7,6 +7,7 @@
 #include <bgfx/bgfx.h>
 
 #include "math/math.h"
+#include "sys/err.h"
 #include "sys/loaders.hh"
 #include "geometry/wavefront_obj.hh"
 #include "core/programs.hh"
@@ -20,9 +21,9 @@
 
 void game(float _width, float _height, float _fps) {
 	VertexManager::init();
-	ProgramManager::init(1);
-	ModelManager::init(3);
-	ObjectManager::init(3);
+	if (ProgramManager::init(1) != NONE) { /* TODO */ }
+	if (ModelManager::init(3) != NONE) { /* TODO */ }
+	if (ObjectManager::init(3) != NONE) { /* TODO */ }
 	
 	Transform camera(V3_NEW(0.0f, 0.0f, -5.0f), Q_IDENTITY, V3_ONE);
 

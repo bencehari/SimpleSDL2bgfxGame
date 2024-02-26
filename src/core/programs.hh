@@ -5,6 +5,8 @@
 
 #include <bgfx/bgfx.h>
 
+#include "../sys/err.h"
+
 namespace ProgramManager {
 	/**
 	 * @brief Initializes the Program Manager
@@ -12,8 +14,10 @@ namespace ProgramManager {
 	 * It reservers enough space in memory for program handles.
 	 *
 	 * @param _maxProgramCount Maximum number of programs it can create.
+	 *
+	 * @return ErrorCode.
 	*/
-	extern void init(int _maxProgramCount);
+	extern ErrorCode init(int _maxProgramCount);
 
 	/**
 	 * @brief Free up space reserved for program handles.

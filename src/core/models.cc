@@ -74,21 +74,15 @@ namespace ModelManager {
 	static int currentIndex;
 	static Model* models;
 
-	// TODO: handle error!
-	void init(int _maxModelCount) {
-		if (initialized) {
-			puts("Already initialized.");
-			return;
-		}
+	ErrorCode init(int _maxModelCount) {
+		if (initialized) return err_create(ALREADY_INITED, "ModelManager::init");
 		
 		maxModelCount = _maxModelCount;
 		models = (Model*)malloc(sizeof(Model) * _maxModelCount);
-		if (models == NULL) {
-			printf(AC_RED "Failed to allocate memory." AC_RESET);
-			return;
-		}
+		if (models == NULL) return err_create(MEM_ALLOC, "ModelManager::init");
 		
 		initialized = true;
+		return NONE;
 	}
 
 	void cleanup(void) {
@@ -114,7 +108,7 @@ namespace ModelManager {
 
 		Vertex_Colored* pvertices { (Vertex_Colored*)malloc(verticesSize) };
 		if (pvertices == NULL) {
-			printf(AC_RED "Failed to allocate memory." AC_RESET);
+			err_create(MEM_ALLOC, "Vertices");
 			return nullptr;
 		}
 		
@@ -122,7 +116,7 @@ namespace ModelManager {
 		
 		uint16_t* pindices { (uint16_t*)malloc(indicesSize) };
 		if (pvertices == NULL) {
-			printf(AC_RED "Failed to allocate memory." AC_RESET);
+			err_create(MEM_ALLOC, "Indices");
 			free(pvertices);
 			return nullptr;
 		}

@@ -32,21 +32,15 @@ namespace ObjectManager {
 	static int currentIndex;
 	static Object* objects;
 
-	// TODO: handle error!
-	void init(int _maxObjectCount) {
-		if (initialized) {
-			puts("Already initialized.");
-			return;
-		}
+	ErrorCode init(int _maxObjectCount) {
+		if (initialized) return err_create(ALREADY_INITED, "ObjectManager::init");
 		
 		maxObjectCount = _maxObjectCount;
 		objects = (Object*)malloc(sizeof(Object) * _maxObjectCount);
-		if (objects == NULL) {
-			printf(AC_RED "Failed to allocate memory." AC_RESET);
-			return;
-		}
+		if (objects == NULL) return err_create(MEM_ALLOC, "ObjectManager::init");
 		
 		initialized = true;
+		return NONE;
 	}
 
 	void cleanup(void) {

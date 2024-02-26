@@ -5,6 +5,7 @@
 
 #include <bgfx/bgfx.h>
 
+#include "../sys/err.h"
 #include "vertex.hh"
 
 /**
@@ -49,8 +50,10 @@ namespace ModelManager {
 	 * It reservers enough space in memory for models.
 	 *
 	 * @param _maxModelCount Maximum number of models it can create.
+	 *
+	 * @return ErrorCode.
 	*/
-	extern void init(int _maxModelCount);
+	extern ErrorCode init(int _maxModelCount);
 
 	/**
 	 * @brief Free up space reserved for models.

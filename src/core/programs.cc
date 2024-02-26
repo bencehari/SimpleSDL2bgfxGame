@@ -15,20 +15,15 @@ namespace ProgramManager {
 	static bgfx::ProgramHandle* programs;
 
 	// TODO: handle errors!
-	void init(int _maxProgramCount) {
-		if (initialized) {
-			puts("Already initialized.");
-			return;
-		}
+	ErrorCode init(int _maxProgramCount) {
+		if (initialized) return err_create(ALREADY_INITED, "ProgramManager::Init");
 		
 		programCount = _maxProgramCount;
 		programs = (bgfx::ProgramHandle*)malloc(sizeof(bgfx::ProgramHandle) * _maxProgramCount);
-		if (programs == NULL) {
-			puts(AC_RED "Failed to allocate memory." AC_RESET);
-			return;
-		}
+		if (programs == NULL) return err_create(MEM_ALLOC, "ProgramManager::Init");
 		
 		initialized = true;
+		return NONE;
 	}
 
 	void cleanup(void) {
@@ -47,11 +42,11 @@ namespace ProgramManager {
 		bgfx::ShaderHandle vertexShaderHnd { 0 };
 		bgfx::ShaderHandle fragmentShaderHnd { 0 };
 		
-		if (!loadShader(_vertexShader, &vertexShaderHnd)) {
+		if (loadShader(_vertexShader, &vertexShaderHnd) != NONE) {
 			// TODO: load fallback shader
 		}
 		
-		if (!loadShader(_fragmentShader, &fragmentShaderHnd)) {
+		if (loadShader(_fragmentShader, &fragmentShaderHnd) != NONE) {
 			// TODO: load fallback shader
 		}
 		

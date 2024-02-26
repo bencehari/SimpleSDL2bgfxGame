@@ -5,6 +5,7 @@
 
 #include <bgfx/bgfx.h>
 
+#include "../sys/err.h"
 #include "../math/math.h"
 #include "transform.hh"
 #include "models.hh"
@@ -58,8 +59,10 @@ namespace ObjectManager {
 	 * Allocates memory for Objects based on parameters.
 	 *
 	 * @param _maxObjectCount One could not create more objects then this.
+	 *
+	 * @return ErrorCode.
 	*/
-	extern void init(int _maxObjectCount);
+	extern ErrorCode init(int _maxObjectCount);
 	
 	/**
 	 * @brief Cleans up Objects.
