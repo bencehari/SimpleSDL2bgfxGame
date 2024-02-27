@@ -1,14 +1,17 @@
 #ifndef KE_ERR_H
 #define KE_ERR_H
 
+/**
+ * @brief Error codes.
+*/
 enum ErrorCode {
-	NONE,
-	MEM_ALLOC,
-	OPEN_FILE,
-	EXT_MISMATCH,
-	NO_CONTENT,
-	PARSE_FAILED,
-	ALREADY_INITED
+	NONE,				//!< None
+	MEM_ALLOC,			//!< Failed allocation memory
+	OPEN_FILE,			//!< Failed open file
+	EXT_MISMATCH,		//!< File extension problem
+	NO_CONTENT,			//!< Expected content doesn't exist (eg: fgets returns NULL)
+	PARSE_FAILED,		//!< Parsing failed
+	ALREADY_INITED		//!< Reinitialize not permitted
 };
 
 /**
