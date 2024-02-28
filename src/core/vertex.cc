@@ -1,5 +1,7 @@
 #include "vertex.hh"
 
+#include <stdio.h>
+
 bgfx::VertexLayout Vertex_Colored::layout;
 bgfx::VertexLayout Vertex_Textured::layout;
 
@@ -11,6 +13,10 @@ void Vertex_Colored::init(void) {
 			.add(bgfx::Attrib::Position, 3, bgfx::AttribType::Float, false, false)
 			.add(bgfx::Attrib::Color0, 4, bgfx::AttribType::Uint8, true, false)
 		.end();
+}
+
+void Vertex_Colored::print() {
+	printf("[Vertex_Colored] x: %.3f, y: %.3f, z: %.3f, color: %d\n", x, y, z, abgr);
 }
 
 Vertex_Textured::Vertex_Textured(float _x, float _y, float _z, uint32_t _normal, uint32_t _tangent, int16_t _u, int16_t _v) :

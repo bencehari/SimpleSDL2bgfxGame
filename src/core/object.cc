@@ -89,7 +89,7 @@ namespace ObjectManager {
 			6, 3, 7,
 		};
 		
-		Model* pCubeModel { ModelManager::create(vertices, 8, indices, 36, Vertex_Colored::layout) };
+		Model* pCubeModel { Model::create(VertexType::Color, vertices, 8, indices, 36) };
 		
 		// pCubeModel.print(true, true);
 		

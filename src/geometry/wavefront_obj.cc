@@ -168,7 +168,7 @@ Model* wfobj_load(const char* _objPath, IndicesOrder _order) {
 	}
 	
 	// TEST
-	for (int i = 0; i < mesh.objectCount; i++) mesh.objects[i].print();
+	// for (int i = 0; i < mesh.objectCount; i++) mesh.objects[i].print();
 	
 	if (process(file, data, mesh, firstTriNormal) != NONE) {
 		fclose(file);
@@ -455,16 +455,38 @@ static ErrorCode process(FILE*& _file, ObjData& _data, Mesh& _mesh, const Vector
 }
 
 static ErrorCode createModel(Mesh& _mesh, Model*& _model) {
-	Vertex_Colored* vertices = (Vertex_Colored*)malloc(sizeof(Vertex_Colored) * _mesh.positionCount);
-	if (vertices == NULL) return err_create(MEM_ALLOC, "Vertices");
+	void* vertices { nullptr };
+	VertexType vertexType { VertexType::Basic };
+	
+	if (_mesh.hasColorData) {
+		vertexType = VertexType::Color;
+		
+		vertices = malloc(sizeof(Vertex_Colored) * _mesh.positionCount);
+		if (vertices == NULL) return err_create(MEM_ALLOC, "Vertices");
 
-	for (int i = 0; i < _mesh.positionCount; i++) {
-		vertices[i] = Vertex_Colored(
-			_mesh.positions[i * 3], _mesh.positions[i * 3 + 1], _mesh.positions[i * 3 + 2],
-			_mesh.hasColorData ? rgbToHex(_mesh.colors[i * 3], _mesh.colors[i * 3 + 1], _mesh.colors[i * 3 + 2]) : 0xff7f00ff);
+		Vertex_Colored* p = (Vertex_Colored*)vertices;
+
+		for (int i = 0; i < _mesh.positionCount; i++) {
+			p[i] = Vertex_Colored(
+				_mesh.positions[i * 3], _mesh.positions[i * 3 + 1], _mesh.positions[i * 3 + 2],
+				rgbToHex(_mesh.colors[i * 3], _mesh.colors[i * 3 + 1], _mesh.colors[i * 3 + 2]));
+		}
+	}
+	// fallback to pink
+	else {
+		vertexType = VertexType::Color;
+		
+		vertices = malloc(sizeof(Vertex_Colored) * _mesh.positionCount);
+		if (vertices == NULL) return err_create(MEM_ALLOC, "Vertices");
+
+		Vertex_Colored* p = (Vertex_Colored*)vertices;
+
+		for (int i = 0; i < _mesh.positionCount; i++) {
+			p[i] = Vertex_Colored(_mesh.positions[i * 3], _mesh.positions[i * 3 + 1], _mesh.positions[i * 3 + 2], 0xff7f00ff);
+		}
 	}
 	
-	_model = Model::create(vertices, _mesh.positionCount, _mesh.indices, _mesh.triCount * 3, Vertex_Colored::layout);
+	_model = Model::create(vertexType, vertices, _mesh.positionCount, _mesh.indices, _mesh.triCount * 3);
 	if (_model == nullptr) {
 		// TODO
 		return (ErrorCode)404;

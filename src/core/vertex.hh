@@ -5,9 +5,14 @@
 
 #include <bgfx/bgfx.h>
 
-// TODO: this whole logic is wrong!
-// Vertex_Colored everywhere is a big no-no.
-// Figure out something for generalize this!
+/**
+ * @brief Possible types of vertices.
+*/
+enum VertexType {
+	Basic,			//!< Only positions
+	Color,			//!< With vertex color data
+	Texture			//!< With texture coordinates
+};
 
 /**
  * @brief Vertex with additional color data.
@@ -20,6 +25,8 @@ struct Vertex_Colored {
 	
 	static bgfx::VertexLayout layout;
 	static void init(void);
+	
+	void print();
 };
 
 /**

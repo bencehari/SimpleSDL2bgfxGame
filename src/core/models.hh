@@ -14,7 +14,7 @@
 class Model {
 private:
 	unsigned int id;
-	Vertex_Colored* vertices;
+	void* vertices;
 	uint16_t* indices;
 	
 public:
@@ -29,7 +29,7 @@ public:
 	*/
 	Model(
 		int _id,
-		Vertex_Colored _vertices[],
+		void* _vertices,
 		int _verticesLen,
 		uint16_t _indices[],
 		int _indicesLen,
@@ -37,11 +37,19 @@ public:
 		bgfx::IndexBufferHandle _indexBufferHnd);
 
 	/**
-	 * @brief Creates model.
+	 * @brief Creates the model.
 	 *
-	 * @return Model* on success, otherwise nullptr.
+	 * Creates and returns the model using bgfx. Indices must be in counter clockwise order.
+	 *
+	 * @param _vertexType VertexType enum will define which Vertex layout will be used.
+	 * @param _vertices Vertex array as void* (contents must aligned with specified _vertexType).
+	 * @param _verticesLen Length of _vertices.
+	 * @param _indices uint16_t array of indices.
+	 * @param _indicesLen Length of _indices.
+	 *
+	 * @return Pointer to the created Model, otherwise nullptr.
 	*/
-	static Model* create(Vertex_Colored _vertices[], int _verticesLen, uint16_t _indices[], int _indicesLen, bgfx::VertexLayout& _vertexLayout);
+	static Model* create(const VertexType _vertexType, void* _vertices, int _verticesLen, uint16_t _indices[], int _indicesLen);
 
 	void cleanup(void);
 	
@@ -70,15 +78,15 @@ namespace ModelManager {
 	 *
 	 * Creates and returns the model using bgfx. Indices must be in counter clockwise order.
 	 *
-	 * @param _vertices Vertex array.
+	 * @param _vertexType VertexType enum will define which Vertex layout will be used.
+	 * @param _vertices Vertex array as void* (contents must aligned with specified _vertexType).
 	 * @param _verticesLen Length of _vertices.
 	 * @param _indices uint16_t array of indices.
 	 * @param _indicesLen Length of _indices.
-	 * @param _vertexLayout bgfx::VertexLayout.
 	 *
-	 * @return Pointer to the created Model.
+	 * @return Pointer to the created Model, otherwise nullptr.
 	*/
-	extern Model* create(const Vertex_Colored _vertices[], int _verticesLen, const uint16_t _indices[], int _indicesLen, const bgfx::VertexLayout& _vertexLayout);
+	extern Model* create(const VertexType _vertexType, const void* _vertices, int _verticesLen, const uint16_t _indices[], int _indicesLen);
 }
 
 #endif // KE_MODELS_HH

@@ -10,7 +10,7 @@
 
 Model::Model(
 		int _id,
-		Vertex_Colored _vertices[],
+		void* _vertices,
 		int _verticesLen,
 		uint16_t _indices[],
 		int _indicesLen,
@@ -25,8 +25,8 @@ Model::Model(
 		vertexBufferHnd(_vertexBufferHnd),
 		indexBufferHnd(_indexBufferHnd) {}
 
-Model* Model::create(Vertex_Colored _vertices[], int _verticesLen, uint16_t _indices[], int _indicesLen, bgfx::VertexLayout& _vertexLayout) {
-	return ModelManager::create(_vertices, _verticesLen, _indices, _indicesLen, _vertexLayout);
+Model* Model::create(VertexType _vertexType, void* _vertices, int _verticesLen, uint16_t _indices[], int _indicesLen) {
+	return ModelManager::create(_vertexType, _vertices, _verticesLen, _indices, _indicesLen);
 }
 
 void Model::cleanup(void) {
@@ -47,15 +47,17 @@ void Model::print(bool _printVertices, bool _printIndices) {
 		vertexBufferHnd.idx,
 		indexBufferHnd.idx);
 	
+	// TODO
 	if (_printVertices && vertices != nullptr) {
 		printf(AC_CYAN "  [VERTICES]\n" AC_RESET);
-		for (int i = 0; i < verticesLen; i++) {
+		puts("Not implemented.");
+		/*for (int i = 0; i < verticesLen; i++) {
 			printf("    %8.2f %8.2f %8.2f\t\t0x%08x\n",
 				vertices[i].x,
 				vertices[i].y,
 				vertices[i].z,
 				vertices[i].abgr);
-		}
+		}*/
 	}
 	
 	if (_printIndices && indices != nullptr) {
@@ -97,16 +99,30 @@ namespace ModelManager {
 		initialized = false;
 	}
 
-	Model* create(const Vertex_Colored _vertices[], int _verticesLen, const uint16_t _indices[], int _indicesLen, const bgfx::VertexLayout& _vertexLayout) {
+	Model* create(const VertexType _vertexType, const void* _vertices, int _verticesLen, const uint16_t _indices[], int _indicesLen) {
 		if (currentIndex >= maxModelCount) {
 			puts(AC_YELLOW "Max model count reached." AC_RESET);
 			return nullptr;
 		}
 
-		size_t verticesSize { sizeof(Vertex_Colored) * _verticesLen };
+		size_t verticesSize { 0 };
+		bgfx::VertexLayout* layout;
+		
+		switch (_vertexType) {
+			case VertexType::Color:
+				verticesSize = sizeof(Vertex_Colored) * _verticesLen;
+				layout = &Vertex_Colored::layout;
+				break;
+			case VertexType::Texture:
+				verticesSize = sizeof(Vertex_Textured) * _verticesLen;
+				layout = &Vertex_Textured::layout;
+				break;
+			default: break;
+		}
+		
 		size_t indicesSize { sizeof(uint16_t) * _indicesLen };
 
-		Vertex_Colored* pvertices { (Vertex_Colored*)malloc(verticesSize) };
+		void* pvertices { malloc(verticesSize) };
 		if (pvertices == NULL) {
 			err_create(MEM_ALLOC, "Vertices");
 			return nullptr;
@@ -129,7 +145,7 @@ namespace ModelManager {
 			_verticesLen,
 			pindices,
 			_indicesLen,
-			bgfx::createVertexBuffer(bgfx::makeRef(pvertices, verticesSize), _vertexLayout, BGFX_BUFFER_NONE),
+			bgfx::createVertexBuffer(bgfx::makeRef(pvertices, verticesSize), *layout, BGFX_BUFFER_NONE),
 			bgfx::createIndexBuffer(bgfx::makeRef(pindices, indicesSize), BGFX_BUFFER_NONE)
 		);
 		
