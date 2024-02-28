@@ -94,6 +94,30 @@ struct Object {
 	}
 };
 
+struct Mesh {
+	int positionCount;
+	float* positions;
+	int normalCount;
+	float* normals;
+	int texcoordCount;
+	float* texcoords;
+	float* colors;
+	int objectCount;
+	Object* objects;
+	
+	void cleanup() {
+		free(positions);
+		free(normals);
+		free(texcoords);
+		free(colors);
+		free(objects);
+	}
+	
+	static Mesh create() {
+		return { 0, nullptr, 0, nullptr, 0, nullptr, nullptr, 0, nullptr };
+	}
+};
+
 /**
  * @brief Opens file and reads header info.
  *
@@ -112,11 +136,12 @@ static ErrorCode readFileAndHeader(const char* _path, FILE*& _file, ObjData& _da
  *
  * @param _file FILE* to the source file.
  * @param _data ObjData& to fill.
+ * @param _mesh Mesh&.
  * @param _firstTriNormal A Vector3& for auto detect indices order.
  *
  * @return ErrorCode.
 */
-static ErrorCode preprocess(FILE*& _file, ObjData& _data, Vector3& _firstTriNormal);
+static ErrorCode preprocess(FILE*& _file, ObjData& _data, Mesh& _mesh, Vector3& _firstTriNormal);
 
 /**
  * @brief Creates model from obj.
@@ -141,15 +166,20 @@ Model* wfobj_load(const char* _objPath, IndicesOrder _order) {
 		return nullptr;
 	}
 
+	Mesh mesh { Mesh::create() };
 	Vector3 firstTriNormal V3_ZERO;
 
-	if (preprocess(file, data, firstTriNormal) != NONE) {
+	if (preprocess(file, data, mesh, firstTriNormal) != NONE) {
 		fclose(file);
 		return nullptr;
 	}
 	
+	// TEST
+	for (int i = 0; i < mesh.objectCount; i++) mesh.objects[i].print();
+	
 	Model* model = process(file, data, firstTriNormal);
 
+	mesh.cleanup();
 	fclose(file);
 
 	return model;
@@ -177,14 +207,13 @@ static ErrorCode readFileAndHeader(const char* _path, FILE*& _file, ObjData& _da
 	return NONE;
 }
 
-static ErrorCode preprocess(FILE*& _file, ObjData& _data, Vector3& _firstTriNormal) {
+static ErrorCode preprocess(FILE*& _file, ObjData& _data, Mesh& _mesh, Vector3& _firstTriNormal) {
 	char c;
 	bool detectOrder = _data.order == IndicesOrder::Auto;
 	bool checkColor = true;
 	
-	// tmp
 	int objI = 0;
-	Object objO[50];
+	Object objO[WFOBJ_MAX_OBJECT_COUNT];
 	
 	while ((c = getc(_file)) != EOF) {
 		if (c == 'v') {
@@ -240,7 +269,11 @@ static ErrorCode preprocess(FILE*& _file, ObjData& _data, Vector3& _firstTriNorm
 		else if (c == 'o') {
 			// object
 			if (getc(_file) == ' ') {
-				char objectName[100];
+				if (objI > 0) {
+					objO[objI - 1].endPositionIndex = _data.positionCount - 1;
+				}
+				
+				char objectName[WFOBJ_MAX_OBJECT_NAME_LEN];
 				int idx = 0;
 				while ((c = getc(_file)) != '\n' && c != EOF) objectName[idx++] = c;
 				objectName[idx] = '\0';
@@ -257,10 +290,21 @@ static ErrorCode preprocess(FILE*& _file, ObjData& _data, Vector3& _firstTriNorm
 		}
 	}
 
+	if (objI > 0) {
+		_mesh.objectCount = objI;
+		_mesh.objects = (Object*)malloc(sizeof(Object) * objI);
+		if (_mesh.objects == NULL) {
+			printf(AC_RED "Failed to allocate memory for objects." AC_RESET);
+			// TODO: now what?
+		}
+		else {
+			for (int i = 0; i < objI; i++) _mesh.objects[i] = objO[i];
+			_mesh.objects[objI - 1].endPositionIndex = _data.positionCount;
+		}
+	}
+
 	if (_data.normalCount != 0) _data.typeMask |= NORM;
 	if (_data.texcoordCount != 0) _data.typeMask |= TEX;
-	
-	for (int i = 0; i < objI; i++) objO[i].print();
 	
 	return NONE;
 }

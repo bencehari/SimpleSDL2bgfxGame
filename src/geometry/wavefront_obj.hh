@@ -18,6 +18,9 @@
 
 #include "../core/models.hh"
 
+#define WFOBJ_MAX_OBJECT_COUNT 50
+#define WFOBJ_MAX_OBJECT_NAME_LEN 100
+
 /**
  * @brief Modes for how to process the provided geometry data.
 */
