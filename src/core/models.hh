@@ -36,6 +36,11 @@ public:
 		bgfx::VertexBufferHandle _vertexBufferHnd,
 		bgfx::IndexBufferHandle _indexBufferHnd);
 
+	/**
+	 * @brief Creates model.
+	 *
+	 * @return Model* on success, otherwise nullptr.
+	*/
 	static Model* create(Vertex_Colored _vertices[], int _verticesLen, uint16_t _indices[], int _indicesLen, bgfx::VertexLayout& _vertexLayout);
 
 	void cleanup(void);

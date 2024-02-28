@@ -15,55 +15,16 @@
 #include "../utils/file.h"
 
 /**
- * @brief Enum flag for storing what data the .obj holds.
-*/
-enum ObjDataType {
-	INVALID		= 0,
-	POS			= 1 << 0,		//!< Position
-	COLOR		= 1 << 1,		//!< Color
-	NORM		= 1 << 2,		//!< Normal
-	TEX			= 1 << 3,		//!< Texture coordinate
-	BLENDER		= 1 << 4		//!< Is Blender produced
-};
-
-/**
- * @brief Prescanned data of .obj.
- *
- * What type of data the .obj holds and counts
- * for able to allocate memory.
+ * @brief Additional data for processing .obj file.
 */
 struct ObjData {
-	int typeMask;			//!< ObjDataType "enum flag"
-	int positionCount;		//!< Number of vertex positions
-	int normalCount;		//!< Number of normals
-	int texcoordCount;		//!< Number of texture coordinates
-	int triCount;			//!< Number of triangles
-	int objectCount;		//!< Number of objects
+	bool mirrorX;			//!< mirror X axis
 	IndicesOrder order;		//!< CW or CCW
 	
 	void print() {
-		char dataType[35];
-		char strs[][11] { "POS", " & COLOR", " & NORM", " & TEX", " & BLENDER" };
-		char* p = dataType;
-		
-		for (int i = 0; i < 5; i++) {
-			if ((typeMask & 1 << i) == 0) continue;
-
-			size_t len = strlen(strs[i]);
-			memcpy(p, strs[i], len);
-			p += len;
-		}
-		*p = '\0';
-		
-		if (typeMask == INVALID) memcpy(dataType, "INVALID", 8);
-		
-		printf("v: %d, vn: %d, vt: %d, tris: %d, objects: %d, type: %s\n",
-			positionCount,
-			normalCount,
-			texcoordCount,
-			triCount,
-			objectCount,
-			dataType);
+		printf("mirror x: %s, indices order: %s\n",
+			mirrorX ? "true" : "false",
+			order == IndicesOrder::Auto ? "Auto" : (order == IndicesOrder::CW ? "Clockwise" : "Counter clockwise"));
 	}
 };
 
@@ -97,24 +58,45 @@ struct Object {
 struct Mesh {
 	int positionCount;
 	float* positions;
+	bool hasColorData;
+	float* colors;
 	int normalCount;
 	float* normals;
 	int texcoordCount;
 	float* texcoords;
-	float* colors;
+	
+	int triCount;
+	uint16_t* indices;
+	
 	int objectCount;
 	Object* objects;
 	
 	void cleanup() {
+		positionCount = 0;
 		free(positions);
-		free(normals);
-		free(texcoords);
+		hasColorData = false;
 		free(colors);
+		normalCount = -1;
+		free(normals);
+		texcoordCount = -1;
+		free(texcoords);
+		
+		triCount = -1;
+		free(indices);
+		
+		objectCount = -1;
 		free(objects);
 	}
 	
 	static Mesh create() {
-		return { 0, nullptr, 0, nullptr, 0, nullptr, nullptr, 0, nullptr };
+		return {
+			0, nullptr,			// position (inited to 0, as it is a must)
+			false, nullptr,		// color
+			-1, nullptr,		// normal
+			-1, nullptr,		// texcoord
+			-1, nullptr,		// triCount, indices
+			-1, nullptr			// object
+		};
 	}
 };
 
@@ -148,18 +130,29 @@ static ErrorCode preprocess(FILE*& _file, ObjData& _data, Mesh& _mesh, Vector3& 
  *
  * @param _file FILE* to the source file.
  * @param _data ObjData& (must init with preprocess).
+ * @param _mesh Mesh& to fill.
  * @param _firstTriNormal Vector3& for auto detect indices order (must init with preprocess).
  *
- * @return nullptr on error, otherwise the Model*.
+ * @return ErrorCode.
 */
-static Model* process(FILE*& _file, ObjData& _data, const Vector3& _firstTriNormal);
+static ErrorCode process(FILE*& _file, ObjData& _data, Mesh& _mesh, const Vector3& _firstTriNormal);
+
+/**
+ * @brief Creates a model from mesh data.
+ *
+ * @param _mesh Mesh&.
+ * @param _model Model*& to fill.
+ *
+ * @return ErrorCode.
+*/
+static ErrorCode createModel(Mesh& _mesh, Model*& _model);
 
 Model* wfobj_load(const char* _objPath, IndicesOrder _order) {
 	printf(AC_YELLOW "[wfobj_load] %s\n" AC_RESET, _objPath);
 
 	FILE* file { nullptr };
 	
-	ObjData data { POS, 0, 0, 0, 0, 0, _order };
+	ObjData data { false, _order };
 	
 	if (readFileAndHeader(_objPath, file, data) != NONE) {
 		if (file != nullptr) fclose(file);
@@ -177,10 +170,17 @@ Model* wfobj_load(const char* _objPath, IndicesOrder _order) {
 	// TEST
 	for (int i = 0; i < mesh.objectCount; i++) mesh.objects[i].print();
 	
-	Model* model = process(file, data, firstTriNormal);
-
-	mesh.cleanup();
+	if (process(file, data, mesh, firstTriNormal) != NONE) {
+		fclose(file);
+		return nullptr;
+	}
+	
 	fclose(file);
+	
+	Model* model { nullptr };
+	if (createModel(mesh, model) != NONE) return nullptr;
+	
+	mesh.cleanup();
 
 	return model;
 }
@@ -202,7 +202,7 @@ static ErrorCode readFileAndHeader(const char* _path, FILE*& _file, ObjData& _da
 		return err_create(NO_CONTENT, NULL);
 	}
 
-	if (strcmp(line, "# Blender") == 0) _data.typeMask |= BLENDER;
+	if (strcmp(line, "# Blender") == 0) _data.mirrorX = true;
 	
 	return NONE;
 }
@@ -219,14 +219,14 @@ static ErrorCode preprocess(FILE*& _file, ObjData& _data, Mesh& _mesh, Vector3& 
 		if (c == 'v') {
 			// vertex
 			if ((c = getc(_file)) == ' ') {
-				_data.positionCount++;
+				_mesh.positionCount++;
 				
 				if (checkColor) {
 					float a;
 					int n = fscanf(_file, "%f %f %f %f %f %f", &a, &a, &a, &a, &a, &a);
 
 					if (n == 6) {
-						_data.typeMask |= COLOR;
+						_mesh.hasColorData = true;
 					}
 					else if (n != 3) {
 						fclose(_file);
@@ -250,7 +250,7 @@ static ErrorCode preprocess(FILE*& _file, ObjData& _data, Mesh& _mesh, Vector3& 
 					}
 					detectOrder = false;
 				}
-				_data.normalCount++;
+				_mesh.normalCount++;
 			}
 		}
 		else if (c == 'f') {
@@ -261,16 +261,16 @@ static ErrorCode preprocess(FILE*& _file, ObjData& _data, Mesh& _mesh, Vector3& 
 					if (c == ' ') vCount++;
 				}
 				// quad
-				if (vCount == 4) _data.triCount += 2;
+				if (vCount == 4) _mesh.triCount += 2;
 				// tri
-				else if (vCount == 3) _data.triCount++;
+				else if (vCount == 3) _mesh.triCount++;
 			}
 		}
 		else if (c == 'o') {
 			// object
 			if (getc(_file) == ' ') {
 				if (objI > 0) {
-					objO[objI - 1].endPositionIndex = _data.positionCount - 1;
+					objO[objI - 1].endPositionIndex = _mesh.positionCount - 1;
 				}
 				
 				char objectName[WFOBJ_MAX_OBJECT_NAME_LEN];
@@ -278,8 +278,8 @@ static ErrorCode preprocess(FILE*& _file, ObjData& _data, Mesh& _mesh, Vector3& 
 				while ((c = getc(_file)) != '\n' && c != EOF) objectName[idx++] = c;
 				objectName[idx] = '\0';
 				
-				objO[objI++] = Object::create(objectName, _data.positionCount);
-				_data.objectCount++;
+				objO[objI++] = Object::create(objectName, _mesh.positionCount);
+				_mesh.objectCount++;
 			}
 		}
 	}
@@ -299,30 +299,33 @@ static ErrorCode preprocess(FILE*& _file, ObjData& _data, Mesh& _mesh, Vector3& 
 		}
 		else {
 			for (int i = 0; i < objI; i++) _mesh.objects[i] = objO[i];
-			_mesh.objects[objI - 1].endPositionIndex = _data.positionCount;
+			_mesh.objects[objI - 1].endPositionIndex = _mesh.positionCount;
 		}
 	}
 
-	if (_data.normalCount != 0) _data.typeMask |= NORM;
-	if (_data.texcoordCount != 0) _data.typeMask |= TEX;
+	if (_mesh.normalCount != 0) _mesh.normalCount = 0;
+	if (_mesh.texcoordCount != 0) _mesh.normalCount = 0;
 	
 	return NONE;
 }
 
-static Model* process(FILE*& _file, ObjData& _data, const Vector3& _firstTriNormal) {
-	Model* model { nullptr };
-	
-	Vertex_Colored* vertices { (Vertex_Colored*)malloc(sizeof(Vertex_Colored) * _data.positionCount) };
-	if (vertices == NULL) {
-		puts(AC_RED "Failed to allocate memory." AC_RESET);
-		return nullptr;
+static ErrorCode process(FILE*& _file, ObjData& _data, Mesh& _mesh, const Vector3& _firstTriNormal) {
+	_mesh.positions = (float*)malloc(sizeof(float) * _mesh.positionCount * 3);
+	if (_mesh.positions == NULL) {
+		return err_create(MEM_ALLOC, "Positions");
 	}
 	
-	uint16_t* indices { (uint16_t*)malloc(sizeof(uint16_t) * _data.triCount * 3) };
-	if (indices == NULL) {
-		puts(AC_RED "Failed to allocate memory." AC_RESET);
-		free(vertices);
-		return nullptr;
+	if (_mesh.hasColorData) {
+		_mesh.colors = (float*)malloc(sizeof(float) * _mesh.positionCount * 3);
+		if (_mesh.positions == NULL) {
+			return err_create(MEM_ALLOC, "Colors");
+		}
+	}
+	
+	_mesh.indices = (uint16_t*)malloc(sizeof(uint16_t) * _mesh.triCount * 3);
+	if (_mesh.indices == NULL) {
+		free(_mesh.positions);
+		return err_create(MEM_ALLOC, "Indices");
 	}
 	
 	int vIndex { 0 };
@@ -335,30 +338,31 @@ static Model* process(FILE*& _file, ObjData& _data, const Vector3& _firstTriNorm
 		if (c == 'v') {
 			// vertex
 			if (getc(_file) == ' ') {
-				if ((_data.typeMask & COLOR) != 0) {
+				if (_mesh.hasColorData) {
 					float x, y, z;
 					float r, g, b;
 					int n = fscanf(_file, "%f %f %f %f %f %f", &x, &y, &z, &r, &g, &b);
 					
 					if (n == 6) {
-						vertices[vIndex] = Vertex_Colored((_data.typeMask & BLENDER) == 0 ? x : -x, y, z, rgbToHex(r, g, b));
+						_mesh.positions[vIndex * 3] = _data.mirrorX ? -x : x;
+						_mesh.colors[vIndex * 3] = r;
+						_mesh.positions[vIndex * 3 + 1] = y;
+						_mesh.colors[vIndex * 3 + 1] = g;
+						_mesh.positions[vIndex * 3 + 2] = z;
+						_mesh.colors[vIndex * 3 + 2] = b;
 					}
-					else {
-						printf(AC_RED "Failed to match vertex data." AC_RESET);
-						goto end;
-					}
+					else return err_create(PARSE_FAILED, "Failed to match vertex data.");
 				}
 				else {
 					float x, y, z;
 					int n = fscanf(_file, "%f %f %f", &x, &y, &z);
 
 					if (n == 3) {
-						vertices[vIndex] = Vertex_Colored((_data.typeMask & BLENDER) == 0 ? x : -x, y, z, 0xff7f00ff);
+						_mesh.positions[vIndex * 3] = _data.mirrorX ? -x : x;
+						_mesh.positions[vIndex * 3 + 1] = y;
+						_mesh.positions[vIndex * 3 + 2] = z;
 					}
-					else {
-						printf(AC_RED "Failed to match vertex data." AC_RESET);
-						goto end;
-					}
+					else return err_create(PARSE_FAILED, "Failed to match vertex data.");
 				}
 				
 				vIndex++;
@@ -377,23 +381,23 @@ static Model* process(FILE*& _file, ObjData& _data, const Vector3& _firstTriNorm
 					"%d/%d/%d %d/%d/%d %d/%d/%d %d/%d/%d",
 					&v1, &vt1, &vn1, &v2, &vt2, &vn2, &v3, &vt3, &vn3, &v4, &vt4, &vn4);
 				
-				v1 += v1 < 0 ? _data.positionCount : -1;
-				vt1 += vt1 < 0 ? _data.texcoordCount : -1;
-				vn1 += vn1 < 0 ? _data.normalCount : -1;
-				v2 += v2 < 0 ? _data.positionCount : -1;
-				vt2 += vt2 < 0 ? _data.texcoordCount : -1;
-				vn2 += vn2 < 0 ? _data.normalCount : -1;
-				v3 += v3 < 0 ? _data.positionCount : -1;
-				vt3 += vt3 < 0 ? _data.texcoordCount : -1;
-				vn3 += vn3 < 0 ? _data.normalCount : -1;
-				v4 += v4 < 0 ? _data.positionCount : -1;
-				vt4 += vt4 < 0 ? _data.texcoordCount : -1;
-				vn4 += vn4 < 0 ? _data.normalCount : -1;
+				v1 += v1 < 0 ? _mesh.positionCount : -1;
+				vt1 += vt1 < 0 ? _mesh.texcoordCount : -1;
+				vn1 += vn1 < 0 ? _mesh.normalCount : -1;
+				v2 += v2 < 0 ? _mesh.positionCount : -1;
+				vt2 += vt2 < 0 ? _mesh.texcoordCount : -1;
+				vn2 += vn2 < 0 ? _mesh.normalCount : -1;
+				v3 += v3 < 0 ? _mesh.positionCount : -1;
+				vt3 += vt3 < 0 ? _mesh.texcoordCount : -1;
+				vn3 += vn3 < 0 ? _mesh.normalCount : -1;
+				v4 += v4 < 0 ? _mesh.positionCount : -1;
+				vt4 += vt4 < 0 ? _mesh.texcoordCount : -1;
+				vn4 += vn4 < 0 ? _mesh.normalCount : -1;
 
 				if (_data.order == IndicesOrder::Auto) {
-					Vector3 a V3_NEW(vertices[v1].x, vertices[v1].y, vertices[v1].z);
-					Vector3 b V3_NEW(vertices[v2].x, vertices[v2].y, vertices[v2].z);
-					Vector3 c V3_NEW(vertices[v3].x, vertices[v3].y, vertices[v3].z);
+					Vector3 a V3_NEW(_mesh.positions[v1 * 3], _mesh.positions[v1 * 3 + 1], _mesh.positions[v1 * 3 + 2]);
+					Vector3 b V3_NEW(_mesh.positions[v2 * 3], _mesh.positions[v2 * 3 + 1], _mesh.positions[v2 * 3 + 2]);
+					Vector3 c V3_NEW(_mesh.positions[v3 * 3], _mesh.positions[v3 * 3 + 1], _mesh.positions[v3 * 3 + 2]);
 					
 					// calculate normal clockwise
 					Vector3 normCalculated V3_NORM(V3_CROSS(b - a, c - a));
@@ -404,22 +408,22 @@ static Model* process(FILE*& _file, ObjData& _data, const Vector3& _firstTriNorm
 				if (n == 12) {
 					switch (_data.order) {
 						case IndicesOrder::CW:
-							indices[iIndex++] = v3;
-							indices[iIndex++] = v2;
-							indices[iIndex++] = v1;
+							_mesh.indices[iIndex++] = v3;
+							_mesh.indices[iIndex++] = v2;
+							_mesh.indices[iIndex++] = v1;
 							
-							indices[iIndex++] = v4;
-							indices[iIndex++] = v3;
-							indices[iIndex++] = v1;
+							_mesh.indices[iIndex++] = v4;
+							_mesh.indices[iIndex++] = v3;
+							_mesh.indices[iIndex++] = v1;
 							break;
 						case IndicesOrder::CCW:
-							indices[iIndex++] = v1;
-							indices[iIndex++] = v2;
-							indices[iIndex++] = v3;
+							_mesh.indices[iIndex++] = v1;
+							_mesh.indices[iIndex++] = v2;
+							_mesh.indices[iIndex++] = v3;
 							
-							indices[iIndex++] = v1;
-							indices[iIndex++] = v3;
-							indices[iIndex++] = v4;
+							_mesh.indices[iIndex++] = v1;
+							_mesh.indices[iIndex++] = v3;
+							_mesh.indices[iIndex++] = v4;
 							break;
 						default: break;
 					}
@@ -428,34 +432,49 @@ static Model* process(FILE*& _file, ObjData& _data, const Vector3& _firstTriNorm
 				else if (n == 9) {
 					switch (_data.order) {
 						case IndicesOrder::CW:
-							indices[iIndex++] = v3;
-							indices[iIndex++] = v2;
-							indices[iIndex++] = v1;
+							_mesh.indices[iIndex++] = v3;
+							_mesh.indices[iIndex++] = v2;
+							_mesh.indices[iIndex++] = v1;
 							break;
 						case IndicesOrder::CCW:
-							indices[iIndex++] = v1;
-							indices[iIndex++] = v2;
-							indices[iIndex++] = v3;
+							_mesh.indices[iIndex++] = v1;
+							_mesh.indices[iIndex++] = v2;
+							_mesh.indices[iIndex++] = v3;
 							break;
 						default: break;
 					}
 				}
 				else {
-					printf(AC_RED "Failed to match tri/quad data." AC_RESET);
-					goto end;
+					return err_create(PARSE_FAILED, "Failed to match tri/quad data.");
 				}
 			}
 		}
 	}
 
-	model = ModelManager::create(vertices, _data.positionCount, indices, _data.triCount * 3, Vertex_Colored::layout);
-
-end:
-	free(vertices);
-	free(indices);
-
-	return model;
+	return NONE;
 }
+
+static ErrorCode createModel(Mesh& _mesh, Model*& _model) {
+	Vertex_Colored* vertices = (Vertex_Colored*)malloc(sizeof(Vertex_Colored) * _mesh.positionCount);
+	if (vertices == NULL) return err_create(MEM_ALLOC, "Vertices");
+
+	for (int i = 0; i < _mesh.positionCount; i++) {
+		vertices[i] = Vertex_Colored(
+			_mesh.positions[i * 3], _mesh.positions[i * 3 + 1], _mesh.positions[i * 3 + 2],
+			_mesh.hasColorData ? rgbToHex(_mesh.colors[i * 3], _mesh.colors[i * 3 + 1], _mesh.colors[i * 3 + 2]) : 0xff7f00ff);
+	}
+	
+	_model = Model::create(vertices, _mesh.positionCount, _mesh.indices, _mesh.triCount * 3, Vertex_Colored::layout);
+	if (_model == nullptr) {
+		// TODO
+		return (ErrorCode)404;
+	}
+	
+	return NONE;
+}
+
+
+
 
 /*
 // quickly copied from bgfx_utils.h to make wfobj_loadTextured work
