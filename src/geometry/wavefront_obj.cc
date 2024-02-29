@@ -76,15 +76,15 @@ struct Mesh {
 		free(positions);
 		hasColorData = false;
 		free(colors);
-		normalCount = -1;
+		normalCount = 0;
 		free(normals);
-		texcoordCount = -1;
+		texcoordCount = 0;
 		free(texcoords);
 		
-		triCount = -1;
+		triCount = 0;
 		free(indices);
 		
-		objectCount = -1;
+		objectCount = 0;
 		free(objects);
 	}
 	
@@ -92,11 +92,21 @@ struct Mesh {
 		return {
 			0, nullptr,			// position (inited to 0, as it is a must)
 			false, nullptr,		// color
-			-1, nullptr,		// normal
-			-1, nullptr,		// texcoord
-			-1, nullptr,		// triCount, indices
-			-1, nullptr			// object
+			0, nullptr,			// normal
+			0, nullptr,			// texcoord
+			0, nullptr,			// triCount, indices
+			0, nullptr			// object
 		};
+	}
+	
+	void print() {
+		printf("v: %d, c: %s, vn: %d, vt: %d, tri: %d, o: %d\n",
+			positionCount,
+			hasColorData ? "true" : "false",
+			normalCount,
+			texcoordCount,
+			triCount,
+			objectCount);
 	}
 };
 
@@ -252,6 +262,10 @@ static ErrorCode preprocess(FILE*& _file, ObjData& _data, Mesh& _mesh, Vector3& 
 				}
 				_mesh.normalCount++;
 			}
+			// texture coordinates
+			else if (c == 't') {
+				_mesh.texcoordCount++;
+			}
 		}
 		else if (c == 'f') {
 			// face
@@ -302,9 +316,12 @@ static ErrorCode preprocess(FILE*& _file, ObjData& _data, Mesh& _mesh, Vector3& 
 			_mesh.objects[objI - 1].endPositionIndex = _mesh.positionCount;
 		}
 	}
+	else _mesh.objectCount = -1;
 
-	if (_mesh.normalCount != 0) _mesh.normalCount = 0;
-	if (_mesh.texcoordCount != 0) _mesh.normalCount = 0;
+	if (_mesh.normalCount == 0) _mesh.normalCount = -1;
+	if (_mesh.texcoordCount == 0) _mesh.texcoordCount = -1;
+	
+	_mesh.print();
 	
 	return NONE;
 }
