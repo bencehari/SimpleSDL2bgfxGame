@@ -55,22 +55,29 @@ struct Object {
 	}
 };
 
+/**
+ * @brief All data for a mesh extracted from 3D geom file.
+*/
 struct Mesh {
-	int positionCount;
-	float* positions;
-	bool hasColorData;
-	float* colors;
-	int normalCount;
-	float* normals;
-	int texcoordCount;
-	float* texcoords;
+	VertexType vertexType;		//!< Indicates what data should be valid.
+	int positionCount;			//!< Vertex position count.
+	float* positions;			//!< Vertex position data (x, y, z).
+	bool hasColorData;			//!< True if there are color data.
+	float* colors;				//!< Vertex color data (r, g, b).
+	int normalCount;			//!< Vertex normal count.
+	float* normals;				//!< Vertex normal data (x, y, z).
+	int texcoordCount;			//!< Vertex texture count.
+	float* texcoords;			//!< Vertex texture coordinates (u, v).
 	
-	int triCount;
-	uint16_t* indices;
+	int triCount;				//!< Triangle count
+	uint16_t* indices;			//!< All index data (v, vn, vt) from faces
 	
-	int objectCount;
-	Object* objects;
+	int objectCount;			//!< Object count.
+	Object* objects;			//!< All object (Object).
 	
+	/**
+	 * @brief Frees all allocated memory and reset counts.
+	*/
 	void cleanup() {
 		positionCount = 0;
 		free(positions);
@@ -90,17 +97,19 @@ struct Mesh {
 	
 	static Mesh create() {
 		return {
-			0, nullptr,			// position (inited to 0, as it is a must)
-			false, nullptr,		// color
-			0, nullptr,			// normal
-			0, nullptr,			// texcoord
-			0, nullptr,			// triCount, indices
-			0, nullptr			// object
+			VertexType::Basic,		// Vertex type
+			0, nullptr,				// position (inited to 0, as it is a must)
+			false, nullptr,			// color
+			0, nullptr,				// normal
+			0, nullptr,				// texcoord
+			0, nullptr,				// triCount, indices
+			0, nullptr				// object
 		};
 	}
 	
 	void print() {
-		printf("v: %d, c: %s, vn: %d, vt: %d, tri: %d, o: %d\n",
+		printf("type: %d, v: %d, c: %s, vn: %d, vt: %d, tri: %d, o: %d\n",
+			(int)vertexType,
 			positionCount,
 			hasColorData ? "true" : "false",
 			normalCount,
@@ -263,7 +272,8 @@ static ErrorCode preprocess(FILE*& _file, ObjData& _data, Mesh& _mesh, Vector3& 
 				_mesh.normalCount++;
 			}
 			// texture coordinates
-			else if (c == 't') {
+			// discarded if color data exists
+			else if (c == 't' && !_mesh.hasColorData) {
 				_mesh.texcoordCount++;
 			}
 		}
@@ -321,6 +331,21 @@ static ErrorCode preprocess(FILE*& _file, ObjData& _data, Mesh& _mesh, Vector3& 
 	if (_mesh.normalCount == 0) _mesh.normalCount = -1;
 	if (_mesh.texcoordCount == 0) _mesh.texcoordCount = -1;
 	
+	if (_mesh.hasColorData) {
+		_mesh.vertexType = VertexType::Color;
+		// TODO: discard normals for now, so _mesh.indices layout will align
+		// with Vertex_Colored::layout, while other layouts are not handled,
+		// or dynamic layout building is not implemented.
+		_mesh.normalCount = -1;
+	}
+	else if (_mesh.texcoordCount != -1) {
+		_mesh.vertexType = VertexType::Texture;
+		// TODO: see above, while the rest of processing Vertex_Textured
+		// is not implemented.
+		_mesh.normalCount = -1;
+	}
+	else _mesh.vertexType = VertexType::Basic;
+	
 	_mesh.print();
 	
 	return NONE;
@@ -332,21 +357,54 @@ static ErrorCode process(FILE*& _file, ObjData& _data, Mesh& _mesh, const Vector
 		return err_create(MEM_ALLOC, "Positions");
 	}
 	
-	if (_mesh.hasColorData) {
-		_mesh.colors = (float*)malloc(sizeof(float) * _mesh.positionCount * 3);
-		if (_mesh.positions == NULL) {
-			return err_create(MEM_ALLOC, "Colors");
-		}
+	switch (_mesh.vertexType) {
+		case VertexType::Color:
+			_mesh.colors = (float*)malloc(sizeof(float) * _mesh.positionCount * 3);
+			if (_mesh.positions == NULL) {
+				free(_mesh.positions);
+				return err_create(MEM_ALLOC, "Colors");
+			}
+			break;
+		case VertexType::Texture:
+			_mesh.texcoords = (float*)malloc(sizeof(float) * _mesh.texcoordCount * 2);
+			if (_mesh.texcoords == NULL) {
+				free(_mesh.positions);
+				return err_create(MEM_ALLOC, "Texcoords");
+			}
+			break;
+		default: break;
 	}
 	
-	_mesh.indices = (uint16_t*)malloc(sizeof(uint16_t) * _mesh.triCount * 3);
+	if (_mesh.normalCount != -1) {
+		_mesh.normals = (float*)malloc(sizeof(float) * _mesh.normalCount * 3);
+	}
+
+	switch (_mesh.vertexType) {
+		case VertexType::Basic:
+			// pos(3)
+			_mesh.indices = (uint16_t*)malloc(sizeof(uint16_t) * _mesh.triCount * 3);
+			break;
+		case VertexType::Color: {
+				// [pos(3) + normal(3)] or pos(3)
+				int dataCount = _mesh.normalCount != -1 ? 6 : 3;
+				_mesh.indices = (uint16_t*)malloc(sizeof(uint16_t) * _mesh.triCount * dataCount);
+			} break;
+		case VertexType::Texture: {
+				// [pos(3) + normal(3) + UV(3)] or [pos(3) + UV(3)]
+				int dataCount = _mesh.normalCount != -1 ? 9 : 6;
+				_mesh.indices = (uint16_t*)malloc(sizeof(uint16_t) * _mesh.triCount * dataCount);
+			} break;
+		default: break;
+	}
+	
 	if (_mesh.indices == NULL) {
+		free(_mesh.colors);
 		free(_mesh.positions);
 		return err_create(MEM_ALLOC, "Indices");
 	}
 	
-	int vIndex { 0 };
-	int iIndex { 0 };
+	int vIndex { 0 }; // vertex
+	int iIndex { 0 }; // index
 	
 	rewind(_file);
 
@@ -355,7 +413,7 @@ static ErrorCode process(FILE*& _file, ObjData& _data, Mesh& _mesh, const Vector
 		if (c == 'v') {
 			// vertex
 			if (getc(_file) == ' ') {
-				if (_mesh.hasColorData) {
+				if (_mesh.vertexType == VertexType::Color) {
 					float x, y, z;
 					float r, g, b;
 					int n = fscanf(_file, "%f %f %f %f %f %f", &x, &y, &z, &r, &g, &b);
@@ -421,44 +479,75 @@ static ErrorCode process(FILE*& _file, ObjData& _data, Mesh& _mesh, const Vector
 					// validate if calculated clockwise normal points the same direction as the provided normal
 					_data.order = V3_DOT(_firstTriNormal, normCalculated) >= 0.95f ? IndicesOrder::CW : IndicesOrder::CCW;
 				}
-
-				if (n == 12) {
+				
+				if (n == 9 || n == 12) {
 					switch (_data.order) {
 						case IndicesOrder::CW:
 							_mesh.indices[iIndex++] = v3;
 							_mesh.indices[iIndex++] = v2;
 							_mesh.indices[iIndex++] = v1;
-							
-							_mesh.indices[iIndex++] = v4;
-							_mesh.indices[iIndex++] = v3;
-							_mesh.indices[iIndex++] = v1;
+							if (_mesh.normalCount != -1) {
+								_mesh.indices[iIndex++] = vn3;
+								_mesh.indices[iIndex++] = vn2;
+								_mesh.indices[iIndex++] = vn1;
+							}
+							/*if (_mesh.vertexType == VertexType::Texture) {
+								_mesh.indices[iIndex++] = vt3;
+								_mesh.indices[iIndex++] = vt2;
+								_mesh.indices[iIndex++] = vt1;
+							}*/
 							break;
 						case IndicesOrder::CCW:
 							_mesh.indices[iIndex++] = v1;
 							_mesh.indices[iIndex++] = v2;
 							_mesh.indices[iIndex++] = v3;
-							
-							_mesh.indices[iIndex++] = v1;
-							_mesh.indices[iIndex++] = v3;
-							_mesh.indices[iIndex++] = v4;
+							if (_mesh.normalCount != -1) {
+								_mesh.indices[iIndex++] = vn1;
+								_mesh.indices[iIndex++] = vn2;
+								_mesh.indices[iIndex++] = vn3;
+							}
+							/*if (_mesh.vertexType == VertexType::Texture) {
+								_mesh.indices[iIndex++] = vt1;
+								_mesh.indices[iIndex++] = vt2;
+								_mesh.indices[iIndex++] = vt3;
+							}*/
 							break;
 						default: break;
 					}
-					
-				}
-				else if (n == 9) {
-					switch (_data.order) {
-						case IndicesOrder::CW:
-							_mesh.indices[iIndex++] = v3;
-							_mesh.indices[iIndex++] = v2;
-							_mesh.indices[iIndex++] = v1;
-							break;
-						case IndicesOrder::CCW:
-							_mesh.indices[iIndex++] = v1;
-							_mesh.indices[iIndex++] = v2;
-							_mesh.indices[iIndex++] = v3;
-							break;
-						default: break;
+					if (n == 12) {
+						switch (_data.order) {
+							case IndicesOrder::CW:
+								_mesh.indices[iIndex++] = v4;
+								_mesh.indices[iIndex++] = v3;
+								_mesh.indices[iIndex++] = v1;
+								if (_mesh.normalCount != -1) {
+									_mesh.indices[iIndex++] = vn4;
+									_mesh.indices[iIndex++] = vn3;
+									_mesh.indices[iIndex++] = vn1;
+								}
+								/*if (_mesh.vertexType == VertexType::Texture) {
+									_mesh.indices[iIndex++] = vt4;
+									_mesh.indices[iIndex++] = vt3;
+									_mesh.indices[iIndex++] = vt1;
+								}*/
+								break;
+							case IndicesOrder::CCW:
+								_mesh.indices[iIndex++] = v1;
+								_mesh.indices[iIndex++] = v3;
+								_mesh.indices[iIndex++] = v4;
+								if (_mesh.normalCount != -1) {
+									_mesh.indices[iIndex++] = vn1;
+									_mesh.indices[iIndex++] = vn3;
+									_mesh.indices[iIndex++] = vn4;
+								}
+								/*if (_mesh.vertexType == VertexType::Texture) {
+									_mesh.indices[iIndex++] = vt1;
+									_mesh.indices[iIndex++] = vt3;
+									_mesh.indices[iIndex++] = vt4;
+								}*/
+								break;
+							default: break;
+						}
 					}
 				}
 				else {
@@ -473,37 +562,50 @@ static ErrorCode process(FILE*& _file, ObjData& _data, Mesh& _mesh, const Vector
 
 static ErrorCode createModel(Mesh& _mesh, Model*& _model) {
 	void* vertices { nullptr };
-	VertexType vertexType { VertexType::Basic };
 	
-	if (_mesh.hasColorData) {
-		vertexType = VertexType::Color;
-		
+	// TODO: there can be texcoords too, how to determine which to use?
+	if (_mesh.vertexType == VertexType::Color) {
 		vertices = malloc(sizeof(Vertex_Colored) * _mesh.positionCount);
-		if (vertices == NULL) return err_create(MEM_ALLOC, "Vertices");
+		if (vertices == NULL) return err_create(MEM_ALLOC, "Vertices (Color)");
 
 		Vertex_Colored* p = (Vertex_Colored*)vertices;
 
 		for (int i = 0; i < _mesh.positionCount; i++) {
+			int idx = i * 3;
 			p[i] = Vertex_Colored(
-				_mesh.positions[i * 3], _mesh.positions[i * 3 + 1], _mesh.positions[i * 3 + 2],
-				rgbToHex(_mesh.colors[i * 3], _mesh.colors[i * 3 + 1], _mesh.colors[i * 3 + 2]));
+				_mesh.positions[idx], _mesh.positions[idx + 1], _mesh.positions[idx + 2],
+				rgbToHex(_mesh.colors[idx], _mesh.colors[idx + 1], _mesh.colors[idx + 2]));
+		}
+	}
+	else if (_mesh.vertexType == VertexType::Texture) {
+		_mesh.vertexType = VertexType::Color;
+		
+		// vertices = malloc(sizeof(Vertex_Textured) * _mesh.positionCount);
+		vertices = malloc(sizeof(Vertex_Colored) * _mesh.positionCount);
+		if (vertices == NULL) return err_create(MEM_ALLOC, "Vertices (Texture)");
+		
+		// Vertex_Textured* p = (Vertex_Textured*)vertices;
+		Vertex_Colored* p = (Vertex_Colored*)vertices;
+		
+		for (int i = 0; i < _mesh.positionCount; i++) {
+			int idx = i * 3; // 6;
+			p[i] = Vertex_Colored(_mesh.positions[idx], _mesh.positions[idx + 1], _mesh.positions[idx + 2], 0xff7f00ff);
 		}
 	}
 	// fallback to pink
 	else {
-		vertexType = VertexType::Color;
-		
 		vertices = malloc(sizeof(Vertex_Colored) * _mesh.positionCount);
 		if (vertices == NULL) return err_create(MEM_ALLOC, "Vertices");
 
 		Vertex_Colored* p = (Vertex_Colored*)vertices;
 
 		for (int i = 0; i < _mesh.positionCount; i++) {
-			p[i] = Vertex_Colored(_mesh.positions[i * 3], _mesh.positions[i * 3 + 1], _mesh.positions[i * 3 + 2], 0xff7f00ff);
+			int idx = i * 3;
+			p[i] = Vertex_Colored(_mesh.positions[idx], _mesh.positions[idx + 1], _mesh.positions[idx + 2], 0xff7f00ff);
 		}
 	}
 	
-	_model = Model::create(vertexType, vertices, _mesh.positionCount, _mesh.indices, _mesh.triCount * 3);
+	_model = Model::create(_mesh.vertexType, vertices, _mesh.positionCount, _mesh.indices, _mesh.triCount * 3);
 	if (_model == nullptr) {
 		// TODO
 		return (ErrorCode)404;

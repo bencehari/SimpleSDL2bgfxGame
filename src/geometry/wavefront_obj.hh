@@ -9,6 +9,9 @@
  * - Process normals (vn x y z).
  * - Process faces (f v1/vt1/vn1 v2/vt2/vn2 v3/vt3/vn3 [v4/vt4/vn4]),
  *   tris and quads.
+ *
+ * Comments:
+ * - If color data exist, texcoords are discarded.
 */
 
 #ifndef KE_WAVEFRONT_OBJ
