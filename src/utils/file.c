@@ -4,7 +4,7 @@
 
 #include "consc.h"
 
-bool getFileSize(const char* _filePath, long* _fileSize, FILE** _file) {
+bool get_file_size(const char* _filePath, long* _fileSize, FILE** _file) {
 	*_file = fopen(_filePath, "rb");
 	if (_file == NULL) {
 		printf(AC_YELLOW "file is NULL: %s\n" AC_RESET, _filePath);
@@ -18,7 +18,7 @@ bool getFileSize(const char* _filePath, long* _fileSize, FILE** _file) {
 	return true;
 }
 
-int getFileName(const char* _path) {
+int get_file_name(const char* _path) {
 	if (_path == NULL) return -1;
 	
 	int len = (int)strlen(_path);

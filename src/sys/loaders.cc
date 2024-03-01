@@ -39,7 +39,7 @@ ErrorCode loadShader(const char* _filename, bgfx::ShaderHandle* _shaderHandle) {
 	
 	FILE* file { nullptr };
 	long fileSize { 0 };
-	if (!getFileSize(filePath, &fileSize, &file)) return err_create(OPEN_FILE, "loaders.cc:loadShader");
+	if (!get_file_size(filePath, &fileSize, &file)) return err_create(OPEN_FILE, "loaders.cc:loadShader");
 	
 	// printf(AC_YELLOW "fileSize: %ld\n" AC_RESET, fileSize);
 	

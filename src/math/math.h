@@ -3,6 +3,10 @@
 
 #include "HandmadeMath.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // float
 #define RAD_TO_DEG(_f) ((_f) * HMM_RadToDeg)
 #define DEG_TO_RAD(_f) ((_f) * HMM_DegToRad)
@@ -87,5 +91,9 @@ static inline Vector3 rotate(const Vector3& _v3, const Quaternion& _q) {
 	
 	return ((u * (2.0f * dot)) + (_v3 * (s * s - V3_DOT(u, u)))) + (cross * (2.0f * s));
 }
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // KE_MATH_H

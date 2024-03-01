@@ -1,6 +1,10 @@
 #ifndef KE_ERR_H
 #define KE_ERR_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @brief Error codes.
 */
@@ -36,5 +40,9 @@ extern enum ErrorCode err_create(enum ErrorCode _errorCode, const char* _format,
  * @return char*.
 */
 extern const char* err_code_str(enum ErrorCode _errorCode);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // KE_ERR_H

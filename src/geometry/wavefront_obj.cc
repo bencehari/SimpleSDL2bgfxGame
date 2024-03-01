@@ -207,12 +207,12 @@ Model* wfobj_load(const char* _objPath, IndicesOrder _order) {
 static ErrorCode readFileAndHeader(const char* _path, FILE*& _file, ObjData& _data) {
 	const char* ext = _path + strlen(_path) - 4;
 	if (strcmp(ext, ".obj") != 0 && strcmp(ext, ".OBJ") != 0) {
-		return err_create(EXT_MISMATCH, "%s is not Wavefront OBJ.\n", getFileName(_path));
+		return err_create(EXT_MISMATCH, "%s is not Wavefront OBJ.\n", get_file_name(_path));
 	}
 	
 	_file = fopen(_path, "r");
 	if (_file == nullptr) {
-		return err_create(OPEN_FILE, "file is NULL: %s\n", getFileName(_path));
+		return err_create(OPEN_FILE, "file is NULL: %s\n", get_file_name(_path));
 	}
 	
 	char buf[10];
@@ -574,7 +574,7 @@ static ErrorCode createModel(Mesh& _mesh, Model*& _model) {
 			int idx = i * 3;
 			p[i] = Vertex_Colored(
 				_mesh.positions[idx], _mesh.positions[idx + 1], _mesh.positions[idx + 2],
-				rgbToHex(_mesh.colors[idx], _mesh.colors[idx + 1], _mesh.colors[idx + 2]));
+				rgb_to_hex_F(_mesh.colors[idx], _mesh.colors[idx + 1], _mesh.colors[idx + 2]));
 		}
 	}
 	else if (_mesh.vertexType == VertexType::Texture) {

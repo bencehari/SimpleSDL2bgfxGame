@@ -1,6 +1,10 @@
 #ifndef KE_CONSC_H
 #define KE_CONSC_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // AC stands for ANSI_COLOR
 #define AC_RED     "\x1b[31m"
 #define AC_GREEN   "\x1b[32m"
@@ -13,5 +17,9 @@
 // usage example:
 // printf(AC_RED "ERROR!\n" AC_RESET);
 // printf(AC_GREEN "[DONE]" AC_RESET " %d model(s) loaded.\n", loadedModelCount);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // KE_CONSC_H

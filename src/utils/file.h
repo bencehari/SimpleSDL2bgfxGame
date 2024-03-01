@@ -4,6 +4,10 @@
 #include <stdio.h>
 #include <stdbool.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @brief Gets the file's size.
  *
@@ -13,7 +17,7 @@
  *
  * @return False on error, otherwise true.
 */
-extern bool getFileSize(const char* _filePath, long* _fileSize, FILE** _file);
+extern bool get_file_size(const char* _filePath, long* _fileSize, FILE** _file);
 
 /**
  * @brief Gets file name from path.
@@ -26,6 +30,10 @@ extern bool getFileSize(const char* _filePath, long* _fileSize, FILE** _file);
  *
  * @return Start index of filename.
 */
-extern int getFileName(const char* _path);
+extern int get_file_name(const char* _path);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // KE_FILE_H

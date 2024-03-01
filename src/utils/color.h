@@ -1,6 +1,10 @@
 #ifndef KE_COLOR_H
 #define KE_COLOR_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @brief Converts RGB to HEX.
  *
@@ -12,7 +16,7 @@
  *
  * @return unsigned int HEX value.
 */
-extern unsigned int rgbToHex(const float r, const float g, const float b);
+extern unsigned int rgb_to_hex_F(const float r, const float g, const float b);
 
 /**
  * @brief Converts RGBA to HEX.
@@ -26,7 +30,7 @@ extern unsigned int rgbToHex(const float r, const float g, const float b);
  *
  * @return unsigned int HEX value.
 */
-extern unsigned int rgbaToHex(const float r, const float g, const float b, const float a);
+extern unsigned int rgba_to_hex_F(const float r, const float g, const float b, const float a);
 
 /**
  * @brief Converts RGB to HEX.
@@ -39,7 +43,7 @@ extern unsigned int rgbaToHex(const float r, const float g, const float b, const
  *
  * @return unsigned int HEX value.
 */
-extern unsigned int rgbToHex(const unsigned char r, const unsigned char g, const unsigned char b);
+extern unsigned int rgb_to_hex(const unsigned char r, const unsigned char g, const unsigned char b);
 
 /**
  * @brief Converts RGBA to HEX.
@@ -53,6 +57,10 @@ extern unsigned int rgbToHex(const unsigned char r, const unsigned char g, const
  *
  * @return unsigned int HEX value.
 */
-extern unsigned int rgbaToHex(const unsigned char r, const unsigned char g, const unsigned char b, const unsigned char a);
+extern unsigned int rgba_to_hex(const unsigned char r, const unsigned char g, const unsigned char b, const unsigned char a);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // KE_COLOR_H
