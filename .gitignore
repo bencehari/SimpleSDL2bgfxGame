@@ -1,7 +1,8 @@
 .vscode/
-.build/
-tools/.build/
+/**/.build/
 paths.txt
+
+tools/**/*.tga
 
 assets/shaders/*
 !assets/shaders/contents.md
