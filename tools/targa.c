@@ -50,10 +50,38 @@ struct Header {
 static bool fread_header(struct Header* _h, FILE* _file);
 static void print_header(struct Header* _h);
 static bool verify_tga_image(const char* _fileName);
-static ui8* createChessTable(ui8 blockSize);
 
-// comment this out if building by dds_test.bat
-/*int main(int argc, char* argv[]) {
+// comment this and main out if building by dds_test.bat
+/*static ui8* createChessTable(ui8 blockSize) {
+	ui8* ret = malloc(sizeof(ui8) * blockSize * blockSize * 8 * 8 * 3);
+	if (ret == NULL) {
+		puts("[ERR] Allocate memory for chess table failed.");
+		return NULL;
+	}
+	
+	int rowLen = blockSize * 8 * 3;
+	for (int row = 0; row < 8; row++) {
+		ui8 color = row % 2 == 0 ? 0x00 : 0xFF;
+
+		for (int col = 0; col < 8; col++) {
+			color = color == 0xFF ? 0x00 : 0xFF;
+
+			int r0 = row * blockSize * rowLen;
+			for (int r = r0; r < r0 + blockSize * rowLen; r += rowLen) {
+				int c0 = col * blockSize * 3;
+				for (int c = c0; c < c0 + blockSize * 3; c += 3) {
+					for (int rgb = 0; rgb < 3; rgb++) {
+						ret[r + c + rgb] = color;
+					}
+				}
+			}
+		}
+	}
+	
+	return ret;
+}
+
+int main(int argc, char* argv[]) {
 	if (argc == 1) {
 		puts("No param provided, creating test chess table tga (40x40) file.");
 		
@@ -272,33 +300,4 @@ static bool verify_tga_image(const char* _fileName) {
 	
 	fclose(f);
 	return true;
-}
-
-static ui8* createChessTable(ui8 blockSize) {
-	ui8* ret = malloc(sizeof(ui8) * blockSize * blockSize * 8 * 8 * 3);
-	if (ret == NULL) {
-		puts("[ERR] Allocate memory for chess table failed.");
-		return NULL;
-	}
-	
-	int rowLen = blockSize * 8 * 3;
-	for (int row = 0; row < 8; row++) {
-		ui8 color = row % 2 == 0 ? 0x00 : 0xFF;
-
-		for (int col = 0; col < 8; col++) {
-			color = color == 0xFF ? 0x00 : 0xFF;
-
-			int r0 = row * blockSize * rowLen;
-			for (int r = r0; r < r0 + blockSize * rowLen; r += rowLen) {
-				int c0 = col * blockSize * 3;
-				for (int c = c0; c < c0 + blockSize * 3; c += 3) {
-					for (int rgb = 0; rgb < 3; rgb++) {
-						ret[r + c + rgb] = color;
-					}
-				}
-			}
-		}
-	}
-	
-	return ret;
 }
