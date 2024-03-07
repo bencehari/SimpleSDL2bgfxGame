@@ -127,5 +127,7 @@ int processDDSFile(FILE*& _file) {
 		return EXIT_SUCCESS;
 	}
 	
+	// TODO: create tga from image data
+	
 	return EXIT_SUCCESS;
 }

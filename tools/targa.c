@@ -4,8 +4,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "targa_test_data.h"
-
 #define BYTE_TO_BINARY_PATTERN "%c%c%c%c%c%c%c%c"
 #define BYTE_TO_BINARY(byte) \
 	((byte) & 0x80 ? '1' : '0'), \
@@ -17,8 +15,8 @@
 	((byte) & 0x02 ? '1' : '0'), \
 	((byte) & 0x01 ? '1' : '0') 
 
-typedef uint8_t		u8;
-typedef uint16_t	u16;
+typedef uint8_t		ui8;
+typedef uint16_t	ui16;
 
 /* Image Type - Field 3
 	0-127 reserved for use by Truevision.
@@ -34,35 +32,76 @@ typedef uint16_t	u16;
 	
 // cm prefix stands for Color-map
 struct Header {
-	u8		idLen;
-	u8		colorMapType;
-	u8		imageType;
-	u8		cmEntrySize;		// Establishes the number of bits per entry. Typically 15, 16, 24 or 32-bit values are used.
+	ui8		idLen;
+	ui8		colorMapType;
+	ui8		imageType;
+	ui8		cmEntrySize;		// Establishes the number of bits per entry. Typically 15, 16, 24 or 32-bit values are used.
 								// (moved from after cmLen to avoid padding, as writing and reading are not done by the type)
-	u16		cmFirstEntryIndex;	// Index of the first color map entry.
-	u16		cmLen;				// Total number of color map entries included.
-	u16		originX;
-	u16		originY;
-	u16		width;
-	u16		height;
-	u8		pixelDepth;
-	u8		imageDescriptor;
+	ui16	cmFirstEntryIndex;	// Index of the first color map entry.
+	ui16	cmLen;				// Total number of color map entries included.
+	ui16	originX;
+	ui16	originY;
+	ui16	width;
+	ui16	height;
+	ui8		pixelDepth;
+	ui8		imageDescriptor;
 };
 
 static bool fread_header(struct Header* _h, FILE* _file);
 static void print_header(struct Header* _h);
+static bool verify_tga_image(const char* _fileName);
+static ui8* createChessTable(ui8 blockSize);
 
 // comment this out if building by dds_test.bat
-int main(void) {
-	create_tga_image("tga_test_output", 40, 40, TOP_LEFT, chessTableColors, true);
+/*int main(int argc, char* argv[]) {
+	if (argc == 1) {
+		puts("No param provided, creating test chess table tga (40x40) file.");
+		
+		int blockSize = 5;
+		ui8* chessTable = createChessTable(blockSize);
+		
+		if (chessTable != NULL) {
+			def_tga_image("tga_test_output", blockSize * 8, blockSize * 8, chessTable);
+			free(chessTable);
+		}
+		else return EXIT_FAILURE;
+	}
+	else if (argc == 3 && strcmp(argv[1], "-i") == 0) {
+		size_t len = strlen(argv[2]);
+		if (len < 5) {
+			puts("[ERR] Invalid file path.");
+			return EXIT_FAILURE;
+		}
+		
+		char* ext = argv[2] + len - 4;
+		if (strcmp(ext, ".tga") != 0 && strcmp(ext, ".TGA") != 0) {
+			puts("[ERR] File must have .tga or .TGA extension.");
+			return EXIT_FAILURE;
+		}
+		
+		if (!verify_tga_image(argv[2])) return EXIT_FAILURE;
+	}
+	else {
+		puts(
+			"MANUAL\n"
+			"------\n"
+			"EMPTY  -> creating test image.\n"
+			"-i     -> prints info about, and verify tga image. Must provide path to tga file (\\w ext) as the next param.");
+	}
+	
+	return EXIT_SUCCESS;
+}*/
+
+bool def_tga_image(const char* _fileName, const uint16_t _width, const uint16_t _height, const uint8_t* _colors) {
+	return create_tga_image(_fileName, _width, _height, RIGHT_DOWN, _colors, false);
 }
 
-static void putnc(u8 c, size_t n, FILE* file) {
+static void putnc(ui8 c, size_t n, FILE* file) {
 	for (size_t i = 0; i < n; i++) putc(c, file);
 }
 
 bool create_tga_image(const char* _fileName, const uint16_t _width, const uint16_t _height,
-					  const enum ColorDataStart _start, const uint8_t* _colors, const bool _verify) {
+					  const enum ColorDataDirection _dir, const uint8_t* _colors, const bool _verify) {
 	size_t len = strlen(_fileName);
 	char* fileName = malloc(sizeof(char) * len + sizeof(char) * 5);
 	memcpy(fileName, _fileName, sizeof(char) * len);
@@ -76,15 +115,13 @@ bool create_tga_image(const char* _fileName, const uint16_t _width, const uint16
 	}
 	if (!_verify) free(fileName);
 
-	u8 start = 0; // default: BOTTOM_LEFT
-	switch (_start) {
-		case BOTTOM_RIGHT: start = 1 << 4; break;
-		case TOP_LEFT: start = 1 << 5; break;
-		case TOP_RIGHT: start &= (1 << 5) & (1 << 4); break;
+	ui8 dir = 0; // default: RIGHT_UP
+	switch (_dir) {
+		case LEFT_UP:		dir = 1 << 4; break;
+		case RIGHT_DOWN:	dir = 1 << 5; break;
+		case LEFT_DOWN:		dir = (1 << 5) | (1 << 4); break;
 		default: break;
 	}
-	
-	start = (1 << 5) | (1 << 4);
 
 	putc(0, file);								// no image identification field
 	putc(0, file);								// indicates that (0) no color-map, (1) a color-map included
@@ -92,13 +129,13 @@ bool create_tga_image(const char* _fileName, const uint16_t _width, const uint16
 	putnc(0, 5, file);							// no color map, so no color map specification
 	putnc(0, 2, file);							// X-origin; the absolute horizontal coordinate for the lower left corner of the image
 	putnc(0, 2, file);							// Y-origin; the absolute vertical coordinate for the lower left corner of the image
-	fwrite(&_width, sizeof(u16), 1, file);		// width
-	fwrite(&_height, sizeof(u16), 1, file);		// height
+	fwrite(&_width, sizeof(ui16), 1, file);		// width
+	fwrite(&_height, sizeof(ui16), 1, file);	// height
 	putc(24, file);								// pixel depth
-	putc(start, file);							// image descriptor (5th bit set: data order starts from top left)
+	putc(dir, file);							// image descriptor (5th bit set: data order starts from top left)
 	
 	// Image ID would be here, if the very first field would be 1
-	// Color Map Data, same as Image ID
+	// Color Map Data, same as Image ID with second field
 	
 	// Image Data (True-color)
 	for (size_t i = 0; i < _width * _height * 3; i++) {
@@ -113,52 +150,7 @@ bool create_tga_image(const char* _fileName, const uint16_t _width, const uint16
 
 	fclose(file);
 
-	if (_verify) {
-		FILE* f = fopen(fileName, "rb");
-		struct Header header;
-		
-		if (!fread_header(&header, f)) {
-			puts("[ERR] Verify output file failed (reading header).");
-			fclose(f);
-			return false;
-		}
-		
-		print_header(&header);
-		
-		printf(
-			"0 - 3 These bits specify the number of attribute bits per pixel.\n"
-			"5 & 4 These bits are used to indicate the order in which pixel data is transferred from the file to the screen.\n"
-			"      Bit 4 is for left-to-right ordering and bit 5 is for top-to-bottom ordering as shown below.\n"
-			"76543210\n"
-			"--------\n"
-			BYTE_TO_BINARY_PATTERN "\n",
-			BYTE_TO_BINARY(header.imageDescriptor));
-		
-		fseek(f, 0, SEEK_END);
-		long imageDataSize = ftell(f) - 18 - 26; // total - header - footer
-		long targetSize = header.width * header.height * 3;
-		if (imageDataSize != targetSize) {
-			printf("[ERR] Image data size doesn't mach: %ld (expected: %ld)\n", imageDataSize, targetSize);
-			fclose(f);
-			return false;
-		}
-		
-		fseek(f, -18, SEEK_END);
-		int c[16];
-		for (int i = 0; i < 16; i++) c[i] = getc(f);
-		char truevision[] = "TRUEVISION-XFILE";
-		for (int i = 0; i < 16; i++) {
-			if (c[i] != truevision[i]) {
-				puts("[ERR] Original TGA not supported.");
-				fclose(f);
-				return false;
-			}
-		}
-		
-		puts("LOOKS GOOD");
-		
-		fclose(f);
-	}
+	if (_verify && !verify_tga_image(fileName)) return false;
 	
 	return true;
 }
@@ -175,25 +167,25 @@ static bool fread_header(struct Header* _h, FILE* _file) {
 	c = fgetc(_file); if (c < 0 || feof(_file)) return false;
 	_h->imageType = c;
 	
-	if (fread(&c, sizeof(u16), 1, _file) != 1) return false;
+	if (fread(&c, sizeof(ui16), 1, _file) != 1) return false;
 	_h->cmFirstEntryIndex = c;
 	
-	if (fread(&c, sizeof(u16), 1, _file) != 1) return false;
+	if (fread(&c, sizeof(ui16), 1, _file) != 1) return false;
 	_h->cmLen = c;
 	
 	c = fgetc(_file); if (c < 0 || feof(_file)) return false;
 	_h->cmEntrySize = c;
 	
-	if (fread(&c, sizeof(u16), 1, _file) != 1) return false;
+	if (fread(&c, sizeof(ui16), 1, _file) != 1) return false;
 	_h->originX = c;
 	
-	if (fread(&c, sizeof(u16), 1, _file) != 1) return false;
+	if (fread(&c, sizeof(ui16), 1, _file) != 1) return false;
 	_h->originY = c;
 	
-	if (fread(&c, sizeof(u16), 1, _file) != 1) return false;
+	if (fread(&c, sizeof(ui16), 1, _file) != 1) return false;
 	_h->width = c;
 	
-	if (fread(&c, sizeof(u16), 1, _file) != 1) return false;
+	if (fread(&c, sizeof(ui16), 1, _file) != 1) return false;
 	_h->height = c;
 	
 	c = fgetc(_file); if (c < 0 || feof(_file)) return false;
@@ -231,4 +223,82 @@ static void print_header(struct Header* _h) {
 		_h->height,
 		_h->pixelDepth,
 		_h->imageDescriptor);
+}
+
+static bool verify_tga_image(const char* _fileName) {
+	FILE* f = fopen(_fileName, "rb");
+	struct Header header;
+	
+	if (!fread_header(&header, f)) {
+		puts("[ERR] Verify output file failed (reading header).");
+		fclose(f);
+		return false;
+	}
+	
+	print_header(&header);
+	
+	printf(
+		"0 - 3 These bits specify the number of attribute bits per pixel.\n"
+		"5 & 4 These bits are used to indicate the order in which pixel data is transferred from the file to the screen.\n"
+		"      Bit 4 is for left-to-right ordering and bit 5 is for top-to-bottom ordering as shown below.\n"
+		"6 - 7 Must be zero! (to insure future compatibility)\n"
+		"76543210\n"
+		"--------\n"
+		BYTE_TO_BINARY_PATTERN "\n",
+		BYTE_TO_BINARY(header.imageDescriptor));
+
+	fseek(f, -18, SEEK_END);
+	int c[16];
+	for (int i = 0; i < 16; i++) c[i] = getc(f);
+	char truevision[] = "TRUEVISION-XFILE";
+	for (int i = 0; i < 16; i++) {
+		if (c[i] != truevision[i]) {
+			puts("[ERR] Original TGA not supported yet.");
+			fclose(f);
+			return false;
+		}
+	}
+	
+	fseek(f, 0, SEEK_END);
+	long imageDataSize = ftell(f) - 18 - 26; // total - header - footer
+	long targetSize = header.width * header.height * 3;
+	if (imageDataSize != targetSize) {
+		printf("[ERR] Image data size doesn't match: %ld (expected: %ld)\n", imageDataSize, targetSize);
+		fclose(f);
+		return false;
+	}
+	
+	printf("File '%s' LOOKS GOOD\n", _fileName);
+	
+	fclose(f);
+	return true;
+}
+
+static ui8* createChessTable(ui8 blockSize) {
+	ui8* ret = malloc(sizeof(ui8) * blockSize * blockSize * 8 * 8 * 3);
+	if (ret == NULL) {
+		puts("[ERR] Allocate memory for chess table failed.");
+		return NULL;
+	}
+	
+	int rowLen = blockSize * 8 * 3;
+	for (int row = 0; row < 8; row++) {
+		ui8 color = row % 2 == 0 ? 0x00 : 0xFF;
+
+		for (int col = 0; col < 8; col++) {
+			color = color == 0xFF ? 0x00 : 0xFF;
+
+			int r0 = row * blockSize * rowLen;
+			for (int r = r0; r < r0 + blockSize * rowLen; r += rowLen) {
+				int c0 = col * blockSize * 3;
+				for (int c = c0; c < c0 + blockSize * 3; c += 3) {
+					for (int rgb = 0; rgb < 3; rgb++) {
+						ret[r + c + rgb] = color;
+					}
+				}
+			}
+		}
+	}
+	
+	return ret;
 }
