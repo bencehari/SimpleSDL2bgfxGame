@@ -1,8 +1,12 @@
-#ifndef DDS_TEST_HH
-#define DDS_TEST_HH
+#ifndef DDS_TEST_H
+#define DDS_TEST_H
+
+#include <stdio.h>
 
 typedef unsigned long	DWORD;
 typedef unsigned int	UINT;
+
+extern int process_dds_file(FILE* _file);
 
 ///////////////////////////////////////////////////////////////////////////////
 // Pixelformat
@@ -39,45 +43,9 @@ struct DDS_PIXELFORMAT {
 	DWORD dwGBitMask;
 	DWORD dwBBitMask;
 	DWORD dwABitMask;
-	
-	void print() {
-		printf(
-			"DDS_PIXELFORMAT\n"
-			"---------------\n"
-			"dwSize: %lu\n"
-			"dwFlags: %lu\n"
-			"dwFourCC: %lu\n"
-			"dwRGBBitCount: %lu\n"
-			"dwRBitMask: %lu\n"
-			"dwGBitMask: %lu\n"
-			"dwBBitMask: %lu\n"
-			"dwABitMask: %lu\n",
-			dwSize,
-			dwFlags,
-			dwFourCC,
-			dwRGBBitCount,
-			dwRBitMask,
-			dwGBitMask,
-			dwBBitMask,
-			dwABitMask);
-
-		printf(
-			"----------\n"
-			"FLAGS:\n"
-			"DDPF_ALPHAPIXELS: %d\n"
-			"DDPF_ALPHA: %d\n"
-			"DDPF_FOURCC: %d\n"
-			"DDPF_RGB: %d\n"
-			"DDPF_YUV: %d\n"
-			"DDPF_LUMINANCE: %d\n\n",
-			(dwFlags & DDPF_ALPHAPIXELS) != 0 ? 1 : 0,
-			(dwFlags & DDPF_ALPHA) != 0 ? 1 : 0,
-			(dwFlags & DDPF_FOURCC) != 0 ? 1 : 0,
-			(dwFlags & DDPF_RGB) != 0 ? 1 : 0,
-			(dwFlags & DDPF_YUV) != 0 ? 1 : 0,
-			(dwFlags & DDPF_LUMINANCE) != 0 ? 1 : 0);
-	}
 };
+
+extern void print_dds_pixelformat(struct DDS_PIXELFORMAT* _pf);
 
 ///////////////////////////////////////////////////////////////////////////////
 // Header
@@ -95,71 +63,23 @@ enum DDS_HEADER_DW_FLAGS {
 };
 
 struct DDS_HEADER {
-	DWORD			dwSize;
-	DWORD			dwFlags;
-	DWORD			dwHeight;
-	DWORD			dwWidth;
-	DWORD			dwPitchOrLinearSize;
-	DWORD			dwDepth;
-	DWORD			dwMipMapCount;
-	DWORD			dwReserved1[11];
-	DDS_PIXELFORMAT	ddspf;
-	DWORD			dwCaps;
-	DWORD			dwCaps2;
-	DWORD			dwCaps3;
-	DWORD			dwCaps4;
-	DWORD			dwReserved2;
-	
-	void print() {
-		printf(
-			"DDS_HEADER\n"
-			"----------\n"
-			"dwSize: %lu\n"
-			"dwFlags: %lu\n"
-			"dwHeight: %lu\n"
-			"dwWidth: %lu\n"
-			"dwPitchOrLinearSize: %lu\n"
-			"dwDepth: %lu\n"
-			"dwMipMapCount: %lu\n"
-			"dwCaps: %lu\n"
-			"dwCaps2: %lu\n"
-			"dwCaps3: %lu\n"
-			"dwCaps4: %lu\n",
-			dwSize,
-			dwFlags,
-			dwHeight,
-			dwWidth,
-			dwPitchOrLinearSize,
-			dwDepth,
-			dwMipMapCount,
-			dwCaps,
-			dwCaps2,
-			dwCaps3,
-			dwCaps4);
-		
-		printf(
-			"----------\n"
-			"FLAGS:\n"
-			"DDSD_CAPS: %d\n"
-			"DDSD_HEIGHT: %d\n"
-			"DDSD_WIDTH: %d\n"
-			"DDSD_PITCH: %d\n"
-			"DDSD_PIXELFORMAT: %d\n"
-			"DDSD_MIPMAPCOUNT: %d\n"
-			"DDSD_LINEARSIZE: %d\n"
-			"DDSD_DEPTH: %d\n\n",
-			(dwFlags & DDSD_CAPS) != 0 ? 1 : 0,
-			(dwFlags & DDSD_HEIGHT) != 0 ? 1 : 0,
-			(dwFlags & DDSD_WIDTH) != 0 ? 1 : 0,
-			(dwFlags & DDSD_PITCH) != 0 ? 1 : 0,
-			(dwFlags & DDSD_PIXELFORMAT) != 0 ? 1 : 0,
-			(dwFlags & DDSD_MIPMAPCOUNT) != 0 ? 1 : 0,
-			(dwFlags & DDSD_LINEARSIZE) != 0 ? 1 : 0,
-			(dwFlags & DDSD_DEPTH) != 0 ? 1 : 0);
-		
-		ddspf.print();
-	}
+	DWORD					dwSize;
+	DWORD					dwFlags;
+	DWORD					dwHeight;
+	DWORD					dwWidth;
+	DWORD					dwPitchOrLinearSize;
+	DWORD					dwDepth;
+	DWORD					dwMipMapCount;
+	DWORD					dwReserved1[11];
+	struct DDS_PIXELFORMAT	ddspf;
+	DWORD					dwCaps;
+	DWORD					dwCaps2;
+	DWORD					dwCaps3;
+	DWORD					dwCaps4;
+	DWORD					dwReserved2;
 };
+
+extern void print_dds_header(struct DDS_HEADER* _h);
 
 /*
 NOTE (LOL)
@@ -361,28 +281,14 @@ enum D3D11_RESOURCE_DIMENSION {
 };
 
 struct DDS_HEADER_DXT10 {
-	DXGI_FORMAT dxgiFormat;
-	D3D11_RESOURCE_DIMENSION resourceDimension;
-	UINT miscFlag;
-	UINT arraySize;
-	UINT miscFlags2;
-	
-	void print() {
-		printf(
-			"DDS_HEADER_DXT10\n"
-			"----------------\n"
-			"dxgiFormat: %d\n"
-			"resourceDimension: %d\n"
-			"miscFlag: %d\n"
-			"arraySize: %d\n"
-			"miscFlags2: %d\n\n",
-			dxgiFormat,
-			resourceDimension,
-			miscFlag,
-			arraySize,
-			miscFlags2);
-	}
+	enum DXGI_FORMAT				dxgiFormat;
+	enum D3D11_RESOURCE_DIMENSION	resourceDimension;
+	UINT							miscFlag;
+	UINT							arraySize;
+	UINT							miscFlags2;
 };
+
+extern void print_dds_header_dxt10(struct DDS_HEADER_DXT10* _h);
 
 enum DDS_HEADER_DXT10_MISCFLAG {
 	// Indicates a 2D texture is a cube-map texture.
@@ -405,4 +311,4 @@ enum DDS_HEADER_DXT10_MISCFLAGS2 {
 	DDS_ALPHA_MODE_CUSTOM				= 0x4
 };
 
-#endif // DDS_TEST_HH
+#endif // DDS_TEST_H

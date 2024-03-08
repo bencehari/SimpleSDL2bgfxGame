@@ -12,5 +12,5 @@ gcc^
  %debug%^
  targa.c^
  -Wall -Wextra -Wpedantic^
- -o .build/targa_test.exe^
- && %run% .build\targa_test.exe
+ -o .build/targa.exe^
+ && %run% .build\targa.exe

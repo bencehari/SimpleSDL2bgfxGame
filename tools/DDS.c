@@ -1,10 +1,10 @@
-#include <stdio.h>
+#include "DDS.h"
+
 #include <stdlib.h>
 #include <stdint.h>
 #include <stdbool.h>
 #include <string.h>
 
-#include "dds_test.hh"
 #include "DXT.h"
 #include "targa.h"
 
@@ -16,10 +16,6 @@
 #define AC_MAGENTA "\x1b[35m"
 #define AC_CYAN    "\x1b[36m"
 #define AC_RESET   "\x1b[0m"
-
-typedef uint8_t BYTE;
-
-int processDDSFile(FILE*& _file);
 
 int main(int argc, char* argv[]) {
 	if (argc < 2) {
@@ -38,13 +34,13 @@ int main(int argc, char* argv[]) {
 	}
 	
 	FILE* file = fopen(filePath, "rb");
-	if (file == nullptr) {
+	if (file == NULL) {
 		printf(AC_RED "[ERR]" AC_RESET " Failed to open file: \"%s\"", filePath);
 		fclose(file);
 		return EXIT_FAILURE;
 	}
 	
-	int exitCode = processDDSFile(file);
+	int exitCode = process_dds_file(file);
 	
 	fclose(file);
 	
@@ -53,7 +49,7 @@ int main(int argc, char* argv[]) {
 
 
 
-void printCompressionFormat(const DXTCompression& cf) {
+void print_compression_format(const enum DXTCompression cf) {
 	printf("Compression format: ");
 	switch (cf) {
 		case DXTC_NONE: puts("NONE"); break;
@@ -66,7 +62,7 @@ void printCompressionFormat(const DXTCompression& cf) {
 	}
 }
 
-int processDDSFile(FILE*& _file) {
+int process_dds_file(FILE* _file) {
 	// https://learn.microsoft.com/en-us/windows/win32/direct3ddds/dx-graphics-dds-pguide
 	
 	{
@@ -83,8 +79,8 @@ int processDDSFile(FILE*& _file) {
 		}
 	}
 	
-	DDS_HEADER header;
-	if (fread(&header, sizeof(DDS_HEADER), 1, _file) != 1) {
+	struct DDS_HEADER header;
+	if (fread(&header, sizeof(struct DDS_HEADER), 1, _file) != 1) {
 		puts(AC_RED "[ERR]" AC_RESET " Reading header failed.");
 		return EXIT_FAILURE;
 	}
@@ -97,14 +93,14 @@ int processDDSFile(FILE*& _file) {
 		return EXIT_FAILURE;
 	}
 	
-	header.print();
+	print_dds_header(&header);
 	
 	if (header.dwHeight % 4 != 0 || header.dwWidth % 4 != 0) {
 		puts(AC_RED "[ERR]" AC_RESET " Image width or/and height is/are not multiple of 4!");
 		return EXIT_FAILURE;
 	}
 	
-	DXTCompression cformat { DXTC_NONE };
+	enum DXTCompression cformat = DXTC_NONE;
 	
 	if ((header.ddspf.dwFlags & DDPF_FOURCC) != 0) {
 		char fourCC[5];
@@ -128,9 +124,9 @@ int processDDSFile(FILE*& _file) {
 		return EXIT_FAILURE;
 	}
 	
-	printCompressionFormat(cformat);
+	print_compression_format(cformat);
 	
-	DDS_HEADER_DXT10 header10;
+	struct DDS_HEADER_DXT10 header10;
 	if (cformat == DXTC_DX10) {
 		if (fread(&header10, sizeof(header10), 1, _file) != 1) {
 			puts(AC_RED "[ERR]" AC_RESET " Reading header10 failed.");
@@ -159,4 +155,108 @@ int processDDSFile(FILE*& _file) {
 	// max(1, ( (width + 3) / 4 ) ) x max(1, ( (height + 3) / 4 ) ) x 8(DXT1) or 16(DXT2-5)
 	
 	return EXIT_SUCCESS;
+}
+
+void print_dds_pixelformat(struct DDS_PIXELFORMAT* _pf) {
+	printf(
+		"DDS_PIXELFORMAT\n"
+		"---------------\n"
+		"dwSize: %lu\n"
+		"dwFlags: %lu\n"
+		"dwFourCC: %lu\n"
+		"dwRGBBitCount: %lu\n"
+		"dwRBitMask: %lu\n"
+		"dwGBitMask: %lu\n"
+		"dwBBitMask: %lu\n"
+		"dwABitMask: %lu\n",
+		_pf->dwSize,
+		_pf->dwFlags,
+		_pf->dwFourCC,
+		_pf->dwRGBBitCount,
+		_pf->dwRBitMask,
+		_pf->dwGBitMask,
+		_pf->dwBBitMask,
+		_pf->dwABitMask);
+
+	printf(
+		"----------\n"
+		"FLAGS:\n"
+		"DDPF_ALPHAPIXELS: %d\n"
+		"DDPF_ALPHA: %d\n"
+		"DDPF_FOURCC: %d\n"
+		"DDPF_RGB: %d\n"
+		"DDPF_YUV: %d\n"
+		"DDPF_LUMINANCE: %d\n\n",
+		(_pf->dwFlags & DDPF_ALPHAPIXELS) != 0 ? 1 : 0,
+		(_pf->dwFlags & DDPF_ALPHA) != 0 ? 1 : 0,
+		(_pf->dwFlags & DDPF_FOURCC) != 0 ? 1 : 0,
+		(_pf->dwFlags & DDPF_RGB) != 0 ? 1 : 0,
+		(_pf->dwFlags & DDPF_YUV) != 0 ? 1 : 0,
+		(_pf->dwFlags & DDPF_LUMINANCE) != 0 ? 1 : 0);
+}
+
+void print_dds_header(struct DDS_HEADER* _h) {
+	printf(
+		"DDS_HEADER\n"
+		"----------\n"
+		"dwSize: %lu\n"
+		"dwFlags: %lu\n"
+		"dwHeight: %lu\n"
+		"dwWidth: %lu\n"
+		"dwPitchOrLinearSize: %lu\n"
+		"dwDepth: %lu\n"
+		"dwMipMapCount: %lu\n"
+		"dwCaps: %lu\n"
+		"dwCaps2: %lu\n"
+		"dwCaps3: %lu\n"
+		"dwCaps4: %lu\n",
+		_h->dwSize,
+		_h->dwFlags,
+		_h->dwHeight,
+		_h->dwWidth,
+		_h->dwPitchOrLinearSize,
+		_h->dwDepth,
+		_h->dwMipMapCount,
+		_h->dwCaps,
+		_h->dwCaps2,
+		_h->dwCaps3,
+		_h->dwCaps4);
+	
+	printf(
+		"----------\n"
+		"FLAGS:\n"
+		"DDSD_CAPS: %d\n"
+		"DDSD_HEIGHT: %d\n"
+		"DDSD_WIDTH: %d\n"
+		"DDSD_PITCH: %d\n"
+		"DDSD_PIXELFORMAT: %d\n"
+		"DDSD_MIPMAPCOUNT: %d\n"
+		"DDSD_LINEARSIZE: %d\n"
+		"DDSD_DEPTH: %d\n\n",
+		(_h->dwFlags & DDSD_CAPS) != 0 ? 1 : 0,
+		(_h->dwFlags & DDSD_HEIGHT) != 0 ? 1 : 0,
+		(_h->dwFlags & DDSD_WIDTH) != 0 ? 1 : 0,
+		(_h->dwFlags & DDSD_PITCH) != 0 ? 1 : 0,
+		(_h->dwFlags & DDSD_PIXELFORMAT) != 0 ? 1 : 0,
+		(_h->dwFlags & DDSD_MIPMAPCOUNT) != 0 ? 1 : 0,
+		(_h->dwFlags & DDSD_LINEARSIZE) != 0 ? 1 : 0,
+		(_h->dwFlags & DDSD_DEPTH) != 0 ? 1 : 0);
+	
+	print_dds_pixelformat(&_h->ddspf);
+}
+
+void print_dds_header_dxt10(struct DDS_HEADER_DXT10* _h) {
+	printf(
+		"DDS_HEADER_DXT10\n"
+		"----------------\n"
+		"dxgiFormat: %d\n"
+		"resourceDimension: %d\n"
+		"miscFlag: %d\n"
+		"arraySize: %d\n"
+		"miscFlags2: %d\n\n",
+		_h->dxgiFormat,
+		_h->resourceDimension,
+		_h->miscFlag,
+		_h->arraySize,
+		_h->miscFlags2);
 }

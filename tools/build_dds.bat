@@ -4,7 +4,7 @@ CLS
 IF NOT EXIST .build MKDIR .build
 
 gcc^
- -std=c++17^
- dds_test.cc targa.c^
+ -std=c17^
+ DDS.c targa.c^
  -Wall -Wextra -Wpedantic^
- -o .build/dds_test.exe
+ -o .build/dds.exe
