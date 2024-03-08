@@ -6,8 +6,6 @@
 typedef unsigned long	DWORD;
 typedef unsigned int	UINT;
 
-extern int process_dds_file(FILE* _file);
-
 ///////////////////////////////////////////////////////////////////////////////
 // Pixelformat
 ///////////////////////////////////////////////////////////////////////////////
@@ -45,8 +43,6 @@ struct DDS_PIXELFORMAT {
 	DWORD dwABitMask;
 };
 
-extern void print_dds_pixelformat(struct DDS_PIXELFORMAT* _pf);
-
 ///////////////////////////////////////////////////////////////////////////////
 // Header
 ///////////////////////////////////////////////////////////////////////////////
@@ -78,8 +74,6 @@ struct DDS_HEADER {
 	DWORD					dwCaps4;
 	DWORD					dwReserved2;
 };
-
-extern void print_dds_header(struct DDS_HEADER* _h);
 
 /*
 NOTE (LOL)
@@ -288,8 +282,6 @@ struct DDS_HEADER_DXT10 {
 	UINT							miscFlags2;
 };
 
-extern void print_dds_header_dxt10(struct DDS_HEADER_DXT10* _h);
-
 enum DDS_HEADER_DXT10_MISCFLAG {
 	// Indicates a 2D texture is a cube-map texture.
 	DDS_RESOURCE_MISC_TEXTURECUBE		= 0x4
@@ -310,5 +302,11 @@ enum DDS_HEADER_DXT10_MISCFLAGS2 {
 	// to represent transparency (straight or premultiplied).
 	DDS_ALPHA_MODE_CUSTOM				= 0x4
 };
+
+extern int process_dds_file(FILE* _file);
+
+extern void print_dds_pixelformat(struct DDS_PIXELFORMAT* _pf);
+extern void print_dds_header(struct DDS_HEADER* _h);
+extern void print_dds_header_dxt10(struct DDS_HEADER_DXT10* _h);
 
 #endif // DDS_TEST_H

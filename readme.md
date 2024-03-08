@@ -8,6 +8,8 @@ Main bullet points of the experiment:
 - Use the least number of techs
 - Go for simplicity, embrace new solutions only when a problem arose
 
+> UPDATE: looks like I love to know how things work, so when I got to texturing, I had to dive into DDS (it's WiP), and to validate some steps, a simple TGA lib also has been written.
+
 # Specs
 
 - **OS:** Windows 11 Pro
