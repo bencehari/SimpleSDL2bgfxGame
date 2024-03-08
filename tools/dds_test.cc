@@ -1,9 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
 #include <stdbool.h>
 #include <string.h>
 
 #include "dds_test.hh"
+#include "DXT.h"
 #include "targa.h"
 
 // AC stands for ANSI_COLOR
@@ -14,6 +16,8 @@
 #define AC_MAGENTA "\x1b[35m"
 #define AC_CYAN    "\x1b[36m"
 #define AC_RESET   "\x1b[0m"
+
+typedef uint8_t BYTE;
 
 int processDDSFile(FILE*& _file);
 
@@ -47,18 +51,18 @@ int main(int argc, char* argv[]) {
 	return exitCode;
 }
 
-enum CompressionFormat { NONE, DXT1, DXT2, DXT3, DXT4, DXT5, DX10 };
 
-void printCompressinFormat(const CompressionFormat& cf) {
+
+void printCompressionFormat(const DXTCompression& cf) {
 	printf("Compression format: ");
 	switch (cf) {
-		case CompressionFormat::NONE: puts("NONE"); break;
-		case CompressionFormat::DXT1: puts("DXT1"); break;
-		case CompressionFormat::DXT2: puts("DXT2"); break;
-		case CompressionFormat::DXT3: puts("DXT3"); break;
-		case CompressionFormat::DXT4: puts("DXT4"); break;
-		case CompressionFormat::DXT5: puts("DXT5"); break;
-		case CompressionFormat::DX10: puts("DX10"); break;
+		case DXTC_NONE: puts("NONE"); break;
+		case DXTC_DXT1: puts("DXT1"); break;
+		case DXTC_DXT2: puts("DXT2"); break;
+		case DXTC_DXT3: puts("DXT3"); break;
+		case DXTC_DXT4: puts("DXT4"); break;
+		case DXTC_DXT5: puts("DXT5"); break;
+		case DXTC_DX10: puts("DX10"); break;
 	}
 }
 
@@ -95,29 +99,39 @@ int processDDSFile(FILE*& _file) {
 	
 	header.print();
 	
-	CompressionFormat cformat { CompressionFormat::NONE };
+	if (header.dwHeight % 4 != 0 || header.dwWidth % 4 != 0) {
+		puts(AC_RED "[ERR]" AC_RESET " Image width or/and height is/are not multiple of 4!");
+		return EXIT_FAILURE;
+	}
+	
+	DXTCompression cformat { DXTC_NONE };
 	
 	if ((header.ddspf.dwFlags & DDPF_FOURCC) != 0) {
 		char fourCC[5];
 		memcpy(fourCC, &header.ddspf.dwFourCC, sizeof(char) * 4);
 		fourCC[4] = '\0';
 		
-		if (strcmp(fourCC, "DXT1") == 0) cformat = DXT1;
-		else if (strcmp(fourCC, "DXT2") == 0) cformat = DXT2;
-		else if (strcmp(fourCC, "DXT3") == 0) cformat = DXT3;
-		else if (strcmp(fourCC, "DXT4") == 0) cformat = DXT4;
-		else if (strcmp(fourCC, "DXT5") == 0) cformat = DXT5;
-		else if (strcmp(fourCC, "DX10") == 0) cformat = DX10;
+		if (strcmp(fourCC, "DXT1") == 0) cformat = DXTC_DXT1;
+		else if (strcmp(fourCC, "DXT2") == 0) cformat = DXTC_DXT2;
+		else if (strcmp(fourCC, "DXT3") == 0) cformat = DXTC_DXT3;
+		else if (strcmp(fourCC, "DXT4") == 0) cformat = DXTC_DXT4;
+		else if (strcmp(fourCC, "DXT5") == 0) cformat = DXTC_DXT5;
+		else if (strcmp(fourCC, "DX10") == 0) cformat = DXTC_DX10;
 		else {
 			puts(AC_RED "[ERR]" AC_RESET " Unknown compression format.");
 			return EXIT_FAILURE;
 		}
 	}
 	
-	printCompressinFormat(cformat);
+	if (cformat == DXTC_DXT2 || cformat == DXTC_DXT4) {
+		printf(AC_RED "[ERR]" AC_RESET " '%s' compression format is not supported.", cformat == DXTC_DXT2 ? "DXT2" : "DXT4");
+		return EXIT_FAILURE;
+	}
+	
+	printCompressionFormat(cformat);
 	
 	DDS_HEADER_DXT10 header10;
-	if (cformat == DX10) {
+	if (cformat == DXTC_DX10) {
 		if (fread(&header10, sizeof(header10), 1, _file) != 1) {
 			puts(AC_RED "[ERR]" AC_RESET " Reading header10 failed.");
 			return EXIT_FAILURE;
@@ -127,7 +141,22 @@ int processDDSFile(FILE*& _file) {
 		return EXIT_SUCCESS;
 	}
 	
-	// TODO: create tga from image data
+	// TEXTURE
+	// https://learn.microsoft.com/en-us/windows/win32/direct3ddds/dds-file-layout-for-textures
+	
+	// DDSD_* <- header.dwFlags
+	// DDPF_* <- header.ddspf.dwFlags
+	
+	// for an uncompressed texture, use the DDSD_PITCH and DDPF_RGB flags.
+	
+	// for a compressed texture, use the DDSD_LINEARSIZE and DDPF_FOURCC flags.
+	
+	// for a mipmapped texture, use the DDSD_MIPMAPCOUNT, DDSCAPS_MIPMAP, and DDSCAPS_COMPLEX flags also as well as the mipmap count member.
+	// if mipmaps are generated, all levels down to 1-by-1 are usually written.
+	// for a compressed texture, the size of each mipmap level image is typically one-fourth the size of the previous,
+	// with a minimum of 8 (DXT1) or 16 (DXT2-5) bytes (for square textures).
+	// formula to calculate the size of each level for a non-square texture:
+	// max(1, ( (width + 3) / 4 ) ) x max(1, ( (height + 3) / 4 ) ) x 8(DXT1) or 16(DXT2-5)
 	
 	return EXIT_SUCCESS;
 }

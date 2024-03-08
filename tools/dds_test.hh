@@ -4,41 +4,10 @@
 typedef unsigned long	DWORD;
 typedef unsigned int	UINT;
 
+///////////////////////////////////////////////////////////////////////////////
 // Pixelformat
+///////////////////////////////////////////////////////////////////////////////
 // https://learn.microsoft.com/en-us/windows/win32/direct3ddds/dds-pixelformat
-struct DDS_PIXELFORMAT {
-	DWORD dwSize;
-	DWORD dwFlags;
-	DWORD dwFourCC;
-	DWORD dwRGBBitCount;
-	DWORD dwRBitMask;
-	DWORD dwGBitMask;
-	DWORD dwBBitMask;
-	DWORD dwABitMask;
-	
-	void print() {
-		printf(
-			"DDS_PIXELFORMAT\n"
-			"---------------\n"
-			"dwSize: %lu\n"
-			"dwFlags: %lu\n"
-			"dwFourCC: %lu\n"
-			"dwRGBBitCount: %lu\n"
-			"dwRBitMask: %lu\n"
-			"dwGBitMask: %lu\n"
-			"dwBBitMask: %lu\n"
-			"dwABitMask: %lu\n\n",
-			dwSize,
-			dwFlags,
-			dwFourCC,
-			dwRGBBitCount,
-			dwRBitMask,
-			dwGBitMask,
-			dwBBitMask,
-			dwABitMask);
-	}
-};
-
 enum DDS_PIXELFORMAT_DW_FLAGS {
 	// Texture contains alpha data; dwRGBAlphaBitMask contains valid data.
 	DDPF_ALPHAPIXELS		= 0x1,
@@ -61,8 +30,70 @@ enum DDS_PIXELFORMAT_DW_FLAGS {
 	DDPF_LUMINANCE			= 0x20000
 };
 
+struct DDS_PIXELFORMAT {
+	DWORD dwSize;
+	DWORD dwFlags;
+	DWORD dwFourCC;
+	DWORD dwRGBBitCount;
+	DWORD dwRBitMask;
+	DWORD dwGBitMask;
+	DWORD dwBBitMask;
+	DWORD dwABitMask;
+	
+	void print() {
+		printf(
+			"DDS_PIXELFORMAT\n"
+			"---------------\n"
+			"dwSize: %lu\n"
+			"dwFlags: %lu\n"
+			"dwFourCC: %lu\n"
+			"dwRGBBitCount: %lu\n"
+			"dwRBitMask: %lu\n"
+			"dwGBitMask: %lu\n"
+			"dwBBitMask: %lu\n"
+			"dwABitMask: %lu\n",
+			dwSize,
+			dwFlags,
+			dwFourCC,
+			dwRGBBitCount,
+			dwRBitMask,
+			dwGBitMask,
+			dwBBitMask,
+			dwABitMask);
+
+		printf(
+			"----------\n"
+			"FLAGS:\n"
+			"DDPF_ALPHAPIXELS: %d\n"
+			"DDPF_ALPHA: %d\n"
+			"DDPF_FOURCC: %d\n"
+			"DDPF_RGB: %d\n"
+			"DDPF_YUV: %d\n"
+			"DDPF_LUMINANCE: %d\n\n",
+			(dwFlags & DDPF_ALPHAPIXELS) != 0 ? 1 : 0,
+			(dwFlags & DDPF_ALPHA) != 0 ? 1 : 0,
+			(dwFlags & DDPF_FOURCC) != 0 ? 1 : 0,
+			(dwFlags & DDPF_RGB) != 0 ? 1 : 0,
+			(dwFlags & DDPF_YUV) != 0 ? 1 : 0,
+			(dwFlags & DDPF_LUMINANCE) != 0 ? 1 : 0);
+	}
+};
+
+///////////////////////////////////////////////////////////////////////////////
 // Header
+///////////////////////////////////////////////////////////////////////////////
 // https://learn.microsoft.com/en-us/windows/win32/direct3ddds/dds-header
+enum DDS_HEADER_DW_FLAGS {
+	DDSD_CAPS			= 0x1,			// Required in every .dds file.
+	DDSD_HEIGHT			= 0x2,			// Required in every .dds file.
+	DDSD_WIDTH			= 0x4,			// Required in every .dds file.
+	DDSD_PITCH			= 0x8,			// Required when pitch is provided for an uncompressed texture.
+	DDSD_PIXELFORMAT	= 0x1000,		// Required in every .dds file.
+	DDSD_MIPMAPCOUNT	= 0x20000,		// Required in a mipmapped texture.
+	DDSD_LINEARSIZE		= 0x80000,		// Required when pitch is provided for a compressed texture.
+	DDSD_DEPTH			= 0x800000		// Required in a depth texture.
+};
+
 struct DDS_HEADER {
 	DWORD			dwSize;
 	DWORD			dwFlags;
@@ -93,7 +124,7 @@ struct DDS_HEADER {
 			"dwCaps: %lu\n"
 			"dwCaps2: %lu\n"
 			"dwCaps3: %lu\n"
-			"dwCaps4: %lu\n\n",
+			"dwCaps4: %lu\n",
 			dwSize,
 			dwFlags,
 			dwHeight,
@@ -105,19 +136,29 @@ struct DDS_HEADER {
 			dwCaps2,
 			dwCaps3,
 			dwCaps4);
+		
+		printf(
+			"----------\n"
+			"FLAGS:\n"
+			"DDSD_CAPS: %d\n"
+			"DDSD_HEIGHT: %d\n"
+			"DDSD_WIDTH: %d\n"
+			"DDSD_PITCH: %d\n"
+			"DDSD_PIXELFORMAT: %d\n"
+			"DDSD_MIPMAPCOUNT: %d\n"
+			"DDSD_LINEARSIZE: %d\n"
+			"DDSD_DEPTH: %d\n\n",
+			(dwFlags & DDSD_CAPS) != 0 ? 1 : 0,
+			(dwFlags & DDSD_HEIGHT) != 0 ? 1 : 0,
+			(dwFlags & DDSD_WIDTH) != 0 ? 1 : 0,
+			(dwFlags & DDSD_PITCH) != 0 ? 1 : 0,
+			(dwFlags & DDSD_PIXELFORMAT) != 0 ? 1 : 0,
+			(dwFlags & DDSD_MIPMAPCOUNT) != 0 ? 1 : 0,
+			(dwFlags & DDSD_LINEARSIZE) != 0 ? 1 : 0,
+			(dwFlags & DDSD_DEPTH) != 0 ? 1 : 0);
+		
 		ddspf.print();
 	}
-};
-
-enum DDS_HEADER_DW_FLAGS {
-	DDSD_CAPS			= 0x1,			// Required in every .dds file.
-	DDSD_HEIGHT			= 0x2,			// Required in every .dds file.
-	DDSD_WIDTH			= 0x4,			// Required in every .dds file.
-	DDSD_PITCH			= 0x8,			// Required when pitch is provided for an uncompressed texture.
-	DDSD_PIXELFORMAT	= 0x1000,		// Required in every .dds file.
-	DDSD_MIPMAPCOUNT	= 0x20000,		// Required in a mipmapped texture.
-	DDSD_LINEARSIZE		= 0x80000,		// Required when pitch is provided for a compressed texture.
-	DDSD_DEPTH			= 0x800000		// Required in a depth texture.
 };
 
 /*
@@ -180,7 +221,9 @@ const int DDS_CUBEMAP_ALLFACES =
 	DDS_CUBEMAP_NEGATIVEY | DDS_CUBEMAP_POSITIVEZ | DDSCAPS2_CUBEMAP_NEGATIVEZ;
 const int DDS_FLAGS_VOLUME = DDSCAPS2_VOLUME;
 
+///////////////////////////////////////////////////////////////////////////////
 // Header DXT10
+///////////////////////////////////////////////////////////////////////////////
 // -- DXGI format
 // -- https://learn.microsoft.com/en-us/windows/win32/api/dxgiformat/ne-dxgiformat-dxgi_format
 enum DXGI_FORMAT {
