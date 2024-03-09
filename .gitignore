@@ -6,6 +6,8 @@ tools/**/*.tga
 
 assets/shaders/*
 !assets/shaders/contents.md
+assets/textures/*
+!assets/textures/contents.md
 
 bin/*
 !bin/contents.md
