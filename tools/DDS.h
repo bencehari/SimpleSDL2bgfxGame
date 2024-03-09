@@ -6,6 +6,9 @@
 #include "DDS_header.h"
 #include "DXT.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /**
  * @brief Prints DDS file header.
@@ -40,5 +43,9 @@ extern int save_dds_file_to_targa(FILE* _file);
 extern void print_dds_pixelformat(struct DDS_PIXELFORMAT* _pf);
 extern void print_dds_header(struct DDS_HEADER* _h);
 extern void print_dds_header_dxt10(struct DDS_HEADER_DXT10* _h);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // KE_DDS_H

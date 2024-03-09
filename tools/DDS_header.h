@@ -3,6 +3,10 @@
 
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 ///////////////////////////////////////////////////////////////////////////////
 // Pixelformat
 ///////////////////////////////////////////////////////////////////////////////
@@ -301,5 +305,9 @@ enum DDS_HEADER_DXT10_MISCFLAGS2 {
 	// to represent transparency (straight or premultiplied).
 	DDS_ALPHA_MODE_CUSTOM				= 0x4
 };
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // KE_DDS_HEADER_H
