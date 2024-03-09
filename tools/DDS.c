@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
+#include <dirent.h>
 
 #include "targa.h"
 
@@ -46,7 +47,38 @@ int main(int argc, char* argv[]) {
 		fclose(file);
 	}
 	else if (argc == 3 && strcmp(argv[1], "-f") == 0) {
-		// TODO: implement
+		DIR* dir = opendir(argv[2]);
+		if (dir == NULL) {
+			printf("AC_RED" "[ERR]" AC_RESET " Folder '%s' is invalid.", argv[2]);
+			return EXIT_FAILURE;
+		}
+
+		size_t dirLen = strlen(argv[2]);
+		struct dirent* entry;
+		while ((entry = readdir(dir)) != NULL) {
+			size_t fileNameLen = strlen(entry->d_name);
+			if (fileNameLen < 5) continue;
+			char* ext = entry->d_name + fileNameLen - 4;
+			if (strcmp(ext, ".dds") != 0 && strcmp(ext, ".DDS") != 0) continue;
+			
+			char* filePath = malloc(sizeof(char) * (dirLen + fileNameLen + 1));
+			memcpy(filePath, argv[2], dirLen);
+			memcpy(filePath + dirLen, entry->d_name, fileNameLen);
+			filePath[dirLen + fileNameLen] = '\0';
+			
+			printf(AC_YELLOW "%s\n" AC_RESET, filePath);
+			FILE* file = fopen(filePath, "rb");
+			if (file == NULL) {
+				printf(AC_RED "[ERR]" AC_RESET " Failed to open file '%s'.", filePath);
+				continue;
+			}
+			
+			print_dds_file_info(file);
+			
+			fclose(file);
+		}
+		
+		closedir(dir);
 	}
 	else {
 		int len = strlen(argv[0]);
@@ -144,7 +176,10 @@ int get_dds_file_info(FILE* _file, struct DDS_HEADER* _header, enum DXTCompressi
 		else if (strcmp(fourCC, "DXT5") == 0) *_cformat = DXTC_DXT5;
 		else if (strcmp(fourCC, "DX10") == 0) *_cformat = DXTC_DX10;
 		else {
-			puts(AC_RED "[ERR]" AC_RESET " Unknown compression format.");
+			char fourCC0[5];
+			memcpy(fourCC0, fourCC, 4);
+			fourCC0[4] = '\0';
+			printf(AC_RED "[ERR]" AC_RESET " Unknown compression format: %s.\n", fourCC0);
 			return EXIT_FAILURE;
 		}
 	}
