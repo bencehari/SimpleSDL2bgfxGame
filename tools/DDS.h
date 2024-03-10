@@ -4,11 +4,17 @@
 #include <stdio.h>
 
 #include "DDS_header.h"
-#include "DXT.h"
+#include "compression_formats.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+struct DDS_Data {
+	struct DDS_HEADER header;
+	enum CompressionFormat cformat;
+	struct DDS_HEADER_DXT10 headerDXT10;
+};
 
 /**
  * @brief Prints DDS file header.
@@ -29,7 +35,7 @@ extern int print_dds_file_info(FILE* _file);
  *
  * @return Error code.
 */
-extern int get_dds_file_info(FILE* _file, struct DDS_HEADER* _header, enum DXTCompression* _cformat, struct DDS_HEADER_DXT10* _headerDXT10);
+extern int get_dds_file_info(FILE* _file, struct DDS_HEADER* _header, enum CompressionFormat* _cformat, struct DDS_HEADER_DXT10* _headerDXT10);
 
 /**
  * @brief Saves highest MIP level to targa.

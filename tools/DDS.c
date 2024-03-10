@@ -3,8 +3,8 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
-#include <dirent.h>
 
+#include "compression_formats.h"
 #include "targa.h"
 
 // AC stands for ANSI_COLOR
@@ -16,105 +16,22 @@
 #define AC_CYAN    "\x1b[36m"
 #define AC_RESET   "\x1b[0m"
 
-int main(int argc, char* argv[]) {
-	if (argc < 2) {
-		puts(AC_RED "[ERR]" AC_RESET " No target file provided.");
-		return EXIT_FAILURE;
-	}
-	
-	int exitCode = EXIT_SUCCESS;
-	
-	if (argc == 2) {
-		char* filePath = argv[1];
-		size_t filePathLen = strlen(filePath);
-		{
-			char* ext = filePath + filePathLen - 4;
-			if (strcmp(ext, ".dds") != 0 && strcmp(ext, ".DDS") != 0) {
-				puts(AC_RED "[ERR]" AC_RESET " Target is not a DDS file!");
-				return EXIT_FAILURE;
-			}
-		}
-		
-		FILE* file = fopen(filePath, "rb");
-		if (file == NULL) {
-			printf(AC_RED "[ERR]" AC_RESET " Failed to open file: \"%s\"", filePath);
-			fclose(file);
-			return EXIT_FAILURE;
-		}
-		
-		exitCode = print_dds_file_info(file);
-	
-		fclose(file);
-	}
-	else if (argc == 3 && strcmp(argv[1], "-f") == 0) {
-		DIR* dir = opendir(argv[2]);
-		if (dir == NULL) {
-			printf("AC_RED" "[ERR]" AC_RESET " Folder '%s' is invalid.", argv[2]);
-			return EXIT_FAILURE;
-		}
-
-		size_t dirLen = strlen(argv[2]);
-		struct dirent* entry;
-		while ((entry = readdir(dir)) != NULL) {
-			size_t fileNameLen = strlen(entry->d_name);
-			if (fileNameLen < 5) continue;
-			char* ext = entry->d_name + fileNameLen - 4;
-			if (strcmp(ext, ".dds") != 0 && strcmp(ext, ".DDS") != 0) continue;
-			
-			char* filePath = malloc(sizeof(char) * (dirLen + fileNameLen + 1));
-			memcpy(filePath, argv[2], dirLen);
-			memcpy(filePath + dirLen, entry->d_name, fileNameLen);
-			filePath[dirLen + fileNameLen] = '\0';
-			
-			printf(AC_YELLOW "%s\n" AC_RESET, filePath);
-			FILE* file = fopen(filePath, "rb");
-			if (file == NULL) {
-				printf(AC_RED "[ERR]" AC_RESET " Failed to open file '%s'.", filePath);
-				continue;
-			}
-			
-			print_dds_file_info(file);
-			
-			fclose(file);
-		}
-		
-		closedir(dir);
-	}
-	else {
-		int len = strlen(argv[0]);
-		int i = len - 1;
-		for (; i >= 0; i--) {
-			if (argv[0][i] == '\\' || argv[0][i] == '/') break;
-		}
-		if (i != 0) i++;
-		
-		printf(
-			"Usage:\n"
-			"------\n"
-			"%s <path-of-dds-image>.dds        Provide the file.\n"
-			"%s -f <path-of-parent-folder>     Provide all dds files in folder.\n",
-			argv[0] + i, argv[0] + i);
-	}
-	
-	return exitCode;
-}
-
-void print_compression_format(const enum DXTCompression cf) {
+void print_compression_format(const enum CompressionFormat cf) {
 	printf("Compression format: ");
 	switch (cf) {
-		case DXTC_NONE: puts("NONE"); break;
-		case DXTC_DXT1: puts("DXT1"); break;
-		case DXTC_DXT2: puts("DXT2"); break;
-		case DXTC_DXT3: puts("DXT3"); break;
-		case DXTC_DXT4: puts("DXT4"); break;
-		case DXTC_DXT5: puts("DXT5"); break;
-		case DXTC_DX10: puts("DX10"); break;
+		case CF_NONE: puts("NONE"); break;
+		case CF_DXT1: puts("DXT1"); break;
+		case CF_DXT2: puts("DXT2"); break;
+		case CF_DXT3: puts("DXT3"); break;
+		case CF_DXT4: puts("DXT4"); break;
+		case CF_DXT5: puts("DXT5"); break;
+		case CF_DX10: puts("DX10"); break;
 	}
 }
 
 int print_dds_file_info(FILE* _file) {
 	struct DDS_HEADER header;
-	enum DXTCompression cformat;
+	enum CompressionFormat cformat;
 	struct DDS_HEADER_DXT10 headerDXT10;
 	
 	if (get_dds_file_info(_file, &header, &cformat, &headerDXT10) != EXIT_SUCCESS) {
@@ -127,7 +44,7 @@ int print_dds_file_info(FILE* _file) {
 	return EXIT_SUCCESS;
 }
 
-int get_dds_file_info(FILE* _file, struct DDS_HEADER* _header, enum DXTCompression* _cformat, struct DDS_HEADER_DXT10* _headerDXT10) {
+int get_dds_file_info(FILE* _file, struct DDS_HEADER* _header, enum CompressionFormat* _cformat, struct DDS_HEADER_DXT10* _headerDXT10) {
 	// https://learn.microsoft.com/en-us/windows/win32/direct3ddds/dx-graphics-dds-pguide
 	
 	{
@@ -162,19 +79,19 @@ int get_dds_file_info(FILE* _file, struct DDS_HEADER* _header, enum DXTCompressi
 		return EXIT_FAILURE;
 	}
 	
-	*_cformat = DXTC_NONE;
+	*_cformat = CF_NONE;
 	
 	if ((_header->ddspf.dwFlags & DDPF_FOURCC) != 0) {
 		char fourCC[5];
 		memcpy(fourCC, &_header->ddspf.dwFourCC, sizeof(char) * 4);
 		fourCC[4] = '\0';
 		
-		if (strcmp(fourCC, "DXT1") == 0) *_cformat = DXTC_DXT1;
-		else if (strcmp(fourCC, "DXT2") == 0) *_cformat = DXTC_DXT2;
-		else if (strcmp(fourCC, "DXT3") == 0) *_cformat = DXTC_DXT3;
-		else if (strcmp(fourCC, "DXT4") == 0) *_cformat = DXTC_DXT4;
-		else if (strcmp(fourCC, "DXT5") == 0) *_cformat = DXTC_DXT5;
-		else if (strcmp(fourCC, "DX10") == 0) *_cformat = DXTC_DX10;
+		if (strcmp(fourCC, "DXT1") == 0) *_cformat = CF_DXT1;
+		else if (strcmp(fourCC, "DXT2") == 0) *_cformat = CF_DXT2;
+		else if (strcmp(fourCC, "DXT3") == 0) *_cformat = CF_DXT3;
+		else if (strcmp(fourCC, "DXT4") == 0) *_cformat = CF_DXT4;
+		else if (strcmp(fourCC, "DXT5") == 0) *_cformat = CF_DXT5;
+		else if (strcmp(fourCC, "DX10") == 0) *_cformat = CF_DX10;
 		else {
 			char fourCC0[5];
 			memcpy(fourCC0, fourCC, 4);
@@ -184,12 +101,12 @@ int get_dds_file_info(FILE* _file, struct DDS_HEADER* _header, enum DXTCompressi
 		}
 	}
 	
-	if (*_cformat == DXTC_DXT2 || *_cformat == DXTC_DXT4) {
-		printf(AC_RED "[ERR]" AC_RESET " '%s' compression format is not supported.", *_cformat == DXTC_DXT2 ? "DXT2" : "DXT4");
+	if (*_cformat == CF_DXT2 || *_cformat == CF_DXT4) {
+		printf(AC_RED "[ERR]" AC_RESET " '%s' compression format is not supported.", *_cformat == CF_DXT2 ? "DXT2" : "DXT4");
 		return EXIT_FAILURE;
 	}
 	
-	if (*_cformat == DXTC_DX10) {
+	if (*_cformat == CF_DX10) {
 		if (fread(&_headerDXT10, sizeof(_headerDXT10), 1, _file) != 1) {
 			puts(AC_RED "[ERR]" AC_RESET " Reading header10 failed.");
 			return EXIT_FAILURE;
@@ -205,7 +122,7 @@ int get_dds_file_info(FILE* _file, struct DDS_HEADER* _header, enum DXTCompressi
 
 int save_dds_file_to_targa(FILE* _file) {
 	struct DDS_HEADER header;
-	enum DXTCompression cformat;
+	enum CompressionFormat cformat;
 	struct DDS_HEADER_DXT10 headerDXT10;
 	
 	if (get_dds_file_info(_file, &header, &cformat, &headerDXT10) != EXIT_SUCCESS) {
