@@ -27,10 +27,18 @@ int main(int argc, char* argv[]) {
 	}
 	
 	if (argc == 2) {
-		exitCode = print_dds_file_info_local(argv[1]);
+		// TODO: Create targa from image
+		puts(AC_MAGENTA "Not implemented yet." AC_RESET);
+	}
+	else if (argc == 3 && strcmp(argv[1], "-i") == 0) {
+		exitCode = print_dds_file_info_local(argv[2]);
 	}
 	else if (argc == 3 && strcmp(argv[1], "-d") == 0) {
-		print_dds_file_infos_in_directory(argv[2]);
+		// TODO: Create targa(s) from all dds files in folder
+		puts(AC_MAGENTA "Not implemented yet." AC_RESET);
+	}
+	else if (argc == 4 && strcmp(argv[1], "-i") == 0 && strcmp(argv[2], "-d") == 0) {
+		print_dds_file_infos_in_directory(argv[3]);
 	}
 	else {
 		print_usage(argv[0]);
@@ -53,8 +61,8 @@ static void print_usage(const char* _argv0) {
 		"------\n"
 		"%s <path-of-dds-image>.dds           Create targa from image.\n"
 		"%s -i <path-of-dds-image>.dds        Prints info about the image.\n"
-		"%s -d <path-of-parent-directory>     Create targa(s) from all dds files in folder.\n"
-		"%s -i -d <path-of-parent-directory>  Prints info about all dds files in folder.\n",
+		"%s -d <path-of-parent-directory>     Create targa(s) from all dds files in folder. Must ends with '\\' or '/'.\n"
+		"%s -i -d <path-of-parent-directory>  Prints info about all dds files in folder. Must ends with '\\' or '/'.\n",
 		fileName, fileName, fileName, fileName);
 }
 
@@ -85,7 +93,7 @@ static int print_dds_file_info_local(const char* _filePath) {
 static int print_dds_file_infos_in_directory(const char* _dirPath) {
 	DIR* dir = opendir(_dirPath);
 	if (dir == NULL) {
-		printf("AC_RED" "[ERR]" AC_RESET " Folder '%s' is invalid.", _dirPath);
+		printf(AC_RED "[ERR]" AC_RESET " Folder '%s' is invalid.", _dirPath);
 		return EXIT_FAILURE;
 	}
 

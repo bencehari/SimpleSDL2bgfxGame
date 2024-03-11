@@ -10,9 +10,18 @@
 extern "C" {
 #endif
 
+enum DDS_DataMeta {
+	ONLY_HEADER		= 0,
+	DXT10_HEADER	= 1
+};
+
+/**
+ * @brief All information extracted from DDS meta data.
+*/
 struct DDS_Data {
-	struct DDS_HEADER header;
+	int meta;
 	enum CompressionFormat cformat;
+	struct DDS_HEADER header;
 	struct DDS_HEADER_DXT10 headerDXT10;
 };
 
@@ -29,13 +38,11 @@ extern int print_dds_file_info(FILE* _file);
  * @brief Sets provided DDS file headers.
  *
  * @param _file FILE* to target DDS file.
- * @param _header DDS_HEADER* to set.
- * @param _cformat Compression format enum extracted from FourCC.
- * @param _headerDXT10 DDS_HEADER_DXT10* to set, NULL if does not DXT10.
+ * @param _data DDS_Data* to set.
  *
  * @return Error code.
 */
-extern int get_dds_file_info(FILE* _file, struct DDS_HEADER* _header, enum CompressionFormat* _cformat, struct DDS_HEADER_DXT10* _headerDXT10);
+extern int get_dds_file_info(FILE* _file, struct DDS_Data* _data);
 
 /**
  * @brief Saves highest MIP level to targa.
@@ -49,6 +56,7 @@ extern int save_dds_file_to_targa(FILE* _file);
 extern void print_dds_pixelformat(struct DDS_PIXELFORMAT* _pf);
 extern void print_dds_header(struct DDS_HEADER* _h);
 extern void print_dds_header_dxt10(struct DDS_HEADER_DXT10* _h);
+extern void print_dds_data(struct DDS_Data* _d);
 
 #ifdef __cplusplus
 }

@@ -30,21 +30,15 @@ void print_compression_format(const enum CompressionFormat cf) {
 }
 
 int print_dds_file_info(FILE* _file) {
-	struct DDS_HEADER header;
-	enum CompressionFormat cformat;
-	struct DDS_HEADER_DXT10 headerDXT10;
+	struct DDS_Data data;
+	if (get_dds_file_info(_file, &data) != EXIT_SUCCESS) return EXIT_FAILURE;
 	
-	if (get_dds_file_info(_file, &header, &cformat, &headerDXT10) != EXIT_SUCCESS) {
-		return EXIT_FAILURE;
-	}
-	
-	print_dds_header(&header);
-	print_compression_format(cformat);
+	print_dds_data(&data);
 	
 	return EXIT_SUCCESS;
 }
 
-int get_dds_file_info(FILE* _file, struct DDS_HEADER* _header, enum CompressionFormat* _cformat, struct DDS_HEADER_DXT10* _headerDXT10) {
+int get_dds_file_info(FILE* _file, struct DDS_Data* _data) {
 	// https://learn.microsoft.com/en-us/windows/win32/direct3ddds/dx-graphics-dds-pguide
 	
 	{
@@ -61,37 +55,37 @@ int get_dds_file_info(FILE* _file, struct DDS_HEADER* _header, enum CompressionF
 		}
 	}
 	
-	if (fread(_header, sizeof(struct DDS_HEADER), 1, _file) != 1) {
+	if (fread(&_data->header, sizeof(struct DDS_HEADER), 1, _file) != 1) {
 		puts(AC_RED "[ERR]" AC_RESET " Reading header failed.");
 		return EXIT_FAILURE;
 	}
-	if (_header->dwSize != 124) {
+	if (_data->header.dwSize != 124) {
 		puts(AC_RED "[ERR]" AC_RESET " header.dwSize is not 124.");
 		return EXIT_FAILURE;
 	}
-	if (_header->ddspf.dwSize != 32) {
+	if (_data->header.ddspf.dwSize != 32) {
 		puts(AC_RED "[ERR]" AC_RESET " header.ddspf.dwSize is not 32");
 		return EXIT_FAILURE;
 	}
 	
-	if (_header->dwHeight % 4 != 0 || _header->dwWidth % 4 != 0) {
+	if (_data->header.dwHeight % 4 != 0 || _data->header.dwWidth % 4 != 0) {
 		puts(AC_RED "[ERR]" AC_RESET " Image width or/and height is/are not multiple of 4!");
 		return EXIT_FAILURE;
 	}
 	
-	*_cformat = CF_NONE;
+	_data->cformat = CF_NONE;
 	
-	if ((_header->ddspf.dwFlags & DDPF_FOURCC) != 0) {
+	if ((_data->header.ddspf.dwFlags & DDPF_FOURCC) != 0) {
 		char fourCC[5];
-		memcpy(fourCC, &_header->ddspf.dwFourCC, sizeof(char) * 4);
+		memcpy(fourCC, &_data->header.ddspf.dwFourCC, sizeof(char) * 4);
 		fourCC[4] = '\0';
 		
-		if (strcmp(fourCC, "DXT1") == 0) *_cformat = CF_DXT1;
-		else if (strcmp(fourCC, "DXT2") == 0) *_cformat = CF_DXT2;
-		else if (strcmp(fourCC, "DXT3") == 0) *_cformat = CF_DXT3;
-		else if (strcmp(fourCC, "DXT4") == 0) *_cformat = CF_DXT4;
-		else if (strcmp(fourCC, "DXT5") == 0) *_cformat = CF_DXT5;
-		else if (strcmp(fourCC, "DX10") == 0) *_cformat = CF_DX10;
+		if (strcmp(fourCC, "DXT1") == 0) _data->cformat = CF_DXT1;
+		else if (strcmp(fourCC, "DXT2") == 0) _data->cformat = CF_DXT2;
+		else if (strcmp(fourCC, "DXT3") == 0) _data->cformat = CF_DXT3;
+		else if (strcmp(fourCC, "DXT4") == 0) _data->cformat = CF_DXT4;
+		else if (strcmp(fourCC, "DXT5") == 0) _data->cformat = CF_DXT5;
+		else if (strcmp(fourCC, "DX10") == 0) _data->cformat = CF_DX10;
 		else {
 			char fourCC0[5];
 			memcpy(fourCC0, fourCC, 4);
@@ -101,33 +95,29 @@ int get_dds_file_info(FILE* _file, struct DDS_HEADER* _header, enum CompressionF
 		}
 	}
 	
-	if (*_cformat == CF_DXT2 || *_cformat == CF_DXT4) {
-		printf(AC_RED "[ERR]" AC_RESET " '%s' compression format is not supported.", *_cformat == CF_DXT2 ? "DXT2" : "DXT4");
+	if (_data->cformat == CF_DXT2 || _data->cformat == CF_DXT4) {
+		printf(AC_RED "[ERR]" AC_RESET " '%s' compression format is not supported.", _data->cformat == CF_DXT2 ? "DXT2" : "DXT4");
 		return EXIT_FAILURE;
 	}
 	
-	if (*_cformat == CF_DX10) {
-		if (fread(&_headerDXT10, sizeof(_headerDXT10), 1, _file) != 1) {
+	if (_data->cformat == CF_DX10) {
+		if (fread(&_data->headerDXT10, sizeof(struct DDS_HEADER_DXT10), 1, _file) != 1) {
 			puts(AC_RED "[ERR]" AC_RESET " Reading header10 failed.");
 			return EXIT_FAILURE;
 		}
 		
+		_data->meta = DXT10_HEADER;
+		
 		puts(AC_YELLOW "[TODO]" AC_RESET " handle DX10!");
 		return EXIT_SUCCESS;
 	}
-	else _headerDXT10 = NULL;
 	
 	return EXIT_SUCCESS;
 }
 
 int save_dds_file_to_targa(FILE* _file) {
-	struct DDS_HEADER header;
-	enum CompressionFormat cformat;
-	struct DDS_HEADER_DXT10 headerDXT10;
-	
-	if (get_dds_file_info(_file, &header, &cformat, &headerDXT10) != EXIT_SUCCESS) {
-		return EXIT_FAILURE;
-	}
+	struct DDS_Data data;
+	if (get_dds_file_info(_file, &data) != EXIT_SUCCESS) return EXIT_FAILURE;
 	
 	// TODO: implement
 	
@@ -253,4 +243,13 @@ void print_dds_header_dxt10(struct DDS_HEADER_DXT10* _h) {
 		_h->miscFlag,
 		_h->arraySize,
 		_h->miscFlags2);
+}
+
+void print_dds_data(struct DDS_Data* _d) {
+	print_dds_header(&_d->header);
+	print_compression_format(_d->cformat);
+	if (_d->meta == DXT10_HEADER) {
+		puts("");
+		print_dds_header_dxt10(&_d->headerDXT10);
+	}
 }
