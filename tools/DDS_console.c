@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <stdbool.h>
 #include <dirent.h>
 
 #include "DDS.h"
@@ -14,8 +15,12 @@
 #define AC_RESET   "\x1b[0m"
 
 static void print_usage(const char* _argv0);
+
+static bool check_file_extension(const char* _filePath);
+
 static int print_dds_file_info_local(const char* _filePath);
 static int print_dds_file_infos_in_directory(const char* _dirPath);
+static int save_dds_file_to_targa_local(const char* _filePath);
 
 int main(int argc, char* argv[]) {
 	int exitCode = EXIT_SUCCESS;
@@ -27,10 +32,11 @@ int main(int argc, char* argv[]) {
 	}
 	
 	if (argc == 2) {
-		// TODO: Create targa from image
-		puts(AC_MAGENTA "Not implemented yet." AC_RESET);
+		if (!check_file_extension(argv[1])) return EXIT_FAILURE;
+		exitCode = save_dds_file_to_targa_local(argv[1]);
 	}
 	else if (argc == 3 && strcmp(argv[1], "-i") == 0) {
+		if (!check_file_extension(argv[2])) return EXIT_FAILURE;
 		exitCode = print_dds_file_info_local(argv[2]);
 	}
 	else if (argc == 3 && strcmp(argv[1], "-d") == 0) {
@@ -47,15 +53,18 @@ int main(int argc, char* argv[]) {
 	return exitCode;
 }
 
-static void print_usage(const char* _argv0) {
-	int len = strlen(_argv0);
+static int get_file_name_index(const char* _filePath) {
+	int len = strlen(_filePath);
 	int i = len - 1;
 	for (; i >= 0; i--) {
-		if (_argv0[i] == '\\' || _argv0[i] == '/') break;
+		if (_filePath[i] == '\\' || _filePath[i] == '/') break;
 	}
 	if (i != 0) i++;
-	
-	const char* fileName = _argv0 + i;
+	return i;
+}
+
+static void print_usage(const char* _argv0) {
+	const char* fileName = _argv0 + get_file_name_index(_argv0);
 	printf(
 		"Usage:\n"
 		"------\n"
@@ -66,16 +75,17 @@ static void print_usage(const char* _argv0) {
 		fileName, fileName, fileName, fileName);
 }
 
-static int print_dds_file_info_local(const char* _filePath) {
+static bool check_file_extension(const char* _filePath) {
 	size_t filePathLen = strlen(_filePath);
-	{
-		const char* ext = _filePath + filePathLen - 4;
-		if (strcmp(ext, ".dds") != 0 && strcmp(ext, ".DDS") != 0) {
-			puts(AC_RED "[ERR]" AC_RESET " Target is not a DDS file!");
-			return EXIT_FAILURE;
-		}
+	const char* ext = _filePath + filePathLen - 4;
+	if (strcmp(ext, ".dds") != 0 && strcmp(ext, ".DDS") != 0) {
+		puts(AC_RED "[ERR]" AC_RESET " Extension mismatch (not .dds or .DDS).");
+		return false;
 	}
-	
+	return true;
+}
+
+static int print_dds_file_info_local(const char* _filePath) {
 	FILE* file = fopen(_filePath, "rb");
 	if (file == NULL) {
 		printf(AC_RED "[ERR]" AC_RESET " Failed to open file: \"%s\"", _filePath);
@@ -125,4 +135,26 @@ static int print_dds_file_infos_in_directory(const char* _dirPath) {
 	closedir(dir);
 	
 	return EXIT_SUCCESS;
+}
+
+static int save_dds_file_to_targa_local(const char* _filePath) {
+	FILE* file = fopen(_filePath, "rb");
+	if (file == NULL) {
+		printf(AC_RED "[ERR]" AC_RESET " Failed to open file: \"%s\"", _filePath);
+		fclose(file);
+		return EXIT_FAILURE;
+	}
+	
+	const char* fileName = _filePath + get_file_name_index(_filePath);
+	size_t len = strlen(fileName);
+	
+	char withoutExtension[len - 3];
+	memcpy(withoutExtension, fileName, len - 4);
+	withoutExtension[len - 4] = '\0';
+	
+	int exitCode = save_dds_file_to_targa(file, withoutExtension);
+
+	fclose(file);
+	
+	return exitCode;
 }

@@ -48,10 +48,11 @@ extern int get_dds_file_info(FILE* _file, struct DDS_Data* _data);
  * @brief Saves highest MIP level to targa.
  *
  * @param _file FILE* to target DDS file.
+ * @param _name Name of the output file.
  *
  * @return Error code.
 */
-extern int save_dds_file_to_targa(FILE* _file);
+extern int save_dds_file_to_targa(FILE* _file, const char* _name);
 
 extern void print_dds_pixelformat(struct DDS_PIXELFORMAT* _pf);
 extern void print_dds_header(struct DDS_HEADER* _h);

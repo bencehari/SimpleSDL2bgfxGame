@@ -64,6 +64,8 @@ struct DDS_HEADER {
 	uint32_t				dwFlags;
 	uint32_t				dwHeight;
 	uint32_t				dwWidth;
+	// Represents the number of bytes per scan line in an uncompressed texture.
+	// It also indicates the total number of bytes in the top-level texture for a compressed texture.
 	uint32_t				dwPitchOrLinearSize;
 	uint32_t				dwDepth;
 	uint32_t				dwMipMapCount;

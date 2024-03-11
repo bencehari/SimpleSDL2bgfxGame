@@ -1,10 +1,12 @@
 #include "DDS.h"
 
 #include <stdlib.h>
+#include <stdint.h>
 #include <stdbool.h>
 #include <string.h>
 
 #include "compression_formats.h"
+#include "DXT.h"
 #include "targa.h"
 
 // AC stands for ANSI_COLOR
@@ -15,19 +17,6 @@
 #define AC_MAGENTA "\x1b[35m"
 #define AC_CYAN    "\x1b[36m"
 #define AC_RESET   "\x1b[0m"
-
-void print_compression_format(const enum CompressionFormat cf) {
-	printf("Compression format: ");
-	switch (cf) {
-		case CF_NONE: puts("NONE"); break;
-		case CF_DXT1: puts("DXT1"); break;
-		case CF_DXT2: puts("DXT2"); break;
-		case CF_DXT3: puts("DXT3"); break;
-		case CF_DXT4: puts("DXT4"); break;
-		case CF_DXT5: puts("DXT5"); break;
-		case CF_DX10: puts("DX10"); break;
-	}
-}
 
 int print_dds_file_info(FILE* _file) {
 	struct DDS_Data data;
@@ -115,11 +104,42 @@ int get_dds_file_info(FILE* _file, struct DDS_Data* _data) {
 	return EXIT_SUCCESS;
 }
 
-int save_dds_file_to_targa(FILE* _file) {
+static bool validate_dds_file_required_fields(struct DDS_Data* _data) {
+	printf("Checking header dwFlags: ");
+	bool error = false;
+	if ((_data->header.dwFlags & DDSD_CAPS) == 0) {
+		puts(AC_RED "[ERR]" AC_RESET " DDSD_CAPS is not set.");
+		error = true;
+	}
+	if ((_data->header.dwFlags & DDSD_HEIGHT) == 0) {
+		puts(AC_RED "[ERR]" AC_RESET " DDSD_HEIGHT is not set.");
+		error = true;
+	}
+	if ((_data->header.dwFlags & DDSD_WIDTH) == 0) {
+		puts(AC_RED "[ERR]" AC_RESET " DDSD_WIDTH is not set.");
+		error = true;
+	}
+	if ((_data->header.dwFlags & DDSD_PIXELFORMAT) == 0) {
+		puts(AC_RED "[ERR]" AC_RESET " DDSD_PIXELFORMAT is not set.");
+		error = true;
+	}
+	if ((_data->header.dwCaps & DDSCAPS_TEXTURE) == 0) {
+		puts(AC_RED "[ERR]" AC_RESET " DDSCAPS_TEXTURE capability is not set.");
+		error = true;
+	}
+	if (error) return false;
+
+	puts(AC_GREEN "DONE" AC_RESET);
+	return true;
+}
+
+int save_dds_file_to_targa(FILE* _file, const char* _name) {
 	struct DDS_Data data;
 	if (get_dds_file_info(_file, &data) != EXIT_SUCCESS) return EXIT_FAILURE;
 	
-	// TODO: implement
+	if (!validate_dds_file_required_fields(&data)) return EXIT_FAILURE;
+	
+	print_dds_data(&data);
 	
 	// TEXTURE
 	// https://learn.microsoft.com/en-us/windows/win32/direct3ddds/dds-file-layout-for-textures
@@ -128,6 +148,35 @@ int save_dds_file_to_targa(FILE* _file) {
 	// DDPF_* <- header.ddspf.dwFlags
 	
 	// for an uncompressed texture, use the DDSD_PITCH and DDPF_RGB flags.
+	if (data.cformat == CF_NONE) {
+		bool error = false;
+		if ((data.header.dwFlags & DDSD_PITCH) == 0) {
+			puts(AC_RED "[ERR]" AC_RESET " DDSD_PITCH is not set.");
+			error = true;
+		}
+		if ((data.header.ddspf.dwFlags & DDPF_RGB) == 0) {
+			puts(AC_RED "[ERR]" AC_RESET " DDPF_RGB is not set.");
+			error = true;
+		}
+		
+		// test only against an existing image
+		if (data.header.ddspf.dwRGBBitCount == 32) {
+			struct Pixel { char b, g, r, a; };
+			
+			uint8_t* colors = malloc(sizeof(uint8_t) * data.header.dwHeight * data.header.dwWidth * 3);
+			for (size_t i = 0, j = 0; i < data.header.dwHeight * data.header.dwWidth; i++) {
+				struct Pixel p;
+				fread(&p, sizeof(uint32_t), 1, _file);
+				
+				colors[j++] = p.r;
+				colors[j++] = p.g;
+				colors[j++] = p.b;
+			}
+			
+			def_tga_image(_name, data.header.dwWidth, data.header.dwHeight, colors);
+			free(colors);
+		}
+	}
 	
 	// for a compressed texture, use the DDSD_LINEARSIZE and DDPF_FOURCC flags.
 	
@@ -149,18 +198,18 @@ void print_dds_pixelformat(struct DDS_PIXELFORMAT* _pf) {
 		"dwFlags: %u\n"
 		"dwFourCC: %u\n"
 		"dwRGBBitCount: %u\n"
-		"dwRBitMask: %u\n"
-		"dwGBitMask: %u\n"
-		"dwBBitMask: %u\n"
-		"dwABitMask: %u\n",
+		"dwRBitMask: %08X (%u)\n"
+		"dwGBitMask: %08X (%u)\n"
+		"dwBBitMask: %08X (%u)\n"
+		"dwABitMask: %08X (%u)\n",
 		_pf->dwSize,
 		_pf->dwFlags,
 		_pf->dwFourCC,
 		_pf->dwRGBBitCount,
-		_pf->dwRBitMask,
-		_pf->dwGBitMask,
-		_pf->dwBBitMask,
-		_pf->dwABitMask);
+		_pf->dwRBitMask, _pf->dwRBitMask,
+		_pf->dwGBitMask, _pf->dwGBitMask,
+		_pf->dwBBitMask, _pf->dwBBitMask,
+		_pf->dwABitMask, _pf->dwABitMask);
 
 	printf(
 		"----------\n"
