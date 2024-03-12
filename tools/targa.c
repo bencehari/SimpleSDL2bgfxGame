@@ -51,7 +51,7 @@ static bool fread_header(struct Header* _h, FILE* _file);
 static void print_header(struct Header* _h);
 
 bool def_tga_image(const char* _fileName, const uint16_t _width, const uint16_t _height, const uint8_t* _colors) {
-	return create_tga_image(_fileName, _width, _height, RIGHT_DOWN, _colors, false);
+	return create_tga_image(_fileName, _width, _height, RIGHT_DOWN, false, _colors, false);
 }
 
 static void putnc(ui8 c, size_t n, FILE* file) {
@@ -59,7 +59,8 @@ static void putnc(ui8 c, size_t n, FILE* file) {
 }
 
 bool create_tga_image(const char* _fileName, const uint16_t _width, const uint16_t _height,
-					  const enum ColorDataDirection _dir, const uint8_t* _colors, const bool _verify) {
+					  const enum ColorDataDirection _dir, const bool _alpha,
+					  const uint8_t* _colors, const bool _verify) {
 	size_t len = strlen(_fileName);
 	char* fileName = malloc(sizeof(char) * len + sizeof(char) * 5);
 	memcpy(fileName, _fileName, sizeof(char) * len);
@@ -73,13 +74,15 @@ bool create_tga_image(const char* _fileName, const uint16_t _width, const uint16
 	}
 	if (!_verify) free(fileName);
 
-	ui8 dir = 0; // default: RIGHT_UP
+	ui8 imgDesc = 0; // default: RIGHT_UP
 	switch (_dir) {
-		case LEFT_UP:		dir = 1 << 4; break;
-		case RIGHT_DOWN:	dir = 1 << 5; break;
-		case LEFT_DOWN:		dir = (1 << 5) | (1 << 4); break;
+		case LEFT_UP:		imgDesc = 1 << 4; break;
+		case RIGHT_DOWN:	imgDesc = 1 << 5; break;
+		case LEFT_DOWN:		imgDesc = (1 << 5) | (1 << 4); break;
 		default: break;
 	}
+	
+	if (_alpha) imgDesc += 3;
 
 	putc(0, file);								// no image identification field
 	putc(0, file);								// indicates that (0) no color-map, (1) a color-map included
@@ -89,14 +92,15 @@ bool create_tga_image(const char* _fileName, const uint16_t _width, const uint16
 	putnc(0, 2, file);							// Y-origin; the absolute vertical coordinate for the lower left corner of the image
 	fwrite(&_width, sizeof(ui16), 1, file);		// width
 	fwrite(&_height, sizeof(ui16), 1, file);	// height
-	putc(24, file);								// pixel depth
-	putc(dir, file);							// image descriptor (5th bit set: data order starts from top left)
+	putc(_alpha ? 32 : 24, file);				// pixel depth
+	putc(imgDesc, file);						// image descriptor (5th bit set: data order starts from top left)
 	
 	// Image ID would be here, if the very first field would be 1
 	// Color Map Data, same as Image ID with second field
 	
 	// Image Data (True-color)
-	for (size_t i = 0; i < _width * _height * 3; i++) {
+	size_t size = _width * _height * (_alpha ? 4 : 3);
+	for (size_t i = 0; i < size; i++) {
 		putc(_colors[i], file);
 	}
 	
@@ -195,6 +199,18 @@ bool verify_tga_image(const char* _filePath) {
 	
 	print_header(&header);
 	
+	char* attributesTypes[] = {
+		"no Alpha data included",
+		"undefined data in the Alpha field, can be ignored",
+		"undefined data in the Alpha field, but should be retained",
+		"useful Alpha channel data is present",
+		"pre-multiplied Alpha"
+	};
+	
+	uint8_t attr = (header.imageDescriptor & 0xF);
+	// cannot happen theoretically
+	if (attr > 4) attr = 0;
+	
 	printf(
 		"0 - 3 These bits specify the number of attribute bits per pixel.\n"
 		"5 & 4 These bits are used to indicate the order in which pixel data is transferred from the file to the screen.\n"
@@ -202,8 +218,10 @@ bool verify_tga_image(const char* _filePath) {
 		"6 - 7 Must be zero! (to insure future compatibility)\n"
 		"76543210\n"
 		"--------\n"
-		BYTE_TO_BINARY_PATTERN "\n",
-		BYTE_TO_BINARY(header.imageDescriptor));
+		BYTE_TO_BINARY_PATTERN "\n"
+		"Attributes: %d (%s)\n",
+		BYTE_TO_BINARY(header.imageDescriptor),
+		attr, attributesTypes[attr]);
 
 	fseek(f, -18, SEEK_END);
 	int c[16];
@@ -219,7 +237,7 @@ bool verify_tga_image(const char* _filePath) {
 	
 	fseek(f, 0, SEEK_END);
 	long imageDataSize = ftell(f) - 18 - 26; // total - header - footer
-	long targetSize = header.width * header.height * 3;
+	long targetSize = header.width * header.height * (attr == 0 ? 3 : 4);
 	if (imageDataSize != targetSize) {
 		printf("[ERR] Image data size doesn't match: %ld (expected: %ld)\n", imageDataSize, targetSize);
 		fclose(f);

@@ -98,8 +98,6 @@ static bool check_file_extension(const char* _filePath, const char* _extension) 
 		ext1[i] = ext0[i] - 32;
 	}
 	
-	printf("%s\n%s\n", ext0, ext1);
-	
 	size_t filePathLen = strlen(_filePath);
 	const char* ext = _filePath + filePathLen - 4;
 	if (strcmp(ext, ext0) != 0 && strcmp(ext, ext1) != 0) {
@@ -162,7 +160,7 @@ static int print_dds_infos_in_directory(const char* _dirPath) {
 }
 
 static int save_dds_to_targa_local(const char* _filePath) {
-	if (!check_file_extension(argv[1], "dds")) return EXIT_FAILURE;
+	if (!check_file_extension(_filePath, "dds")) return EXIT_FAILURE;
 	
 	FILE* file = fopen(_filePath, "rb");
 	if (file == NULL) {
@@ -186,7 +184,7 @@ static int save_dds_to_targa_local(const char* _filePath) {
 }
 
 static int save_targa_to_dds_local(const char* _filePath) {
-	if (!check_file_extension(argv[1], "tga")) return EXIT_FAILURE;
+	if (!check_file_extension(_filePath, "tga")) return EXIT_FAILURE;
 	
 	FILE* file = fopen(_filePath, "rb");
 	if (file == NULL) {

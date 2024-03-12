@@ -39,6 +39,7 @@ extern bool def_tga_image(
  * @param _width Width of image.
  * @param _height Height of image.
  * @param _dir Color data direction.
+ * @param _alpha Contains alpha channel.
  * @param _colors Color data.
  * @param _verify Verifies the output file.
  * @return False on error, otherwise true.
@@ -48,6 +49,7 @@ extern bool create_tga_image(
 	const uint16_t _width,
 	const uint16_t _height,
 	const enum ColorDataDirection _dir,
+	const bool _alpha,
 	const uint8_t* _colors,
 	const bool _verify);
 
