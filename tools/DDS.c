@@ -18,16 +18,16 @@
 #define AC_CYAN    "\x1b[36m"
 #define AC_RESET   "\x1b[0m"
 
-int print_dds_file_info(FILE* _file) {
+int print_dds_info(FILE* _file) {
 	struct DDS_Data data;
-	if (get_dds_file_info(_file, &data) != EXIT_SUCCESS) return EXIT_FAILURE;
+	if (get_dds_info(_file, &data) != EXIT_SUCCESS) return EXIT_FAILURE;
 	
 	print_dds_data(&data);
 	
 	return EXIT_SUCCESS;
 }
 
-int get_dds_file_info(FILE* _file, struct DDS_Data* _data) {
+int get_dds_info(FILE* _file, struct DDS_Data* _data) {
 	// https://learn.microsoft.com/en-us/windows/win32/direct3ddds/dx-graphics-dds-pguide
 	
 	{
@@ -104,7 +104,7 @@ int get_dds_file_info(FILE* _file, struct DDS_Data* _data) {
 	return EXIT_SUCCESS;
 }
 
-static bool validate_dds_file_required_fields(struct DDS_Data* _data) {
+static bool validate_dds_required_fields(struct DDS_Data* _data) {
 	printf("Checking header dwFlags: ");
 	bool error = false;
 	if ((_data->header.dwFlags & DDSD_CAPS) == 0) {
@@ -133,11 +133,11 @@ static bool validate_dds_file_required_fields(struct DDS_Data* _data) {
 	return true;
 }
 
-int save_dds_file_to_targa(FILE* _file, const char* _name) {
+int save_dds_to_targa(FILE* _file, const char* _name) {
 	struct DDS_Data data;
-	if (get_dds_file_info(_file, &data) != EXIT_SUCCESS) return EXIT_FAILURE;
+	if (get_dds_info(_file, &data) != EXIT_SUCCESS) return EXIT_FAILURE;
 	
-	if (!validate_dds_file_required_fields(&data)) return EXIT_FAILURE;
+	if (!validate_dds_required_fields(&data)) return EXIT_FAILURE;
 	
 	print_dds_data(&data);
 	
@@ -188,6 +188,10 @@ int save_dds_file_to_targa(FILE* _file, const char* _name) {
 	// max(1, ( (width + 3) / 4 ) ) x max(1, ( (height + 3) / 4 ) ) x 8(DXT1) or 16(DXT2-5)
 	
 	return EXIT_SUCCESS;
+}
+
+int save_targa_to_dds(FILE* _file, const char* _name) {
+	
 }
 
 void print_dds_pixelformat(struct DDS_PIXELFORMAT* _pf) {

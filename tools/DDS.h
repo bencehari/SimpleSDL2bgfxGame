@@ -32,7 +32,7 @@ struct DDS_Data {
  *
  * @return Error code.
 */
-extern int print_dds_file_info(FILE* _file);
+extern int print_dds_info(FILE* _file);
 
 /**
  * @brief Sets provided DDS file headers.
@@ -42,7 +42,7 @@ extern int print_dds_file_info(FILE* _file);
  *
  * @return Error code.
 */
-extern int get_dds_file_info(FILE* _file, struct DDS_Data* _data);
+extern int get_dds_info(FILE* _file, struct DDS_Data* _data);
 
 /**
  * @brief Saves highest MIP level to targa.
@@ -52,7 +52,17 @@ extern int get_dds_file_info(FILE* _file, struct DDS_Data* _data);
  *
  * @return Error code.
 */
-extern int save_dds_file_to_targa(FILE* _file, const char* _name);
+extern int save_dds_to_targa(FILE* _file, const char* _name);
+
+/**
+ * @brief Saves targa to DDS.
+ *
+ * @param _file FILE* to target targa file.
+ * @param _name Name of the output file.
+ *
+ * @return Error code.
+*/
+extern int save_targa_to_dds(FILE* _file, const char* _name);
 
 extern void print_dds_pixelformat(struct DDS_PIXELFORMAT* _pf);
 extern void print_dds_header(struct DDS_HEADER* _h);

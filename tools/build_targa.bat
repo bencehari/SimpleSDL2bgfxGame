@@ -10,7 +10,7 @@ gcc^
  -std=c17^
  -m64^
  %debug%^
- targa.c^
+ targa_console.c targa.c^
  -Wall -Wextra -Wpedantic^
  -o .build/targa.exe^
  && %run% .build\targa.exe

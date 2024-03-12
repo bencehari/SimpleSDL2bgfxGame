@@ -51,6 +51,15 @@ extern bool create_tga_image(
 	const uint8_t* _colors,
 	const bool _verify);
 
+/**
+ * @brief Verifies targa content.
+ *
+ * @param _filePath Path to the targa file.
+ *
+ * @return True, if everything looks good, otherwise false.
+*/
+extern bool verify_tga_image(const char* _filePath);
+
 #ifdef __cplusplus
 }
 #endif
