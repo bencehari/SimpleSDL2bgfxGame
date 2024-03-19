@@ -15,6 +15,11 @@ enum ColorDataDirection {
 	LEFT_DOWN		//!< Starts from top right corner
 };
 
+enum ColorFormat {
+	CF_UNKNOWN,			//!< Unkown color format
+	CF_R8G8B8_UINT		//!< 24 bit color format (0-255)
+};
+
 /**
  * @brief Creates targa image file.
  *
@@ -23,13 +28,18 @@ enum ColorDataDirection {
  * @param _fileName Name of the output file without extension.
  * @param _width Width of image.
  * @param _height Height of image.
+ * @param _pixelDepth Pixel depth.
+ * @param _alpha Contains alpha channel.
  * @param _colors Color data.
+ *
  * @return False on error, otherwise true.
 */
 extern bool def_tga_image(
 	const char* _fileName,
 	const uint16_t _width,
 	const uint16_t _height,
+	const uint8_t _pixelDepth,
+	const bool _alpha,
 	const uint8_t* _colors);
 
 /**
@@ -39,9 +49,11 @@ extern bool def_tga_image(
  * @param _width Width of image.
  * @param _height Height of image.
  * @param _dir Color data direction.
+ * @param _pixelDepth Pixel depth.
  * @param _alpha Contains alpha channel.
  * @param _colors Color data.
  * @param _verify Verifies the output file.
+ *
  * @return False on error, otherwise true.
 */
 extern bool create_tga_image(
@@ -49,6 +61,7 @@ extern bool create_tga_image(
 	const uint16_t _width,
 	const uint16_t _height,
 	const enum ColorDataDirection _dir,
+	const uint8_t _pixelDepth,
 	const bool _alpha,
 	const uint8_t* _colors,
 	const bool _verify);

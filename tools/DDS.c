@@ -161,19 +161,22 @@ int save_dds_to_targa(FILE* _file, const char* _name) {
 		
 		// test only against an existing image
 		if (data.header.ddspf.dwRGBBitCount == 32) {
-			struct Pixel { char b, g, r, a; };
+			struct Pixel { uint8_t r, g, b, a; };
 			
-			uint8_t* colors = malloc(sizeof(uint8_t) * data.header.dwHeight * data.header.dwWidth * 3);
+			uint8_t* colors = malloc(sizeof(uint8_t) * data.header.dwHeight * data.header.dwWidth * 4);
 			for (size_t i = 0, j = 0; i < data.header.dwHeight * data.header.dwWidth; i++) {
 				struct Pixel p;
 				fread(&p, sizeof(uint32_t), 1, _file);
-				
-				colors[j++] = p.r;
-				colors[j++] = p.g;
+
 				colors[j++] = p.b;
+				colors[j++] = p.g;
+				colors[j++] = p.r;
+				colors[j++] = p.a;
+				
+				// printf("R: %3d, G: %3d, B: %3d, A: %3d\n", p.r, p.g, p.b, p.a);
 			}
 			
-			def_tga_image(_name, data.header.dwWidth, data.header.dwHeight, colors);
+			def_tga_image(_name, data.header.dwWidth, data.header.dwHeight, 32, false, colors);
 			free(colors);
 		}
 	}
@@ -190,8 +193,10 @@ int save_dds_to_targa(FILE* _file, const char* _name) {
 	return EXIT_SUCCESS;
 }
 
+// TODO:
 int save_targa_to_dds(FILE* _file, const char* _name) {
-	
+	puts("Not implemented yet.");
+	return -1;
 }
 
 void print_dds_pixelformat(struct DDS_PIXELFORMAT* _pf) {

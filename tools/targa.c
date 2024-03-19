@@ -50,8 +50,9 @@ struct Header {
 static bool fread_header(struct Header* _h, FILE* _file);
 static void print_header(struct Header* _h);
 
-bool def_tga_image(const char* _fileName, const uint16_t _width, const uint16_t _height, const uint8_t* _colors) {
-	return create_tga_image(_fileName, _width, _height, RIGHT_DOWN, false, _colors, false);
+bool def_tga_image(const char* _fileName, const uint16_t _width, const uint16_t _height,
+				   const uint8_t _pixelDepth, const bool _alpha, const uint8_t* _colors) {
+	return create_tga_image(_fileName, _width, _height, RIGHT_DOWN, _pixelDepth, _alpha, _colors, false);
 }
 
 static void putnc(ui8 c, size_t n, FILE* file) {
@@ -59,7 +60,7 @@ static void putnc(ui8 c, size_t n, FILE* file) {
 }
 
 bool create_tga_image(const char* _fileName, const uint16_t _width, const uint16_t _height,
-					  const enum ColorDataDirection _dir, const bool _alpha,
+					  const enum ColorDataDirection _dir, const uint8_t _pixelDepth, const bool _alpha,
 					  const uint8_t* _colors, const bool _verify) {
 	size_t len = strlen(_fileName);
 	char* fileName = malloc(sizeof(char) * len + sizeof(char) * 5);
@@ -92,14 +93,14 @@ bool create_tga_image(const char* _fileName, const uint16_t _width, const uint16
 	putnc(0, 2, file);							// Y-origin; the absolute vertical coordinate for the lower left corner of the image
 	fwrite(&_width, sizeof(ui16), 1, file);		// width
 	fwrite(&_height, sizeof(ui16), 1, file);	// height
-	putc(_alpha ? 32 : 24, file);				// pixel depth
+	putc(_pixelDepth, file);					// pixel depth
 	putc(imgDesc, file);						// image descriptor (5th bit set: data order starts from top left)
 	
 	// Image ID would be here, if the very first field would be 1
 	// Color Map Data, same as Image ID with second field
 	
 	// Image Data (True-color)
-	size_t size = _width * _height * (_alpha ? 4 : 3);
+	size_t size = _width * _height * (_pixelDepth / 8);
 	for (size_t i = 0; i < size; i++) {
 		putc(_colors[i], file);
 	}
