@@ -159,25 +159,48 @@ int save_dds_to_targa(FILE* _file, const char* _name) {
 			error = true;
 		}
 		
-		// test only against an existing image
-		if (data.header.ddspf.dwRGBBitCount == 32) {
-			struct Pixel { uint8_t r, g, b, a; };
-			
-			uint8_t* colors = malloc(sizeof(uint8_t) * data.header.dwHeight * data.header.dwWidth * 4);
-			for (size_t i = 0, j = 0; i < data.header.dwHeight * data.header.dwWidth; i++) {
-				struct Pixel p;
-				fread(&p, sizeof(uint32_t), 1, _file);
-
-				colors[j++] = p.b;
-				colors[j++] = p.g;
-				colors[j++] = p.r;
-				colors[j++] = p.a;
+		if (error) return EXIT_FAILURE;
+		
+		// TODO: handle alpha properly
+		
+		switch (data.header.ddspf.dwRGBBitCount) {
+			case 24: {
+				struct Pixel { uint8_t r, g, b; };
 				
-				// printf("R: %3d, G: %3d, B: %3d, A: %3d\n", p.r, p.g, p.b, p.a);
-			}
-			
-			def_tga_image(_name, data.header.dwWidth, data.header.dwHeight, 32, false, colors);
-			free(colors);
+				uint8_t* colors = malloc(sizeof(uint8_t) * data.header.dwHeight * data.header.dwWidth * 3);
+				for (size_t i = 0, j = 0; i < data.header.dwHeight * data.header.dwWidth; i++) {
+					struct Pixel p;
+					fread(&p, sizeof(uint32_t), 1, _file);
+
+					colors[j++] = p.b;
+					colors[j++] = p.g;
+					colors[j++] = p.r;
+					
+					// printf("R: %3d, G: %3d, B: %3d\n", p.r, p.g, p.b);
+				}
+				
+				def_tga_image(_name, data.header.dwWidth, data.header.dwHeight, 24, false, colors);
+				free(colors);
+			} break;
+			case 32: {
+				struct Pixel { uint8_t r, g, b, a; };
+				
+				uint8_t* colors = malloc(sizeof(uint8_t) * data.header.dwHeight * data.header.dwWidth * 4);
+				for (size_t i = 0, j = 0; i < data.header.dwHeight * data.header.dwWidth; i++) {
+					struct Pixel p;
+					fread(&p, sizeof(uint32_t), 1, _file);
+
+					colors[j++] = p.b;
+					colors[j++] = p.g;
+					colors[j++] = p.r;
+					colors[j++] = p.a;
+					
+					// printf("R: %3d, G: %3d, B: %3d, A: %3d\n", p.r, p.g, p.b, p.a);
+				}
+				
+				def_tga_image(_name, data.header.dwWidth, data.header.dwHeight, 32, false, colors);
+				free(colors);
+			} break;
 		}
 	}
 	
@@ -194,10 +217,10 @@ int save_dds_to_targa(FILE* _file, const char* _name) {
 }
 
 // TODO:
-int save_targa_to_dds(FILE* _file, const char* _name) {
+/*int save_targa_to_dds(FILE* _file, const char* _name) {
 	puts("Not implemented yet.");
 	return -1;
-}
+}*/
 
 void print_dds_pixelformat(struct DDS_PIXELFORMAT* _pf) {
 	printf(

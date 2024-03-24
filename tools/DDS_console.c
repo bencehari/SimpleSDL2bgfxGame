@@ -29,8 +29,7 @@ static bool check_file_extension(const char* _filePath, const char* _extension);
 static int print_dds_info_local(const char* _filePath);
 static int print_dds_infos_in_directory(const char* _dirPath);
 static int save_dds_to_targa_local(const char* _filePath);
-static int save_targa_to_dds_local(const char* _filePath);
-static int save_dds_to_targa_local(const char* _filePath);
+// static int save_targa_to_dds_local(const char* _filePath);
 
 int main(int argc, char* argv[]) {
 	int exitCode = EXIT_SUCCESS;
@@ -183,7 +182,7 @@ static int save_dds_to_targa_local(const char* _filePath) {
 	return exitCode;
 }
 
-static int save_targa_to_dds_local(const char* _filePath) {
+/*static int save_targa_to_dds_local(const char* _filePath) {
 	if (!check_file_extension(_filePath, "tga")) return EXIT_FAILURE;
 	
 	FILE* file = fopen(_filePath, "rb");
@@ -205,4 +204,4 @@ static int save_targa_to_dds_local(const char* _filePath) {
 	fclose(file);
 	
 	return exitCode;
-}
+}*/

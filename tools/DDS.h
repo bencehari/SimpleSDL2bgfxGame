@@ -55,14 +55,14 @@ extern int get_dds_info(FILE* _file, struct DDS_Data* _data);
 extern int save_dds_to_targa(FILE* _file, const char* _name);
 
 /**
- * @brief Saves targa to DDS.
+ * @brief !!! NOT IMPLEMENTED !!! Saves targa to DDS.
  *
  * @param _file FILE* to target targa file.
  * @param _name Name of the output file.
  *
  * @return Error code.
 */
-extern int save_targa_to_dds(FILE* _file, const char* _name);
+// extern int save_targa_to_dds(FILE* _file, const char* _name);
 
 extern void print_dds_pixelformat(struct DDS_PIXELFORMAT* _pf);
 extern void print_dds_header(struct DDS_HEADER* _h);

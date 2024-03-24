@@ -10,26 +10,38 @@ extern "C" {
 ///////////////////////////////////////////////////////////////////////////////
 // Pixelformat
 ///////////////////////////////////////////////////////////////////////////////
-// https://learn.microsoft.com/en-us/windows/win32/direct3ddds/dds-pixelformat
+
+/**  https://learn.microsoft.com/en-us/windows/win32/direct3ddds/dds-pixelformat */
 enum DDS_PIXELFORMAT_DW_FLAGS {
-	// Texture contains alpha data; dwRGBAlphaBitMask contains valid data.
+	// TODO: there is no info about dwRGBAlphaBitMask on the link above...
+	// (probably it is a "unioned" version of a part of DDS_PIXELFORMAT)
+	
+	/** Texture contains alpha data; dwRGBAlphaBitMask contains valid data. */
 	DDPF_ALPHAPIXELS		= 0x1,
-	// Used in some older DDS files for alpha channel only uncompressed data
-	// (dwRGBBitCount contains the alpha channel bitcount; dwABitMask contains valid data).
+	/**
+	 * Used in some older DDS files for alpha channel only uncompressed data
+	 * (dwRGBBitCount contains the alpha channel bitcount; dwABitMask contains valid data).
+	*/
 	DDPF_ALPHA				= 0x2,
-	// Texture contains compressed RGB data; dwFourCC contains valid data.
+	/** Texture contains compressed RGB data; dwFourCC contains valid data. */
 	DDPF_FOURCC				= 0x4,
-	// Texture contains uncompressed RGB data; dwRGBBitCount and the RGB masks
-	// (dwRBitMask, dwGBitMask, dwBBitMask) contain valid data.
+	/**
+	 * Texture contains uncompressed RGB data; dwRGBBitCount and the RGB masks
+	 * (dwRBitMask, dwGBitMask, dwBBitMask) contain valid data.
+	*/
 	DDPF_RGB				= 0x40,
-	// Used in some older DDS files for YUV uncompressed data
-	// (dwRGBBitCount contains the YUV bit count; dwRBitMask contains the Y mask,
-	// dwGBitMask contains the U mask, dwBBitMask contains the V mask).
+	/**
+	 * Used in some older DDS files for YUV uncompressed data
+	 * (dwRGBBitCount contains the YUV bit count; dwRBitMask contains the Y mask,
+	 * dwGBitMask contains the U mask, dwBBitMask contains the V mask).
+	*/
 	DDPF_YUV				= 0x200,
-	// Used in some older DDS files for single channel color uncompressed data
-	// (dwRGBBitCount contains the luminance channel bit count;
-	// dwRBitMask contains the channel mask).
-	// Can be combined with DDPF_ALPHAPIXELS for a two channel DDS file.
+	/**
+	 * Used in some older DDS files for single channel color uncompressed data
+	 * (dwRGBBitCount contains the luminance channel bit count;
+	 * dwRBitMask contains the channel mask).
+	 * Can be combined with DDPF_ALPHAPIXELS for a two channel DDS file.
+	*/
 	DDPF_LUMINANCE			= 0x20000
 };
 
@@ -47,16 +59,17 @@ struct DDS_PIXELFORMAT {
 ///////////////////////////////////////////////////////////////////////////////
 // Header
 ///////////////////////////////////////////////////////////////////////////////
-// https://learn.microsoft.com/en-us/windows/win32/direct3ddds/dds-header
+
+/** https://learn.microsoft.com/en-us/windows/win32/direct3ddds/dds-header */
 enum DDS_HEADER_DW_FLAGS {
-	DDSD_CAPS			= 0x1,			// Required in every .dds file.
-	DDSD_HEIGHT			= 0x2,			// Required in every .dds file.
-	DDSD_WIDTH			= 0x4,			// Required in every .dds file.
-	DDSD_PITCH			= 0x8,			// Required when pitch is provided for an uncompressed texture.
-	DDSD_PIXELFORMAT	= 0x1000,		// Required in every .dds file.
-	DDSD_MIPMAPCOUNT	= 0x20000,		// Required in a mipmapped texture.
-	DDSD_LINEARSIZE		= 0x80000,		// Required when pitch is provided for a compressed texture.
-	DDSD_DEPTH			= 0x800000		// Required in a depth texture.
+	DDSD_CAPS			= 0x1,			//!< Required in every .dds file.
+	DDSD_HEIGHT			= 0x2,			//!< Required in every .dds file.
+	DDSD_WIDTH			= 0x4,			//!< Required in every .dds file.
+	DDSD_PITCH			= 0x8,			//!< Required when pitch (number of bytes per scan line) is provided for an uncompressed texture.
+	DDSD_PIXELFORMAT	= 0x1000,		//!< Required in every .dds file.
+	DDSD_MIPMAPCOUNT	= 0x20000,		//!< Required in a mipmapped texture.
+	DDSD_LINEARSIZE		= 0x80000,		//!< Required when pitch is provided for a compressed texture.
+	DDSD_DEPTH			= 0x800000		//!< Required in a depth texture.
 };
 
 struct DDS_HEADER {
@@ -64,8 +77,10 @@ struct DDS_HEADER {
 	uint32_t				dwFlags;
 	uint32_t				dwHeight;
 	uint32_t				dwWidth;
-	// Represents the number of bytes per scan line in an uncompressed texture.
-	// It also indicates the total number of bytes in the top-level texture for a compressed texture.
+	/**
+	 * Represents the number of bytes per scan line in an uncompressed texture.
+	 * It also indicates the total number of bytes in the top-level texture for a compressed texture.
+	*/
 	uint32_t				dwPitchOrLinearSize;
 	uint32_t				dwDepth;
 	uint32_t				dwMipMapCount;
@@ -94,12 +109,14 @@ and DDSD_MIPMAPCOUNT flags being set because some writers of such a file might n
 #define DDS_HEADER_FALGS_LINEARSIZE		(DDSD_LINEARSIZE)
 
 enum DDS_HEADER_DW_CAPS {
-	// Optional; must be used on any file that contains more than one surface
-	// (a mipmap, a cubic environment map, or mipmapped volume texture).
+	/**
+	 * Optional; must be used on any file that contains more than one surface
+	 * (a mipmap, a cubic environment map, or mipmapped volume texture).
+	*/
 	DDSCAPS_COMPLEX		= 0x8,
-	// Optional; should be used for a mipmap.
+	/** Optional; should be used for a mipmap. */
 	DDSCAPS_MIPMAP		= 0x400000,
-	// Required
+	/** Required */
 	DDSCAPS_TEXTURE		= 0x1000
 };
 
@@ -117,14 +134,14 @@ DDSCAPS_COMPLEX flags being set because some writers of such a file might not se
 */
 
 enum DDS_HEADER_DW_CAPS2 {
-	DDSCAPS2_CUBEMAP				= 0x200,		// Required for a cube map.
-	DDSCAPS2_CUBEMAP_POSITIVEX		= 0x400,		// Required when these surfaces are stored in a cube map.
-	DDSCAPS2_CUBEMAP_NEGATIVEX		= 0x800,		// Required when these surfaces are stored in a cube map.
-	DDSCAPS2_CUBEMAP_POSITIVEY		= 0x1000,		// Required when these surfaces are stored in a cube map.
-	DDSCAPS2_CUBEMAP_NEGATIVEY		= 0x2000,		// Required when these surfaces are stored in a cube map.
-	DDSCAPS2_CUBEMAP_POSITIVEZ		= 0x4000,		// Required when these surfaces are stored in a cube map.
-	DDSCAPS2_CUBEMAP_NEGATIVEZ		= 0x8000,		// Required when these surfaces are stored in a cube map.
-	DDSCAPS2_VOLUME					= 0x200000		// Required for a volume texture.
+	DDSCAPS2_CUBEMAP				= 0x200,		//!< Required for a cube map.
+	DDSCAPS2_CUBEMAP_POSITIVEX		= 0x400,		//!< Required when these surfaces are stored in a cube map.
+	DDSCAPS2_CUBEMAP_NEGATIVEX		= 0x800,		//!< Required when these surfaces are stored in a cube map.
+	DDSCAPS2_CUBEMAP_POSITIVEY		= 0x1000,		//!< Required when these surfaces are stored in a cube map.
+	DDSCAPS2_CUBEMAP_NEGATIVEY		= 0x2000,		//!< Required when these surfaces are stored in a cube map.
+	DDSCAPS2_CUBEMAP_POSITIVEZ		= 0x4000,		//!< Required when these surfaces are stored in a cube map.
+	DDSCAPS2_CUBEMAP_NEGATIVEZ		= 0x8000,		//!< Required when these surfaces are stored in a cube map.
+	DDSCAPS2_VOLUME					= 0x200000		//!< Required for a volume texture.
 };
 
 #define DDS_CUBEMAP_POSITIVEX		(DDSCAPS2_CUBEMAP | DDSCAPS2_CUBEMAP_POSITIVEX)
@@ -140,8 +157,9 @@ enum DDS_HEADER_DW_CAPS2 {
 ///////////////////////////////////////////////////////////////////////////////
 // Header DXT10
 ///////////////////////////////////////////////////////////////////////////////
+
 // -- DXGI format
-// -- https://learn.microsoft.com/en-us/windows/win32/api/dxgiformat/ne-dxgiformat-dxgi_format
+/** https://learn.microsoft.com/en-us/windows/win32/api/dxgiformat/ne-dxgiformat-dxgi_format */
 enum DXGI_FORMAT {
 	DXGI_FORMAT_UNKNOWN										= 0,
 	DXGI_FORMAT_R32G32B32A32_TYPELESS						= 1,
@@ -269,13 +287,13 @@ enum DXGI_FORMAT {
 	DXGI_FORMAT_FORCE_UINT									= 0xffffffff
 };
 
-// https://learn.microsoft.com/en-us/windows/win32/direct3ddds/dds-header-dxt10
+/** https://learn.microsoft.com/en-us/windows/win32/direct3ddds/dds-header-dxt10 */
 enum D3D11_RESOURCE_DIMENSION {
-	D3D11_RESOURCE_DIMENSION_UNKNOWN		= 0,	// Resource is of unknown type.
-	D3D11_RESOURCE_DIMENSION_BUFFER			= 1,	// Resource is a buffer.
-	D3D11_RESOURCE_DIMENSION_TEXTURE1D		= 2,	// Resource is a 1D texture.
-	D3D11_RESOURCE_DIMENSION_TEXTURE2D		= 3,	// Resource is a 2D texture.
-	D3D11_RESOURCE_DIMENSION_TEXTURE3D		= 4		// Resource is a 3D texture.
+	D3D11_RESOURCE_DIMENSION_UNKNOWN		= 0,	//!< Resource is of unknown type.
+	D3D11_RESOURCE_DIMENSION_BUFFER			= 1,	//!< Resource is a buffer.
+	D3D11_RESOURCE_DIMENSION_TEXTURE1D		= 2,	//!< Resource is a 1D texture.
+	D3D11_RESOURCE_DIMENSION_TEXTURE2D		= 3,	//!< Resource is a 2D texture.
+	D3D11_RESOURCE_DIMENSION_TEXTURE3D		= 4		//!< Resource is a 3D texture.
 };
 
 struct DDS_HEADER_DXT10 {
@@ -287,23 +305,29 @@ struct DDS_HEADER_DXT10 {
 };
 
 enum DDS_HEADER_DXT10_MISCFLAG {
-	// Indicates a 2D texture is a cube-map texture.
+	/** Indicates a 2D texture is a cube-map texture. */
 	DDS_RESOURCE_MISC_TEXTURECUBE		= 0x4
 };
 
 enum DDS_HEADER_DXT10_MISCFLAGS2 {
-	// Alpha channel content is unknown. This is the value for legacy files,
-	// which typically is assumed to be 'straight' alpha.
+	/**
+	 * Alpha channel content is unknown. This is the value for legacy files,
+	 * which typically is assumed to be 'straight' alpha.
+	*/
 	DDS_ALPHA_MODE_UNKNOWN				= 0x0,
-	// Any alpha channel content is presumed to use straight alpha.
+	/** Any alpha channel content is presumed to use straight alpha. */
 	DDS_ALPHA_MODE_STRAIGHT				= 0x1,
-	// Any alpha channel content is using premultiplied alpha.
-	// The only legacy file formats that indicate this information are 'DX2' and 'DX4'.
+	/**
+	 * Any alpha channel content is using premultiplied alpha.
+	 * The only legacy file formats that indicate this information are 'DX2' and 'DX4'.
+	*/
 	DDS_ALPHA_MODE_PREMULTIPLIED		= 0x2,
-	// Any alpha channel content is all set to fully opaque.
+	/** Any alpha channel content is all set to fully opaque. */
 	DDS_ALPHA_MODE_OPAQUE				= 0x3,
-	// Any alpha channel content is being used as a 4th channel and is not intended
-	// to represent transparency (straight or premultiplied).
+	/**
+	 * Any alpha channel content is being used as a 4th channel and is not intended
+	 * to represent transparency (straight or premultiplied).
+	*/
 	DDS_ALPHA_MODE_CUSTOM				= 0x4
 };
 
